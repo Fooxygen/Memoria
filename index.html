@@ -1,13 +1,114 @@
+<!--
+  Memoria
+  Copyright (c) 2026 BaseTUT.
+  Licensed under the MIT License.
+-->
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>memoria</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+<html lang="zh-CN">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>PrivaSearch</title>
+	<link rel="stylesheet" href="/src/style.css" />
+</head>
+
+<body>
+	<div class="app">
+		<div class="orb orb_one"></div>
+		<div class="orb orb_two"></div>
+
+		<aside class="sidebar pane">
+			<h1 class="app_title">PrivaSearch</h1>
+
+			<section class="import_block" aria-label="Import documents">
+				<div id="drop_zone" class="dropzone card">
+					<input type="file" id="file_input" class="visually_hidden" multiple
+						accept=".txt,.md,.json,.csv,.js,.py" />
+					<span class="dropzone_icon" aria-hidden="true"><i data-lucide="upload-cloud"></i></span>
+					<p class="dropzone_title">拖拽文件到此处 或 点击上传</p>
+					<p class="dropzone_hint">支持 TXT, MD, JSON, Code 等</p>
+				</div>
+
+				<button id="btn_load_sample" class="load_sample card" type="button">
+					<i data-lucide="sparkles" aria-hidden="true"></i>
+					<span>加载默认演示文档库</span>
+				</button>
+			</section>
+
+			<section class="library" aria-label="Document library">
+				<div class="library_head">
+					<span class="library_label">知识库列表 (<span id="doc_count">0</span>)</span>
+					<button id="btn_clear_docs" class="library_clear" type="button">清空</button>
+				</div>
+
+				<div id="doc_list" class="library_list" role="list"></div>
+			</section>
+
+			<footer class="engine card">
+				<span class="engine_dot" aria-hidden="true"></span>
+				<div class="engine_text">
+					<p class="engine_name">PrivaSearch Engine</p>
+					<p class="engine_version">v2.4.0 (Build 2026.09)</p>
+				</div>
+			</footer>
+		</aside>
+
+		<main class="workspace pane">
+			<header class="status card">
+				<span class="status_label">端侧计算状态</span>
+				<span id="stat_chunks" class="chip">切分切片: 0</span>
+				<span id="stat_latency" class="chip">匹配响应: 0 ms</span>
+			</header>
+
+			<section class="results" aria-label="Search results">
+				<div class="results_inner">
+					<div id="results_list" class="results_list" aria-live="polite">
+						<div id="initial_state" class="empty">
+							<span class="empty_icon card" aria-hidden="true"><i data-lucide="search-code"></i></span>
+							<p class="empty_title">探索您的私密知识库</p>
+							<p class="empty_hint">在下方输入框中用自然语言提问，即刻检索调取最相关的带出处的证据片段</p>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<footer class="searchdock">
+				<div class="searchbar">
+					<i data-lucide="search" class="searchbar_icon" aria-hidden="true"></i>
+					<input id="search_input" type="text" autocomplete="off"
+						placeholder="搜索知识库文档，例如：‘数据安全规范’、‘RAG 架构’ 或 ‘模型部署’..." />
+					<button id="btn_search" class="searchbtn" type="button">
+						<span>检索</span>
+						<i data-lucide="arrow-right" aria-hidden="true"></i>
+					</button>
+				</div>
+
+				<div class="dock_options">
+					<div class="field">
+						<label for="search_mode">检索模式</label>
+						<span class="select_wrap">
+							<select id="search_mode" class="select">
+								<option value="hybrid">混合检索 (Vector + BM25)</option>
+								<option value="semantic">纯语义向量 (Semantic)</option>
+								<option value="keyword">精确关键词 (BM25)</option>
+							</select>
+							<i data-lucide="chevron-down" aria-hidden="true"></i>
+						</span>
+					</div>
+
+					<div class="field">
+						<label for="top_k">Top-K 结果</label>
+						<input id="top_k" class="select select_numeric" type="number" min="1" max="20" value="4" />
+					</div>
+
+					<p class="dock_hint">快捷键 <kbd>Enter</kbd> 执行检索</p>
+				</div>
+			</footer>
+		</main>
+	</div>
+
+	<script type="module" src="/src/main.ts"></script>
+</body>
+
 </html>
