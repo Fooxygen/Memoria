@@ -496,7 +496,7 @@ select {
 	flex: 1;
 	min-height: 0;
 	overflow-y: auto;
-	padding: 24px 34px 12px;
+	padding: 20px 34px 160px;
 }
 
 .results_inner {
@@ -515,7 +515,7 @@ select {
 
 .empty {
 	text-align: center;
-	padding: 96px 20px;
+	padding: clamp(110px, 22vh, 320px) 20px 0;
 	font-weight: var(--text-faint-w);
 	color: var(--text-faint-c);
 }
@@ -627,11 +627,13 @@ select {
 }
 
 .searchdock {
-	max-width: 720px;
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	top: 74%;
+	z-index: 10;
 	width: calc(100% - 48px);
-	margin: 0 auto;
-	padding-bottom: 22px;
-	flex-shrink: 0;
+	max-width: 720px;
 }
 
 .searchbar {
@@ -726,7 +728,8 @@ select {
 	gap: 8px;
 }
 
-.field>label {
+.field > label,
+.field_label {
 	font-weight: var(--text-soft-w);
 	color: var(--text-soft-c);
 }
@@ -771,9 +774,61 @@ select {
 }
 
 .select_numeric {
-	width: 56px;
-	padding: 5px 8px 5px 12px;
+	width: 40px;
+	padding: 5px 6px;
 	text-align: center;
+	-webkit-appearance: none;
+	-moz-appearance: textfield;
+	appearance: textfield;
+}
+
+.select_numeric::-webkit-outer-spin-button,
+.select_numeric::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+.stepper {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.step_btn {
+	width: 20px;
+	height: 20px;
+	flex-shrink: 0;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border: var(--bd-w) solid var(--bd-c);
+	border-radius: 50%;
+	outline: none;
+	background: rgba(255, 255, 255, 0.35);
+	color: var(--text-soft-c);
+	font-size: 15px;
+	line-height: 1;
+	cursor: pointer;
+	box-shadow: var(--glass-specular);
+	-webkit-backdrop-filter: blur(20px);
+	backdrop-filter: blur(20px);
+	transition: var(--transition);
+	user-select: none;
+}
+
+.step_btn:hover {
+	background: rgba(255, 255, 255, 0.7);
+	border-color: var(--bd-c-hover);
+}
+
+.step_btn:active {
+	transform: scale(0.9);
+}
+
+.step_btn:disabled {
+	opacity: 0.4;
+	cursor: default;
+	transform: none;
 }
 
 .dock_hint {
@@ -838,6 +893,105 @@ mark.highlight_mark,
 
 ::-webkit-scrollbar-thumb:hover {
 	background: rgba(0, 0, 0, 0.22);
+}
+
+.dd_host {
+	display: inline-flex;
+}
+
+.dd {
+	position: relative;
+}
+
+.dd_trigger {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 5px 12px;
+	border: var(--bd-w) solid var(--bd-c);
+	border-radius: 14px;
+	outline: none;
+	background: rgba(255, 255, 255, 0.35);
+	color: var(--text-soft-c);
+	font-size: 12px;
+	font-weight: var(--text-soft-w);
+	cursor: pointer;
+	box-shadow: var(--glass-specular);
+	-webkit-backdrop-filter: blur(20px);
+	backdrop-filter: blur(20px);
+	transition: var(--transition);
+}
+
+.dd_trigger:hover {
+	background: rgba(255, 255, 255, 0.7);
+	border-color: var(--bd-c-hover);
+}
+
+.dd_value {
+	white-space: nowrap;
+}
+
+.dd_trigger [data-lucide="chevron-down"] {
+	width: 14px;
+	height: 14px;
+	color: var(--text-soft-c);
+	transition: transform 0.3s var(--ease-silk);
+}
+
+.dd.is_open .dd_trigger [data-lucide="chevron-down"] {
+	transform: rotate(180deg);
+}
+
+.dd_menu {
+	position: absolute;
+	top: calc(100% + 8px);
+	right: 0;
+	z-index: 20;
+	min-width: 100%;
+	margin: 0;
+	padding: 4px;
+	list-style: none;
+	background: rgba(255, 255, 255, 0.62);
+	-webkit-backdrop-filter: var(--blur-medium);
+	backdrop-filter: var(--blur-medium);
+	border: var(--bd-w) solid var(--bd-c);
+	border-radius: 14px;
+	box-shadow: var(--shadow-hover), var(--glass-specular);
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+	transform: translateY(-4px);
+	transition: opacity 0.22s var(--ease-silk), transform 0.26s var(--ease-silk),
+		visibility 0.26s;
+}
+
+.dd.is_open .dd_menu {
+	opacity: 1;
+	visibility: visible;
+	pointer-events: auto;
+	transform: translateY(0);
+}
+
+.dd_item {
+	position: relative;
+	padding: 7px 12px;
+	border-radius: 10px;
+	font-size: 12px;
+	font-weight: var(--text-soft-w);
+	color: var(--text-soft-c);
+	cursor: pointer;
+	white-space: nowrap;
+	transition: background 0.15s, color 0.15s;
+}
+
+.dd_item:hover {
+	background: rgba(255, 255, 255, 0.75);
+	color: var(--text-strong-c);
+}
+
+.dd_item.is_active {
+	color: var(--accent);
+	font-weight: var(--text-body-w);
 }
 
 @media (max-width: 1024px) {

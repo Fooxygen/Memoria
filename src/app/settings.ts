@@ -31,9 +31,9 @@ export interface SearchModeOption {
 }
 
 export const SEARCH_MODES: SearchModeOption[] = [
-    { value: "hybrid", label: "混合检索 (Vector + BM25)" },
-    { value: "semantic", label: "纯语义向量 (Semantic)" },
-    { value: "keyword", label: "精确关键词 (BM25)" },
+    { value: "hybrid", label: "混合检索" },
+    { value: "semantic", label: "向量检索" },
+    { value: "keyword", label: "全文检索" },
 ];
 
 export const SEARCH_DEFAULTS = {

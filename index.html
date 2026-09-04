@@ -97,19 +97,18 @@
 
 				<div class="dock_options">
 					<div class="field">
-						<label for="search_mode">检索模式</label>
-						<span class="select_wrap">
-							<select id="search_mode" class="select"></select>
-							<i data-lucide="chevron-down" aria-hidden="true"></i>
-						</span>
+						<span class="field_label">检索方式</span>
+						<div id="search_mode_dd" class="dd_host"></div>
 					</div>
 
 					<div class="field">
 						<label for="top_k">Top-K 结果</label>
-						<input id="top_k" class="select select_numeric" type="number" />
+						<div class="stepper">
+							<button id="top_k_dec" class="step_btn" type="button" aria-label="减少 Top-K 值">−</button>
+							<input id="top_k" class="select select_numeric" type="number" inputmode="numeric" min="1" max="20" />
+							<button id="top_k_inc" class="step_btn" type="button" aria-label="增加 Top-K 值">+</button>
+						</div>
 					</div>
-
-					<p class="dock_hint">快捷键 <kbd>Enter</kbd> 执行检索</p>
 				</div>
 			</footer>
 		</main>

@@ -7,6 +7,7 @@ import type { ResultHit, SourceDoc, TextChunk } from "./app/types";
 import { SAMPLE_DOCS } from "./app/samples";
 import { text_chunk_document } from "./app/text";
 import { score_chunk } from "./app/scoring";
+import { dropdown_create } from "./app/dropdown";
 import {
     render_lib_empty,
     render_lib_items,
@@ -36,8 +37,10 @@ const doc_list = by_id("doc_list");
 const doc_count = by_id("doc_count");
 const search_input = by_id<HTMLInputElement>("search_input");
 const btn_search = by_id("btn_search");
-const search_mode = by_id<HTMLSelectElement>("search_mode");
+const search_mode_dd = by_id("search_mode_dd");
 const top_k_input = by_id<HTMLInputElement>("top_k");
+const top_k_dec = by_id<HTMLButtonElement>("top_k_dec");
+const top_k_inc = by_id<HTMLButtonElement>("top_k_inc");
 const results_list = by_id("results_list");
 const initial_state = by_id("initial_state");
 const stat_chunks = by_id("stat_chunks");
@@ -50,6 +53,7 @@ const rt_quant = by_id("rt_quant");
 
 let documents: SourceDoc[] = [];
 let chunks: TextChunk[] = [];
+let search_mode_value: SearchMode = SEARCH_DEFAULTS.mode;
 
 function process_documents(): void {
     chunks = documents.flatMap((doc) => text_chunk_document(doc));
@@ -75,10 +79,9 @@ function fill_runtime(): void {
 }
 
 function fill_search_settings(): void {
-    search_mode.innerHTML = SEARCH_MODES.map(
-        (m) => `<option value="${m.value}">${m.label}</option>`,
-    ).join("");
-    search_mode.value = SEARCH_DEFAULTS.mode;
+    dropdown_create<SearchMode>(search_mode_dd, SEARCH_MODES, SEARCH_DEFAULTS.mode, (value) => {
+        search_mode_value = value;
+    });
     top_k_input.min = String(SEARCH_DEFAULTS.top_k_min);
     top_k_input.max = String(SEARCH_DEFAULTS.top_k_max);
     top_k_input.value = String(SEARCH_DEFAULTS.top_k);
@@ -94,7 +97,7 @@ function execute_search(): void {
     }
 
     const start = performance.now();
-    const mode = search_mode.value as SearchMode;
+    const mode = search_mode_value;
     const top_k = Math.min(Math.max(parseInt(top_k_input.value, 10) || 4, 1), 20);
 
     const hits: ResultHit[] = chunks
@@ -164,6 +167,29 @@ btn_clear_docs.addEventListener("click", () => {
 
 btn_search.addEventListener("click", execute_search);
 
+function read_top_k(): number {
+    return Math.min(
+        SEARCH_DEFAULTS.top_k_max,
+        Math.max(SEARCH_DEFAULTS.top_k_min, parseInt(top_k_input.value, 10) || SEARCH_DEFAULTS.top_k),
+    );
+}
+
+function sync_step_state(): void {
+    const value = read_top_k();
+    top_k_dec.disabled = value <= SEARCH_DEFAULTS.top_k_min;
+    top_k_inc.disabled = value >= SEARCH_DEFAULTS.top_k_max;
+}
+
+function apply_top_k(value: number): void {
+    top_k_input.value = String(value);
+    sync_step_state();
+}
+
+top_k_dec.addEventListener("click", () => apply_top_k(read_top_k() - 1));
+top_k_inc.addEventListener("click", () => apply_top_k(read_top_k() + 1));
+top_k_input.addEventListener("input", sync_step_state);
+top_k_input.addEventListener("change", () => apply_top_k(read_top_k()));
+
 search_input.addEventListener("keydown", (event) => {
     if (event.key === "Enter") execute_search();
 });
@@ -171,6 +197,7 @@ search_input.addEventListener("keydown", (event) => {
 refresh_icons();
 fill_runtime();
 fill_search_settings();
+sync_step_state();
 documents = [...SAMPLE_DOCS];
 process_documents();
 show_initial_state();
