@@ -64,13 +64,38 @@ let chunks: TextChunk[] = [];
 let search_mode_value: SearchMode = SEARCH_DEFAULTS.mode;
 const opened_docs = new Set<string>();
 
+function mount_docs_waterfall(html: string, empty_html: string): void {
+    if (!html.trim()) {
+        doc_list.innerHTML = empty_html;
+        return;
+    }
+    const host = document.createElement("div");
+    host.innerHTML = html;
+    const cards = Array.from(host.children) as HTMLElement[];
+
+    const col_a = document.createElement("div");
+    col_a.className = "doc_waterfall_col";
+    const col_b = document.createElement("div");
+    col_b.className = "doc_waterfall_col";
+    doc_list.innerHTML = "";
+    doc_list.append(col_a, col_b);
+
+    cards.forEach((card, index) => {
+        if (index % 2 === 0) col_a.appendChild(card);
+        else col_b.appendChild(card);
+    });
+}
+
 function process_documents(): void {
     chunks = documents.flatMap((doc) => text_chunk_document(doc));
 
     doc_count.textContent = String(documents.length);
     stat_chunks.textContent = `切分切片: ${chunks.length}`;
 
-    doc_list.innerHTML = documents.length === 0 ? render_lib_empty() : render_lib_items(documents, chunks);
+    mount_docs_waterfall(
+        documents.length === 0 ? "" : render_lib_items(documents, chunks),
+        render_lib_empty(),
+    );
     btn_clear_docs.hidden = documents.length === 0;
     refresh_icons();
 }

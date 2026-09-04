@@ -1194,15 +1194,37 @@ mark.highlight_mark,
 	padding: 2px 2px 6px;
 }
 
+.doc_waterfall {
+	flex: 1;
+	min-width: 0;
+	width: 100%;
+	min-height: 0;
+	overflow-y: auto;
+	overflow-x: hidden;
+	display: flex;
+	gap: 12px;
+	padding: 2px 2px 6px;
+	overscroll-behavior: contain;
+}
+
+.doc_waterfall_col {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+}
+
 .doc_card {
 	position: relative;
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
 	gap: 8px;
+	min-width: 0;
+	flex-shrink: 0;
 	break-inside: avoid;
 	margin-bottom: 12px;
-	padding: 25% 14px 14px;
+	padding: 14px;
 	cursor: pointer;
 	overflow: hidden;
 	text-align: left;
@@ -1235,9 +1257,6 @@ mark.highlight_mark,
 }
 
 .doc_card_meta {
-	position: absolute;
-	top: 14px;
-	left: 14px;
 	font-size: 9px;
 	font-family: var(--mono);
 	font-weight: var(--text-soft-w);
@@ -1268,12 +1287,23 @@ mark.highlight_mark,
 	overflow: hidden;
 }
 
+.doc_card_head {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+	min-width: 0;
+}
+
+.doc_card_head .doc_card_title {
+	flex: 1;
+	min-width: 0;
+}
+
 .doc_card_status {
-	position: absolute;
-	top: 14px;
-	left: 14px;
 	width: 10px;
 	height: 10px;
+	flex-shrink: 0;
 	border-radius: 50%;
 	background: var(--text-faint-c);
 }

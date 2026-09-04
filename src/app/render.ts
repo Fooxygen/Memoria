@@ -54,8 +54,10 @@ export function render_queue_cards(items: QueueCardItem[]): string {
             const label = it.status === "run" ? "终止任务" : "清除记录";
             return `
                 <article class="doc_card card ${status_class}" role="listitem" data-key="${text_escape_html(it.title)}">
-                    <span class="doc_card_status" aria-hidden="true"></span>
-                    <h3 class="doc_card_title" title="${text_escape_html(it.title)}">${text_escape_html(it.title)}</h3>
+                    <div class="doc_card_head">
+                        <span class="doc_card_status" aria-hidden="true"></span>
+                        <h3 class="doc_card_title" title="${text_escape_html(it.title)}">${text_escape_html(it.title)}</h3>
+                    </div>
                     <button class="doc_card_action" type="button" title="${label}" aria-label="${label}">
                         <i data-lucide="${icon}"></i>
                     </button>
