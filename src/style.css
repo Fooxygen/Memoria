@@ -1189,9 +1189,10 @@ mark.highlight_mark,
 	flex: 1;
 	min-height: 0;
 	overflow-y: auto;
+	overflow-x: hidden;
 	column-count: 2;
 	column-gap: 12px;
-	padding: 2px 2px 6px;
+	padding: 18px 0 26px;
 }
 
 .doc_waterfall {
@@ -1203,7 +1204,7 @@ mark.highlight_mark,
 	overflow-x: hidden;
 	display: flex;
 	gap: 12px;
-	padding: 2px 2px 6px;
+	padding: 18px 0 26px;
 	overscroll-behavior: contain;
 }
 
@@ -1229,19 +1230,22 @@ mark.highlight_mark,
 	overflow: hidden;
 	text-align: left;
 	border-radius: 22px;
+	box-shadow: 0 10px 22px -8px rgba(0, 0, 0, 0.1),
+		0 2px 6px -2px rgba(0, 0, 0, 0.04), var(--glass-specular);
 	transition: var(--transition);
 }
 
 .doc_card:hover {
 	border-color: var(--bd-c-hover);
-	box-shadow: var(--shadow-hover), var(--glass-specular);
+	box-shadow: 0 18px 34px -12px rgba(0, 0, 0, 0.12),
+		0 3px 10px -4px rgba(0, 0, 0, 0.05), var(--glass-specular);
 }
 
 .doc_card.is_open,
 .doc_card.is_open:hover {
 	background: var(--state-open-bg);
 	border-color: var(--state-open-border);
-	box-shadow: var(--shadow-hover), var(--glass-specular), 0 0 20px rgba(111, 140, 240, 0.45);
+	box-shadow: 0 12px 26px -10px rgba(111, 140, 240, 0.45), var(--glass-specular);
 }
 
 .doc_card.is_open .doc_card_meta {
