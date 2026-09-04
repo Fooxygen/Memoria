@@ -4,8 +4,10 @@
 //  Licensed under the MIT License.
 
 export interface DocumentMeta {
-    id:    string;
+    id: string;
     title: string;
+    preview: string;
+    chunk_count: number;
 }
 
 /**

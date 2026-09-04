@@ -3,21 +3,23 @@
 // Copyright (c) 2026 BaseTUT.
 // Licensed under the MIT License.
 
-import type { ResultHit, SourceDoc, TextChunk } from "./types";
+import type { ResultHit } from "./types";
 import { text_escape_html, text_highlight } from "./text";
 
-export function render_lib_items(docs: SourceDoc[], chunks: TextChunk[]): string {
+export interface LibDoc {
+    title: string;
+    preview: string;
+    chunk_count: number;
+}
+
+export function render_lib_items(docs: LibDoc[]): string {
     return docs
         .map((doc) => {
-            const count = chunks.filter((c) => c.doc_title === doc.title).length;
-            const trimmed = doc.content.trim().replace(/\s+/g, " ");
-            const preview = trimmed.slice(0, 120);
-            const overflow = trimmed.length > 120 ? "…" : "";
             return `
                 <article class="doc_card card" role="listitem" data-key="${text_escape_html(doc.title)}">
-                    <div class="doc_card_meta">${count} 切片</div>
+                    <div class="doc_card_meta">${doc.chunk_count} 切片</div>
                     <h3 class="doc_card_title" title="${text_escape_html(doc.title)}">${text_escape_html(doc.title)}</h3>
-                    <p class="doc_card_desc">${text_escape_html(preview)}${overflow}</p>
+                    <p class="doc_card_desc">${text_escape_html(doc.preview ?? "")}</p>
                 </article>`;
         })
         .join("");

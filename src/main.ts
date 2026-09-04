@@ -3,11 +3,12 @@
 // Copyright (c) 2026 BaseTUT.
 // Licensed under the MIT License.
 
-import type { ResultHit, SourceDoc, TextChunk } from "./app/types";
+import type { ResultHit, TextChunk } from "./app/types";
 import { SAMPLE_DOCS } from "./app/samples";
 import { text_chunk_document } from "./app/text";
 import { score_chunk } from "./app/scoring";
 import { dropdown_create } from "./app/dropdown";
+import { create_embedder, type Embedder } from "./app/embed";
 import {
     render_lib_empty,
     render_lib_items,
@@ -15,6 +16,7 @@ import {
     render_result_card,
     render_result_empty,
     render_toast,
+    type LibDoc,
     type QueueCardItem,
 } from "./app/render";
 import { refresh_icons } from "./app/icons";
@@ -59,14 +61,20 @@ const rt_backend = by_id("rt_backend");
 const rt_backend_badge = by_id("rt_backend_badge");
 const rt_quant = by_id("rt_quant");
 
-let documents: SourceDoc[] = [];
 let chunks: TextChunk[] = [];
 let search_mode_value: SearchMode = SEARCH_DEFAULTS.mode;
 const opened_docs = new Set<string>();
 
-function mount_docs_waterfall(html: string, empty_html: string): void {
+let embedder: Embedder | null = null;
+let ingest_queue: File[] = [];
+let ingest_busy = false;
+
+const SEARCH_CHUNKS: TextChunk[] = SAMPLE_DOCS.flatMap((doc) => text_chunk_document(doc));
+chunks = SEARCH_CHUNKS;
+
+function mount_waterfall(container: HTMLElement, html: string, empty_html: string): void {
     if (!html.trim()) {
-        doc_list.innerHTML = empty_html;
+        container.innerHTML = empty_html;
         return;
     }
     const host = document.createElement("div");
@@ -77,8 +85,8 @@ function mount_docs_waterfall(html: string, empty_html: string): void {
     col_a.className = "doc_waterfall_col";
     const col_b = document.createElement("div");
     col_b.className = "doc_waterfall_col";
-    doc_list.innerHTML = "";
-    doc_list.append(col_a, col_b);
+    container.innerHTML = "";
+    container.append(col_a, col_b);
 
     cards.forEach((card, index) => {
         if (index % 2 === 0) col_a.appendChild(card);
@@ -86,18 +94,106 @@ function mount_docs_waterfall(html: string, empty_html: string): void {
     });
 }
 
-function process_documents(): void {
-    chunks = documents.flatMap((doc) => text_chunk_document(doc));
+async function post_json(url: string, payload: unknown): Promise<unknown> {
+    const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error(`request failed ${res.status}`);
+    return res.json();
+}
 
-    doc_count.textContent = String(documents.length);
-    stat_chunks.textContent = `切分切片: ${chunks.length}`;
+async function fetch_documents(): Promise<LibDoc[]> {
+    const res = await fetch("/api/documents");
+    if (!res.ok) throw new Error(`request failed ${res.status}`);
+    const data = (await res.json()) as { documents: LibDoc[] };
+    return data.documents ?? [];
+}
 
-    mount_docs_waterfall(
-        documents.length === 0 ? "" : render_lib_items(documents, chunks),
-        render_lib_empty(),
-    );
-    btn_clear_docs.hidden = documents.length === 0;
+async function refresh_documents(): Promise<void> {
+    let docs: LibDoc[] = [];
+    try {
+        docs = await fetch_documents();
+    } catch (error) {
+        render_toast(`无法加载知识库：${String(error)}`);
+    }
+
+    doc_count.textContent = String(docs.length);
+    stat_chunks.textContent = `切分切片: ${docs.reduce((sum, d) => sum + d.chunk_count, 0)}`;
+
+    mount_waterfall(doc_list, docs.length === 0 ? "" : render_lib_items(docs), render_lib_empty());
+    btn_clear_docs.hidden = docs.length === 0;
     refresh_icons();
+}
+
+async function get_embedder(): Promise<Embedder> {
+    if (!embedder) {
+        embedder = await create_embedder();
+        const info = embedder.info();
+        update_runtime({
+            ...RUNTIME_INFO,
+            source: "HuggingFace · Transformers.js",
+            dimension: info.dimension,
+            backend: info.backend,
+            ready: true,
+        });
+    }
+    return embedder;
+}
+
+function strip_extension(name: string): string {
+    return name.replace(/\.[^.]+$/, "");
+}
+
+async function process_file(file: File): Promise<void> {
+    const title = strip_extension(file.name);
+    const doc_id = `doc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    const text = await file.text();
+
+    const doc = { id: doc_id, title, content: text };
+    const chunk_docs = text_chunk_document(doc);
+
+    const embed = await get_embedder();
+    const vectors = await embed.encode(chunk_docs.map((c) => c.content));
+
+    const records = chunk_docs.map((c, i) => ({
+        id: `${doc_id}-c${i}`,
+        content: c.content,
+        embedding: vectors[i],
+        meta: { id_document: doc_id, idx_chunk: i },
+    }));
+
+    const preview = text.trim().replace(/\s+/g, " ").slice(0, 120);
+
+    await post_json("/api/ingest", {
+        doc: { id: doc_id, title, preview, chunk_count: records.length },
+        chunks: records,
+    });
+
+    render_toast(`已入库：【${title}】· ${records.length} 切片`);
+}
+
+async function run_ingest_loop(): Promise<void> {
+    while (ingest_queue.length > 0) {
+        const file = ingest_queue.shift();
+        if (!file) break;
+        try {
+            await process_file(file);
+        } catch (error) {
+            render_toast(`处理失败：${String(error)}`);
+        }
+    }
+    ingest_busy = false;
+    await refresh_documents();
+}
+
+function enqueue_files(files: File[]): void {
+    ingest_queue.push(...files);
+    if (!ingest_busy) {
+        ingest_busy = true;
+        void run_ingest_loop();
+    }
 }
 
 function show_initial_state(): void {
@@ -153,21 +249,7 @@ function execute_search(): void {
 
 function handle_files(file_list: FileList | null): void {
     if (!file_list || file_list.length === 0) return;
-
-    Array.from(file_list).forEach((file) => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const content = typeof event.target?.result === "string" ? event.target.result : "";
-            documents.push({
-                id: `doc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-                title: file.name,
-                content,
-            });
-            process_documents();
-            render_toast(`已成功将【${file.name}】解析切片存入本地知识库`);
-        };
-        reader.readAsText(file);
-    });
+    enqueue_files(Array.from(file_list));
 }
 
 drop_zone.addEventListener("click", () => file_input.click());
@@ -190,17 +272,17 @@ file_input.addEventListener("change", (event) => {
 });
 
 btn_load_sample.addEventListener("click", () => {
-    documents = [...SAMPLE_DOCS];
-    process_documents();
-    render_toast("已加载演示知识库，共导入 3 份规范文档！");
+    const files = SAMPLE_DOCS.map((d) => new File([d.content], d.title, { type: "text/plain" }));
+    enqueue_files(files);
+    render_toast("正在导入演示文档库…");
 });
 
 btn_clear_docs.addEventListener("click", () => {
-    documents = [];
-    chunks = [];
-    process_documents();
+    ingest_queue = [];
+    opened_docs.clear();
+    void refresh_documents();
     show_initial_state();
-    render_toast("知识库已清空");
+    render_toast("已重置界面（数据库持久保留，重新上传即可更新）");
 });
 
 btn_search.addEventListener("click", execute_search);
@@ -234,12 +316,7 @@ search_input.addEventListener("keydown", (event) => {
 
 type PageName = "docs" | "queue";
 
-let queue_items: QueueCardItem[] = [
-    { title: "入职手册 v3", status: "run" },
-    { title: "RAG 架构笔记", status: "wait" },
-    { title: "数据安全规范", status: "done" },
-    { title: "产品说明书 2026", status: "wait" },
-];
+let queue_items: QueueCardItem[] = [];
 
 const switch_entries = new Map<PageName, { btn: HTMLButtonElement; label: HTMLElement }>();
 
@@ -300,7 +377,11 @@ function build_page_switch(): void {
 }
 
 function fill_queue(): void {
-    queue_shelf.innerHTML = render_queue_cards(queue_items);
+    mount_waterfall(
+        queue_shelf,
+        queue_items.length ? render_queue_cards(queue_items) : "",
+        '<p class="doc_shelf_empty">处理队列为空</p>',
+    );
 }
 
 function sync_open_cards(): void {
@@ -343,9 +424,11 @@ fill_queue();
 bind_open(doc_list);
 bind_open(queue_shelf);
 refresh_icons();
-update_runtime();
+update_runtime({
+    ...RUNTIME_INFO,
+    backend: navigator.gpu ? "webgpu" : "wasm",
+});
 fill_search_settings();
 sync_step_state();
-documents = [...SAMPLE_DOCS];
-process_documents();
 show_initial_state();
+void refresh_documents();

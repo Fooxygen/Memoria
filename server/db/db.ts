@@ -14,7 +14,7 @@ import {
 import type {
     ChunkRecord,
     DocumentMeta
-} from "./meta"
+} from "./meta.ts"
 
 // Database
 
@@ -120,7 +120,9 @@ export async function documents_create() {
     await cl.execute(`
         create table if not exists ${TABLE_DOCUMENTS} (
             id    varchar(255) primary key,
-            title varchar(255)
+            title varchar(255),
+            preview text,
+            chunk_count int
         )    
     `);
 }
@@ -129,8 +131,8 @@ export async function documents_add(meta: DocumentMeta) {
     const cl = await db_client_get();
     await documents_create();
     await cl.execute(`
-        insert into ${TABLE_DOCUMENTS} values (?, ?)    
-    `, [meta.id, meta.title]);
+        insert into ${TABLE_DOCUMENTS} values (?, ?, ?, ?)    
+    `, [meta.id, meta.title, meta.preview, meta.chunk_count]);
 }
 
 export async function documents_list() : Promise<DocumentMeta[]> {
@@ -138,11 +140,13 @@ export async function documents_list() : Promise<DocumentMeta[]> {
     await documents_create();
     
     const rows = await cl.execute(`
-        select * from ${TABLE_DOCUMENTS}    
+        select id, title, preview, chunk_count from ${TABLE_DOCUMENTS}    
     `)  as Record<string, unknown>[] | null;
     if (!rows) return [];
     return rows.map(r => ({
-        id:    String(r.id),
-        title: String(r.title)
+        id:           String(r.id),
+        title:        String(r.title),
+        preview:      String(r.preview ?? ""),
+        chunk_count:  Number(r.chunk_count ?? 0),
     }));
 }
