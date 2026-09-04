@@ -20,6 +20,7 @@ import {
     RUNTIME_INFO,
     SEARCH_DEFAULTS,
     SEARCH_MODES,
+    type RuntimeInfo,
     type SearchMode,
 } from "./app/settings";
 
@@ -49,6 +50,7 @@ const rt_model = by_id("rt_model");
 const rt_source = by_id("rt_source");
 const rt_dim = by_id("rt_dim");
 const rt_backend = by_id("rt_backend");
+const rt_backend_badge = by_id("rt_backend_badge");
 const rt_quant = by_id("rt_quant");
 
 let documents: SourceDoc[] = [];
@@ -70,12 +72,16 @@ function show_initial_state(): void {
     results_list.replaceChildren(initial_state);
 }
 
-function fill_runtime(): void {
-    rt_model.textContent = RUNTIME_INFO.model_name;
-    rt_source.textContent = RUNTIME_INFO.source;
-    rt_dim.textContent = `${RUNTIME_INFO.dimension} 维`;
-    rt_backend.textContent = RUNTIME_INFO.backend;
-    rt_quant.textContent = RUNTIME_INFO.quant;
+function update_runtime(info: RuntimeInfo = RUNTIME_INFO): void {
+    rt_model.textContent = info.model_name;
+    rt_source.textContent = info.source;
+    rt_dim.textContent = `${info.dimension} 维`;
+    rt_quant.textContent = info.quant;
+
+    const backend_label = info.backend === "webgpu" ? "WebGPU" : "WASM";
+    rt_backend.textContent = backend_label;
+    rt_backend_badge.classList.toggle("is_webgpu", info.backend === "webgpu");
+    rt_backend_badge.classList.toggle("is_wasm", info.backend === "wasm");
 }
 
 function fill_search_settings(): void {
@@ -195,7 +201,7 @@ search_input.addEventListener("keydown", (event) => {
 });
 
 refresh_icons();
-fill_runtime();
+update_runtime();
 fill_search_settings();
 sync_step_state();
 documents = [...SAMPLE_DOCS];

@@ -20,6 +20,15 @@
 	--mark-bg: rgba(255, 230, 0, 0.38);
 	--mark-border: #e6b800;
 
+	--state-gpu-bg: #1a7f37;
+	--state-gpu-border: #0f5d26;
+	--state-gpu-label: #a9e0b8;
+	--state-gpu-val: #ecfff1;
+	--state-cpu-bg: #d4a72c;
+	--state-cpu-border: #9a6a14;
+	--state-cpu-label: #f6ecc9;
+	--state-cpu-val: #fffdf0;
+
 	/* Text scale: darker -> heavier, lighter -> thinner (regular..bold). */
 	--text-strong-c: var(--ink-900);
 	--text-strong-w: 700;
@@ -458,6 +467,44 @@ select {
 	font-size: 11px;
 	font-weight: var(--text-body-w);
 	color: var(--text-body-c);
+}
+
+#rt_backend_badge {
+	border-radius: 999px;
+	padding: 4px 12px;
+	gap: 8px;
+	border: var(--bd-w) solid transparent;
+}
+
+#rt_backend_badge .runtime_badge_val {
+	font-size: 12px;
+	font-weight: 700;
+}
+
+#rt_backend_badge.is_webgpu {
+	background: var(--state-gpu-bg);
+	border-color: var(--state-gpu-label);
+}
+
+#rt_backend_badge.is_webgpu .runtime_badge_label {
+	color: var(--state-gpu-label);
+}
+
+#rt_backend_badge.is_webgpu .runtime_badge_val {
+	color: var(--state-gpu-val);
+}
+
+#rt_backend_badge.is_wasm {
+	background: var(--state-cpu-bg);
+	border-color: var(--state-cpu-label);
+}
+
+#rt_backend_badge.is_wasm .runtime_badge_label {
+	color: var(--state-cpu-label);
+}
+
+#rt_backend_badge.is_wasm .runtime_badge_val {
+	color: var(--state-cpu-val);
 }
 
 .workspace {
