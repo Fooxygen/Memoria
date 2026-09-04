@@ -20,8 +20,6 @@
 	--glass-window-bg: rgba(255, 255, 255, 0.26);
 	--glass-card-bg: rgba(255, 255, 255, 0.28);
 	--glass-card-hover: rgba(255, 255, 255, 0.58);
-	--glass-window-border: rgba(255, 255, 255, 0.4);
-	--glass-line: rgba(255, 255, 255, 0.45);
 
 	--glass-specular: inset 0 1px 1px 0 rgba(255, 255, 255, 0.7),
 		inset 0 -1px 1px 0 rgba(255, 255, 255, 0.2),
@@ -42,6 +40,11 @@
 	--font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
 		"Segoe UI", Roboto, "Inter", sans-serif;
 	--mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+
+	--bd-w: 0.5px;
+	--bd-c: rgba(255, 255, 255, 0.5);
+	--bd-c-hover: rgba(255, 255, 255, 0.95);
+	--divider: rgba(0, 0, 0, 0.08);
 
 	--ease-silk: cubic-bezier(0.16, 1, 0.3, 1);
 	--transition: all 0.55s var(--ease-silk);
@@ -102,7 +105,7 @@ select {
 	background: var(--glass-window-bg);
 	-webkit-backdrop-filter: var(--blur-deep);
 	backdrop-filter: var(--blur-deep);
-	border: 0.5px solid var(--glass-window-border);
+	border: var(--bd-w) solid var(--bd-c);
 	border-radius: var(--radius-pane);
 	box-shadow: 0 20px 60px -15px rgba(0, 0, 0, 0.05), var(--glass-specular);
 }
@@ -164,7 +167,7 @@ select {
 	background: var(--glass-card-bg);
 	-webkit-backdrop-filter: var(--blur-medium);
 	backdrop-filter: var(--blur-medium);
-	border: 0.5px solid var(--glass-line);
+	border: var(--bd-w) solid var(--bd-c);
 	border-radius: var(--radius-card);
 	box-shadow: var(--shadow-subtle), var(--glass-specular);
 	transition: var(--transition);
@@ -173,7 +176,7 @@ select {
 .card:hover,
 .card:focus-within {
 	background: var(--glass-card-hover);
-	border-color: rgba(255, 255, 255, 0.85);
+	border-color: var(--bd-c-hover);
 	box-shadow: var(--shadow-hover), var(--glass-specular),
 		0 0 20px rgba(255, 255, 255, 0.4);
 }
@@ -445,7 +448,7 @@ select {
 	font-size: 12px;
 	color: var(--ink-700);
 	background: rgba(255, 255, 255, 0.4);
-	border: 0.5px solid rgba(255, 255, 255, 0.6);
+	border: var(--bd-w) solid var(--bd-c);
 	padding: 3px 10px;
 	border-radius: 999px;
 	font-weight: 500;
@@ -516,7 +519,7 @@ select {
 	gap: 12px;
 	padding-bottom: 12px;
 	margin-bottom: 12px;
-	border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+	border-bottom: var(--bd-w) solid var(--divider);
 }
 
 .result_card_source {
@@ -600,7 +603,7 @@ select {
 	background: rgba(255, 255, 255, 0.38);
 	-webkit-backdrop-filter: blur(40px) saturate(220%);
 	backdrop-filter: blur(40px) saturate(220%);
-	border: 0.5px solid rgba(255, 255, 255, 0.55);
+	border: var(--bd-w) solid var(--bd-c);
 	border-radius: var(--radius-search);
 	box-shadow: var(--shadow-subtle), var(--glass-specular);
 	transition: var(--transition);
@@ -609,7 +612,7 @@ select {
 .searchbar:hover,
 .searchbar:focus-within {
 	background: rgba(255, 255, 255, 0.68);
-	border-color: rgba(255, 255, 255, 0.95);
+	border-color: var(--bd-c-hover);
 	box-shadow: var(--shadow-hover), var(--glass-specular), 0 0 25px rgba(255, 255, 255, 0.5);
 }
 
@@ -642,7 +645,7 @@ select {
 	gap: 8px;
 	flex-shrink: 0;
 	padding: 10px 20px;
-	border: 0.5px solid rgba(255, 255, 255, 0.65);
+	border: var(--bd-w) solid var(--bd-c);
 	border-radius: 18px;
 	background: rgba(255, 255, 255, 0.52);
 	color: var(--ink-900);
@@ -656,7 +659,7 @@ select {
 
 .searchbtn:hover {
 	background: rgba(255, 255, 255, 0.92);
-	border-color: #fff;
+	border-color: var(--bd-c-hover);
 	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08), var(--glass-specular);
 }
 
@@ -705,7 +708,7 @@ select {
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	appearance: none;
-	border: 0.5px solid rgba(255, 255, 255, 0.5);
+	border: var(--bd-w) solid var(--bd-c);
 	outline: none;
 	background: rgba(255, 255, 255, 0.35);
 	color: var(--ink-600);
@@ -722,7 +725,7 @@ select {
 
 .select:hover {
 	background: rgba(255, 255, 255, 0.7);
-	border-color: rgba(255, 255, 255, 0.9);
+	border-color: var(--bd-c-hover);
 }
 
 .select_numeric {
@@ -739,7 +742,7 @@ select {
 kbd {
 	font-family: var(--mono);
 	background: rgba(255, 255, 255, 0.6);
-	border: 1px solid rgba(255, 255, 255, 0.8);
+	border: var(--bd-w) solid var(--bd-c);
 	border-radius: 6px;
 	padding: 1px 6px;
 	color: var(--ink-600);
@@ -761,7 +764,7 @@ mark.highlight_mark,
 	bottom: 28px;
 	z-index: 50;
 	padding: 10px 16px;
-	border: 0.5px solid rgba(255, 255, 255, 0.8);
+	border: var(--bd-w) solid var(--bd-c);
 	color: var(--ink-800);
 	font-size: 12px;
 	box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.2), var(--glass-specular);
