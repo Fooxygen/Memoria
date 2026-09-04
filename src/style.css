@@ -5,17 +5,30 @@
 */
 
 :root {
-	--bg-color:		#e6ebf3;
-	--ink-900: 		#0f172a;
-	--ink-800: 		#1e293b;
-	--ink-700: 		#334155;
-	--ink-600: 		#475569;
-	--ink-500: 		#64748b;
-	--ink-400: 		#94a3b8;
-	--accent: 		#2563eb;
-	--accent-soft: 	#eff6ff;
-	--mark-bg: 		rgba(255, 230, 0, 0.38);
-	--mark-border: 	#e6b800;
+	--bg-color: #e6ebf3;
+
+	/* Ink palette (kept as raw colors for reference). */
+	--ink-900: #0f172a;
+	--ink-800: #1e293b;
+	--ink-700: #334155;
+	--ink-600: #475569;
+	--ink-500: #64748b;
+	--ink-400: #94a3b8;
+
+	--accent: #2563eb;
+	--accent-soft: #eff6ff;
+	--mark-bg: rgba(255, 230, 0, 0.38);
+	--mark-border: #e6b800;
+
+	/* Text scale: darker -> heavier, lighter -> thinner (regular..bold). */
+	--text-strong-c: var(--ink-900);
+	--text-strong-w: 700;
+	--text-body-c: var(--ink-700);
+	--text-body-w: 600;
+	--text-soft-c: var(--ink-500);
+	--text-soft-w: 500;
+	--text-faint-c: var(--ink-400);
+	--text-faint-w: 400;
 
 	--glass-window-bg: rgba(255, 255, 255, 0.26);
 	--glass-card-bg: rgba(255, 255, 255, 0.28);
@@ -37,14 +50,14 @@
 	--radius-card: 20px;
 	--radius-search: 24px;
 
-	--font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
-		"Segoe UI", Roboto, "Inter", sans-serif;
-	--mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
-
 	--bd-w: 0.5px;
 	--bd-c: rgba(255, 255, 255, 0.5);
 	--bd-c-hover: rgba(255, 255, 255, 0.95);
 	--divider: rgba(0, 0, 0, 0.08);
+
+	--font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+		"Segoe UI", Roboto, "Inter", sans-serif;
+	--mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
 
 	--ease-silk: cubic-bezier(0.16, 1, 0.3, 1);
 	--transition: all 0.55s var(--ease-silk);
@@ -62,7 +75,7 @@ body {
 
 body {
 	background: var(--bg-color);
-	color: var(--ink-800);
+	color: var(--text-body-c);
 	font-family: var(--font-sans);
 	font-size: 14px;
 	overflow: hidden;
@@ -191,9 +204,9 @@ select {
 
 .app_title {
 	font-size: 19px;
-	font-weight: 700;
+	font-weight: var(--text-strong-w);
 	letter-spacing: -0.02em;
-	color: var(--ink-900);
+	color: var(--text-strong-c);
 	padding: 2px 4px 10px;
 }
 
@@ -234,13 +247,14 @@ select {
 
 .dropzone_title {
 	font-size: 12px;
-	font-weight: 600;
-	color: var(--ink-700);
+	font-weight: var(--text-body-w);
+	color: var(--text-body-c);
 }
 
 .dropzone_hint {
 	font-size: 10px;
-	color: var(--ink-400);
+	font-weight: var(--text-faint-w);
+	color: var(--text-faint-c);
 	margin-top: 2px;
 }
 
@@ -252,8 +266,8 @@ select {
 	width: 100%;
 	padding: 9px 10px;
 	font-size: 12px;
-	font-weight: 600;
-	color: var(--ink-700);
+	font-weight: var(--text-body-w);
+	color: var(--text-body-c);
 	cursor: pointer;
 }
 
@@ -282,17 +296,18 @@ select {
 
 .library_label {
 	font-size: 11px;
-	font-weight: 600;
+	font-weight: var(--text-faint-w);
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
-	color: var(--ink-400);
+	color: var(--text-faint-c);
 }
 
 .library_clear {
 	border: none;
 	background: none;
 	font-size: 11px;
-	color: var(--ink-400);
+	font-weight: var(--text-faint-w);
+	color: var(--text-faint-c);
 	transition: color 0.2s;
 }
 
@@ -333,8 +348,8 @@ select {
 
 .lib_item_name {
 	font-size: 12px;
-	font-weight: 500;
-	color: var(--ink-700);
+	font-weight: var(--text-body-w);
+	color: var(--text-body-c);
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -344,7 +359,8 @@ select {
 	flex-shrink: 0;
 	font-size: 10px;
 	font-family: var(--mono);
-	color: var(--ink-500);
+	font-weight: var(--text-soft-w);
+	color: var(--text-soft-c);
 	background: rgba(255, 255, 255, 0.5);
 	padding: 2px 8px;
 	border-radius: 999px;
@@ -353,7 +369,8 @@ select {
 .lib_empty {
 	text-align: center;
 	padding: 26px 12px;
-	color: var(--ink-400);
+	font-weight: var(--text-faint-w);
+	color: var(--text-faint-c);
 }
 
 .lib_empty [data-lucide="folder-open"] {
@@ -367,60 +384,80 @@ select {
 	font-size: 12px;
 }
 
-.engine {
+.runtime {
 	display: flex;
-	align-items: center;
+	flex-direction: column;
 	gap: 8px;
-	padding: 10px 12px;
+	padding: 18px 14px;
 	margin-top: auto;
 }
 
-.engine_dot {
-	position: relative;
-	width: 8px;
-	height: 8px;
-	flex-shrink: 0;
+.runtime_model {
+	font-size: 16px;
+	font-weight: var(--text-strong-w);
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	color: var(--text-strong-c);
+	word-break: break-word;
 }
 
-.engine_dot::before {
-	content: "";
-	position: absolute;
-	inset: 0;
-	border-radius: 50%;
-	background: #10b981;
-}
-
-.engine_dot::after {
-	content: "";
-	position: absolute;
-	inset: 0;
-	border-radius: 50%;
-	background: rgba(16, 185, 129, 0.6);
-	animation: enginePing 1.4s var(--ease-silk) infinite;
-}
-
-@keyframes enginePing {
-	0% {
-		transform: scale(1);
-		opacity: 0.7;
-	}
-
-	100% {
-		transform: scale(2.4);
-		opacity: 0;
-	}
-}
-
-.engine_name {
+.runtime_meta {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px;
 	font-size: 12px;
-	font-weight: 600;
-	color: var(--ink-800);
+	font-weight: var(--text-soft-w);
+	color: var(--text-soft-c);
 }
 
-.engine_version {
-	font-size: 10px;
+.runtime_source {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.runtime_sep {
+	width: 4px;
+	height: 4px;
+	flex-shrink: 0;
+	border-radius: 50%;
+	background: var(--text-faint-c);
+}
+
+.runtime_dim {
 	font-family: var(--mono);
-	color: var(--ink-400);
+	font-weight: var(--text-soft-w);
+	color: var(--text-soft-c);
+}
+
+.runtime_badges {
+	display: flex;
+	gap: 6px;
+	margin-top: 2px;
+}
+
+.runtime_badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 3px 10px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.4);
+	border: var(--bd-w) solid var(--bd-c);
+}
+
+.runtime_badge_label {
+	font-size: 10px;
+	font-weight: var(--text-faint-w);
+	color: var(--text-faint-c);
+}
+
+.runtime_badge_val {
+	font-size: 11px;
+	font-weight: var(--text-body-w);
+	color: var(--text-body-c);
 }
 
 .workspace {
@@ -440,18 +477,18 @@ select {
 
 .status_label {
 	font-size: 12px;
-	font-weight: 600;
-	color: var(--ink-700);
+	font-weight: var(--text-body-w);
+	color: var(--text-body-c);
 }
 
 .chip {
 	font-size: 12px;
-	color: var(--ink-700);
+	font-weight: var(--text-soft-w);
+	color: var(--text-soft-c);
 	background: rgba(255, 255, 255, 0.4);
 	border: var(--bd-w) solid var(--bd-c);
 	padding: 3px 10px;
 	border-radius: 999px;
-	font-weight: 500;
 	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
@@ -463,11 +500,11 @@ select {
 }
 
 .results_inner {
-  max-width: 720px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+	max-width: 720px;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
 }
 
 .results_list {
@@ -479,7 +516,8 @@ select {
 .empty {
 	text-align: center;
 	padding: 96px 20px;
-	color: var(--ink-400);
+	font-weight: var(--text-faint-w);
+	color: var(--text-faint-c);
 }
 
 .empty_icon {
@@ -490,18 +528,19 @@ select {
 	height: 56px;
 	margin: 0 auto 16px;
 	border-radius: 20px;
-	color: var(--ink-400);
+	color: var(--text-soft-c);
 }
 
 .empty_title {
-	font-size: 14px;
-	font-weight: 600;
-	color: var(--ink-600);
+	font-size: 15px;
+	font-weight: var(--text-strong-w);
+	color: var(--text-strong-c);
 }
 
 .empty_hint {
 	font-size: 12px;
-	color: var(--ink-400);
+	font-weight: var(--text-faint-w);
+	color: var(--text-faint-c);
 	margin-top: 6px;
 	max-width: 360px;
 	margin-left: auto;
@@ -545,8 +584,8 @@ select {
 
 .result_card_title {
 	font-size: 12px;
-	font-weight: 600;
-	color: var(--ink-700);
+	font-weight: var(--text-body-w);
+	color: var(--text-body-c);
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -577,14 +616,14 @@ select {
 .result_card_pct {
 	font-size: 11px;
 	font-family: var(--mono);
-	font-weight: 600;
-	color: var(--ink-500);
+	font-weight: var(--text-soft-w);
+	color: var(--text-soft-c);
 }
 
 .result_card_text {
 	font-size: 13px;
 	line-height: 1.75;
-	color: var(--ink-700);
+	color: var(--text-body-c);
 }
 
 .searchdock {
@@ -619,7 +658,7 @@ select {
 .searchbar_icon {
 	width: 18px;
 	height: 18px;
-	color: var(--ink-400);
+	color: var(--text-soft-c);
 	margin-left: 8px;
 	flex-shrink: 0;
 }
@@ -630,13 +669,15 @@ select {
 	border: none;
 	outline: none;
 	background: transparent;
-	color: var(--ink-800);
+	color: var(--text-strong-c);
 	font-size: 14px;
+	font-weight: var(--text-body-w);
 	padding: 8px 0;
 }
 
 .searchbar input::placeholder {
-	color: var(--ink-400);
+	color: var(--text-faint-c);
+	font-weight: var(--text-faint-w);
 }
 
 .searchbtn {
@@ -648,9 +689,9 @@ select {
 	border: var(--bd-w) solid var(--bd-c);
 	border-radius: 18px;
 	background: rgba(255, 255, 255, 0.52);
-	color: var(--ink-900);
+	color: var(--text-strong-c);
 	font-size: 12px;
-	font-weight: 500;
+	font-weight: var(--text-body-w);
 	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03), var(--glass-specular);
 	-webkit-backdrop-filter: blur(24px);
 	backdrop-filter: blur(24px);
@@ -675,7 +716,8 @@ select {
 	margin-top: 12px;
 	padding: 0 8px;
 	font-size: 12px;
-	color: var(--ink-500);
+	font-weight: var(--text-soft-w);
+	color: var(--text-soft-c);
 }
 
 .field {
@@ -685,8 +727,8 @@ select {
 }
 
 .field>label {
-	color: var(--ink-400);
-	font-weight: 500;
+	font-weight: var(--text-soft-w);
+	color: var(--text-soft-c);
 }
 
 .select_wrap {
@@ -700,7 +742,7 @@ select {
 	right: 10px;
 	width: 14px;
 	height: 14px;
-	color: var(--ink-500);
+	color: var(--text-soft-c);
 	pointer-events: none;
 }
 
@@ -711,9 +753,9 @@ select {
 	border: var(--bd-w) solid var(--bd-c);
 	outline: none;
 	background: rgba(255, 255, 255, 0.35);
-	color: var(--ink-600);
+	color: var(--text-soft-c);
 	font-size: 12px;
-	font-weight: 500;
+	font-weight: var(--text-soft-w);
 	border-radius: 14px;
 	padding: 5px 28px 5px 12px;
 	cursor: pointer;
@@ -736,7 +778,8 @@ select {
 
 .dock_hint {
 	font-size: 11px;
-	color: var(--ink-400);
+	font-weight: var(--text-soft-w);
+	color: var(--text-soft-c);
 }
 
 kbd {
@@ -745,7 +788,7 @@ kbd {
 	border: var(--bd-w) solid var(--bd-c);
 	border-radius: 6px;
 	padding: 1px 6px;
-	color: var(--ink-600);
+	color: var(--text-body-c);
 }
 
 mark.highlight_mark,
@@ -765,8 +808,9 @@ mark.highlight_mark,
 	z-index: 50;
 	padding: 10px 16px;
 	border: var(--bd-w) solid var(--bd-c);
-	color: var(--ink-800);
+	color: var(--text-body-c);
 	font-size: 12px;
+	font-weight: var(--text-body-w);
 	box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.2), var(--glass-specular);
 	opacity: 0;
 	transform: translateY(12px);

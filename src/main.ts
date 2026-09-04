@@ -6,7 +6,7 @@
 import type { ResultHit, SourceDoc, TextChunk } from "./app/types";
 import { SAMPLE_DOCS } from "./app/samples";
 import { text_chunk_document } from "./app/text";
-import { score_chunk, type SearchMode } from "./app/scoring";
+import { score_chunk } from "./app/scoring";
 import {
     render_lib_empty,
     render_lib_items,
@@ -15,6 +15,12 @@ import {
     render_toast,
 } from "./app/render";
 import { refresh_icons } from "./app/icons";
+import {
+    RUNTIME_INFO,
+    SEARCH_DEFAULTS,
+    SEARCH_MODES,
+    type SearchMode,
+} from "./app/settings";
 
 function by_id<T extends HTMLElement = HTMLElement>(id: string): T {
     const el = document.getElementById(id);
@@ -36,6 +42,11 @@ const results_list = by_id("results_list");
 const initial_state = by_id("initial_state");
 const stat_chunks = by_id("stat_chunks");
 const stat_latency = by_id("stat_latency");
+const rt_model = by_id("rt_model");
+const rt_source = by_id("rt_source");
+const rt_dim = by_id("rt_dim");
+const rt_backend = by_id("rt_backend");
+const rt_quant = by_id("rt_quant");
 
 let documents: SourceDoc[] = [];
 let chunks: TextChunk[] = [];
@@ -53,6 +64,24 @@ function process_documents(): void {
 
 function show_initial_state(): void {
     results_list.replaceChildren(initial_state);
+}
+
+function fill_runtime(): void {
+    rt_model.textContent = RUNTIME_INFO.model_name;
+    rt_source.textContent = RUNTIME_INFO.source;
+    rt_dim.textContent = `${RUNTIME_INFO.dimension} 维`;
+    rt_backend.textContent = RUNTIME_INFO.backend;
+    rt_quant.textContent = RUNTIME_INFO.quant;
+}
+
+function fill_search_settings(): void {
+    search_mode.innerHTML = SEARCH_MODES.map(
+        (m) => `<option value="${m.value}">${m.label}</option>`,
+    ).join("");
+    search_mode.value = SEARCH_DEFAULTS.mode;
+    top_k_input.min = String(SEARCH_DEFAULTS.top_k_min);
+    top_k_input.max = String(SEARCH_DEFAULTS.top_k_max);
+    top_k_input.value = String(SEARCH_DEFAULTS.top_k);
 }
 
 function execute_search(): void {
@@ -140,6 +169,8 @@ search_input.addEventListener("keydown", (event) => {
 });
 
 refresh_icons();
+fill_runtime();
+fill_search_settings();
 documents = [...SAMPLE_DOCS];
 process_documents();
 show_initial_state();

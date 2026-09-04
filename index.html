@@ -45,11 +45,22 @@
 				<div id="doc_list" class="library_list" role="list"></div>
 			</section>
 
-			<footer class="engine card">
-				<span class="engine_dot" aria-hidden="true"></span>
-				<div class="engine_text">
-					<p class="engine_name">PrivaSearch Engine</p>
-					<p class="engine_version">v2.4.0 (Build 2026.09)</p>
+			<footer class="runtime card">
+				<p class="runtime_model" id="rt_model">—</p>
+				<div class="runtime_meta">
+					<span class="runtime_source" id="rt_source">—</span>
+					<span class="runtime_sep" aria-hidden="true"></span>
+					<span class="runtime_dim" id="rt_dim">—</span>
+				</div>
+				<div class="runtime_badges">
+					<span class="runtime_badge">
+						<span class="runtime_badge_label">推理</span>
+						<b class="runtime_badge_val" id="rt_backend">—</b>
+					</span>
+					<span class="runtime_badge">
+						<span class="runtime_badge_label">量化</span>
+						<b class="runtime_badge_val" id="rt_quant">—</b>
+					</span>
 				</div>
 			</footer>
 		</aside>
@@ -88,18 +99,14 @@
 					<div class="field">
 						<label for="search_mode">检索模式</label>
 						<span class="select_wrap">
-							<select id="search_mode" class="select">
-								<option value="hybrid">混合检索 (Vector + BM25)</option>
-								<option value="semantic">纯语义向量 (Semantic)</option>
-								<option value="keyword">精确关键词 (BM25)</option>
-							</select>
+							<select id="search_mode" class="select"></select>
 							<i data-lucide="chevron-down" aria-hidden="true"></i>
 						</span>
 					</div>
 
 					<div class="field">
 						<label for="top_k">Top-K 结果</label>
-						<input id="top_k" class="select select_numeric" type="number" min="1" max="20" value="4" />
+						<input id="top_k" class="select select_numeric" type="number" />
 					</div>
 
 					<p class="dock_hint">快捷键 <kbd>Enter</kbd> 执行检索</p>

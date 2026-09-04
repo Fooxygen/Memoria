@@ -4,8 +4,7 @@
 // Licensed under the MIT License.
 
 import { text_escape_regexp } from "./text";
-
-export type SearchMode = "hybrid" | "semantic" | "keyword";
+import type { SearchMode } from "./settings";
 
 export function score_chunk(text: string, query: string, mode: SearchMode): number {
     const text_lower = text.toLowerCase();
