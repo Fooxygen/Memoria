@@ -11,9 +11,11 @@ import { dropdown_create } from "./app/dropdown";
 import {
     render_lib_empty,
     render_lib_items,
+    render_queue_cards,
     render_result_card,
     render_result_empty,
     render_toast,
+    type QueueCardItem,
 } from "./app/render";
 import { refresh_icons } from "./app/icons";
 import {
@@ -36,6 +38,10 @@ const btn_load_sample = by_id("btn_load_sample");
 const btn_clear_docs = by_id("btn_clear_docs");
 const doc_list = by_id("doc_list");
 const doc_count = by_id("doc_count");
+const page_switch = by_id("page_switch");
+const page_docs = by_id("page_docs");
+const page_queue = by_id("page_queue");
+const queue_shelf = by_id("queue_shelf");
 const search_input = by_id<HTMLInputElement>("search_input");
 const btn_search = by_id("btn_search");
 const search_mode_dd = by_id("search_mode_dd");
@@ -56,6 +62,7 @@ const rt_quant = by_id("rt_quant");
 let documents: SourceDoc[] = [];
 let chunks: TextChunk[] = [];
 let search_mode_value: SearchMode = SEARCH_DEFAULTS.mode;
+const opened_docs = new Set<string>();
 
 function process_documents(): void {
     chunks = documents.flatMap((doc) => text_chunk_document(doc));
@@ -200,6 +207,116 @@ search_input.addEventListener("keydown", (event) => {
     if (event.key === "Enter") execute_search();
 });
 
+type PageName = "docs" | "queue";
+
+let queue_items: QueueCardItem[] = [
+    { title: "入职手册 v3", status: "run" },
+    { title: "RAG 架构笔记", status: "wait" },
+    { title: "数据安全规范", status: "done" },
+    { title: "产品说明书 2026", status: "wait" },
+];
+
+const switch_entries = new Map<PageName, { btn: HTMLButtonElement; label: HTMLElement }>();
+
+function make_switch_button(page: PageName, icon: string, label_text: string): HTMLButtonElement {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "switch_btn";
+    btn.dataset.page = page;
+    btn.title = label_text;
+
+    const icon_el = document.createElement("span");
+    icon_el.className = "switch_icon";
+    const i = document.createElement("i");
+    i.setAttribute("data-lucide", icon);
+    icon_el.appendChild(i);
+
+    const label_el = document.createElement("span");
+    label_el.className = "switch_label";
+    label_el.textContent = label_text;
+
+    btn.append(icon_el, label_el);
+    btn.addEventListener("click", () => show_page(page));
+    switch_entries.set(page, { btn, label: label_el });
+    return btn;
+}
+
+function set_tab_active(page: PageName, active: boolean): void {
+    const entry = switch_entries.get(page);
+    if (!entry) return;
+    if (active) {
+        const icon_w = entry.btn.querySelector<HTMLElement>(".switch_icon")?.offsetWidth ?? 32;
+        const label_w = entry.label.scrollWidth;
+        entry.btn.classList.add("is_active");
+        entry.btn.style.width = `${icon_w + label_w + 18}px`;
+        entry.btn.dataset.spin = page === "queue" ? "true" : "false";
+    } else {
+        entry.btn.classList.remove("is_active");
+        entry.btn.style.removeProperty("width");
+        delete entry.btn.dataset.spin;
+    }
+}
+
+let active_page: PageName | null = null;
+
+function show_page(page: PageName): void {
+    if (active_page === page) return;
+    active_page = page;
+    page_docs.hidden = page !== "docs";
+    page_queue.hidden = page !== "queue";
+    set_tab_active("docs", page === "docs");
+    set_tab_active("queue", page === "queue");
+}
+
+function build_page_switch(): void {
+    page_switch.appendChild(make_switch_button("docs", "upload-cloud", "上传文档"));
+    page_switch.appendChild(make_switch_button("queue", "loader-circle", "处理队列"));
+    show_page("docs");
+}
+
+function fill_queue(): void {
+    queue_shelf.innerHTML = render_queue_cards(queue_items);
+}
+
+function sync_open_cards(): void {
+    for (const list of [doc_list, queue_shelf]) {
+        list.querySelectorAll<HTMLElement>(".doc_card").forEach((card) => {
+            const key = card.dataset.key ?? "";
+            card.classList.toggle("is_open", opened_docs.has(key));
+        });
+    }
+}
+
+function toggle_doc_open(title: string): void {
+    const opening = !opened_docs.has(title);
+    opened_docs.clear();
+    if (opening) opened_docs.add(title);
+    sync_open_cards();
+}
+
+function bind_open(list: HTMLElement): void {
+    list.addEventListener("click", (event) => {
+        const target = event.target as HTMLElement;
+        const action = target.closest<HTMLElement>(".doc_card_action");
+        const card = target.closest<HTMLElement>(".doc_card");
+        if (!card) return;
+        const key = card.dataset.key;
+        if (!key) return;
+        if (action) {
+            queue_items = queue_items.filter((it) => it.title !== key);
+            fill_queue();
+            sync_open_cards();
+            refresh_icons();
+            return;
+        }
+        toggle_doc_open(key);
+    });
+}
+
+build_page_switch();
+fill_queue();
+bind_open(doc_list);
+bind_open(queue_shelf);
 refresh_icons();
 update_runtime();
 fill_search_settings();

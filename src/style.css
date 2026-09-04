@@ -29,6 +29,12 @@
 	--state-cpu-label: #f6ecc9;
 	--state-cpu-val: #fffdf0;
 
+	--state-open-bg: #3a54d8;
+	--state-open-border: #6f8cf0;
+	--state-open-meta: #9faaff;
+	--state-open-desc: #c2d0ff;
+	--state-open-title: #eef3ff;
+
 	/* Text scale: darker -> heavier, lighter -> thinner (regular..bold). */
 	--text-strong-c: var(--ink-900);
 	--text-strong-w: 700;
@@ -205,7 +211,7 @@ select {
 
 .sidebar {
 	flex-shrink: 0;
-	width: 290px;
+	width: 435px;
 	display: flex;
 	flex-direction: column;
 	padding: 14px;
@@ -517,6 +523,7 @@ select {
 .status {
 	display: flex;
 	align-items: center;
+	width: fit-content;
 	gap: 8px;
 	margin: 14px 14px 0;
 	padding: 10px 16px;
@@ -1041,8 +1048,301 @@ mark.highlight_mark,
 	font-weight: var(--text-body-w);
 }
 
+.sidebar_head {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	min-height: 34px;
+	padding: 2px 2px 10px;
+}
+
+.sidebar_head .app_title {
+	padding: 0 4px;
+	margin-right: 76px;
+}
+
+.page_switch {
+	position: absolute;
+	top: 0;
+	right: 0;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.switch_btn {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	height: 32px;
+	width: 32px;
+	padding: 0;
+	border: var(--bd-w) solid var(--bd-c);
+	border-radius: 999px;
+	outline: none;
+	background: rgba(255, 255, 255, 0.4);
+	color: var(--text-body-c);
+	cursor: pointer;
+	overflow: hidden;
+	box-shadow: var(--glass-specular);
+	-webkit-backdrop-filter: blur(18px);
+	backdrop-filter: blur(18px);
+	transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s,
+		border-color 0.3s;
+}
+
+.switch_btn .switch_icon {
+	display: grid;
+	place-items: center;
+	width: 32px;
+	height: 32px;
+	flex-shrink: 0;
+}
+
+.switch_btn .switch_icon [data-lucide] {
+	width: 15px;
+	height: 15px;
+}
+
+.switch_btn .switch_label {
+	display: block;
+	width: 0;
+	opacity: 0;
+	white-space: nowrap;
+	font-size: 12px;
+	font-weight: var(--text-body-w);
+	transition: opacity 0.25s ease 0.05s;
+}
+
+.switch_btn.is_active {
+	background: rgba(255, 255, 255, 0.78);
+	border-color: var(--bd-c-hover);
+	color: var(--text-strong-c);
+	box-shadow: var(--shadow-subtle), var(--glass-specular);
+}
+
+.switch_btn.is_active .switch_label {
+	opacity: 1;
+	width: auto;
+	padding-right: 12px;
+}
+
+.switch_btn[data-spin="true"] .switch_icon [data-lucide="loader-circle"] {
+	animation: switchSpin 1.2s linear infinite;
+}
+
+@keyframes switchSpin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.page_view {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	flex: 1;
+}
+
+.page_view[hidden] {
+	display: none;
+}
+
+.shelf_head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 10px 2px 8px;
+}
+
+.shelf_label {
+	font-size: 11px;
+	font-weight: var(--text-faint-w);
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--text-faint-c);
+}
+
+.shelf_count {
+	font-family: var(--mono);
+	font-weight: var(--text-soft-w);
+	color: var(--text-soft-c);
+}
+
+.shelf_clear {
+	border: none;
+	background: none;
+	font-size: 11px;
+	font-weight: var(--text-faint-w);
+	color: var(--text-faint-c);
+	cursor: pointer;
+	transition: color 0.2s;
+}
+
+.shelf_clear:hover {
+	color: #ef4444;
+}
+
+.doc_shelf {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+	column-count: 2;
+	column-gap: 12px;
+	padding: 2px 2px 6px;
+}
+
+.doc_card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 8px;
+	break-inside: avoid;
+	margin-bottom: 12px;
+	padding: 25% 14px 14px;
+	cursor: pointer;
+	overflow: hidden;
+	text-align: left;
+	border-radius: 22px;
+	transition: var(--transition);
+}
+
+.doc_card:hover {
+	border-color: var(--bd-c-hover);
+	box-shadow: var(--shadow-hover), var(--glass-specular);
+}
+
+.doc_card.is_open,
+.doc_card.is_open:hover {
+	background: var(--state-open-bg);
+	border-color: var(--state-open-border);
+	box-shadow: var(--shadow-hover), var(--glass-specular), 0 0 20px rgba(111, 140, 240, 0.45);
+}
+
+.doc_card.is_open .doc_card_meta {
+	color: var(--state-open-meta);
+}
+
+.doc_card.is_open .doc_card_title {
+	color: var(--state-open-title);
+}
+
+.doc_card.is_open .doc_card_desc {
+	color: var(--state-open-desc);
+}
+
+.doc_card_meta {
+	position: absolute;
+	top: 14px;
+	left: 14px;
+	font-size: 9px;
+	font-family: var(--mono);
+	font-weight: var(--text-soft-w);
+	letter-spacing: 0.02em;
+	color: var(--text-faint-c);
+}
+
+.doc_card_title {
+	font-size: 16px;
+	line-height: 1.25;
+	font-weight: 700;
+	letter-spacing: -0.01em;
+	color: var(--text-strong-c);
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.doc_card_desc {
+	font-size: 12px;
+	line-height: 1.5;
+	font-weight: var(--text-soft-w);
+	color: var(--text-soft-c);
+	display: -webkit-box;
+	-webkit-line-clamp: 8;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.doc_card_status {
+	position: absolute;
+	top: 14px;
+	left: 14px;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: var(--text-faint-c);
+}
+
+.doc_card.is_wait .doc_card_status {
+	background: #febc2e;
+}
+
+.doc_card.is_run .doc_card_status {
+	background: #ff5f57;
+}
+
+.doc_card.is_done .doc_card_status {
+	background: #28c840;
+}
+
+.doc_card_action {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	width: 22px;
+	height: 22px;
+	flex-shrink: 0;
+	display: grid;
+	place-items: center;
+	border: var(--bd-w) solid var(--bd-c);
+	border-radius: 50%;
+	outline: none;
+	background: rgba(255, 255, 255, 0.35);
+	color: var(--text-soft-c);
+	cursor: pointer;
+	box-shadow: var(--glass-specular);
+	-webkit-backdrop-filter: blur(20px);
+	backdrop-filter: blur(20px);
+	transition: var(--transition);
+}
+
+.doc_card_action [data-lucide] {
+	width: 12px;
+	height: 12px;
+}
+
+.doc_card_action:hover {
+	background: rgba(255, 255, 255, 0.72);
+	border-color: var(--bd-c-hover);
+	color: var(--text-strong-c);
+}
+
+.doc_card_action:active {
+	transform: scale(0.88);
+}
+
+.doc_card.is_open .doc_card_action {
+	background: rgba(255, 255, 255, 0.18);
+	border-color: var(--state-open-border);
+	color: var(--state-open-title);
+}
+
+.doc_shelf_empty {
+	text-align: center;
+	padding: 30px 12px;
+	font-size: 12px;
+	font-weight: var(--text-faint-w);
+	color: var(--text-faint-c);
+	opacity: 0.7;
+}
+
 @media (max-width: 1024px) {
 	.sidebar {
-		width: 230px;
+		width: 345px;
 	}
 }

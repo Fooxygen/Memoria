@@ -7,13 +7,16 @@ import {
     createIcons,
     ArrowRight,
     ChevronDown,
+    CircleStop,
     FileText,
     FolderOpen,
     Ghost,
+    LoaderCircle,
     Search,
     SearchCode,
     Sparkles,
     UploadCloud,
+    X,
 } from "lucide";
 
 const USED_ICONS = {
@@ -25,6 +28,9 @@ const USED_ICONS = {
     SearchCode,
     ArrowRight,
     ChevronDown,
+    LoaderCircle,
+    CircleStop,
+    X,
     Ghost,
 };
 

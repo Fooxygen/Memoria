@@ -19,30 +19,37 @@
 		<div class="orb orb_two"></div>
 
 		<aside class="sidebar pane">
-			<h1 class="app_title">PrivaSearch</h1>
+			<header class="sidebar_head">
+				<h1 class="app_title">PrivaSearch</h1>
+				<nav class="page_switch" id="page_switch" aria-label="视图切换"></nav>
+			</header>
 
-			<section class="import_block" aria-label="Import documents">
-				<div id="drop_zone" class="dropzone card">
-					<input type="file" id="file_input" class="visually_hidden" multiple
-						accept=".txt,.md,.json,.csv,.js,.py" />
-					<span class="dropzone_icon" aria-hidden="true"><i data-lucide="upload-cloud"></i></span>
-					<p class="dropzone_title">拖拽文件到此处 或 点击上传</p>
-					<p class="dropzone_hint">支持 TXT, MD, JSON, Code 等</p>
+			<section class="page_view" id="page_docs" data-page="docs">
+				<div class="import_block">
+					<div id="drop_zone" class="dropzone card">
+						<input type="file" id="file_input" class="visually_hidden" multiple
+							accept=".txt,.md,.json,.csv,.js,.py" />
+						<span class="dropzone_icon" aria-hidden="true"><i data-lucide="upload-cloud"></i></span>
+						<p class="dropzone_title">拖拽文件到此处 或 点击上传</p>
+						<p class="dropzone_hint">支持 TXT, MD, JSON, Code 等</p>
+					</div>
+
+					<button id="btn_load_sample" class="load_sample card" type="button">
+						<i data-lucide="sparkles" aria-hidden="true"></i>
+						<span>加载默认演示文档库</span>
+					</button>
 				</div>
 
-				<button id="btn_load_sample" class="load_sample card" type="button">
-					<i data-lucide="sparkles" aria-hidden="true"></i>
-					<span>加载默认演示文档库</span>
-				</button>
+				<div class="shelf_head">
+					<span class="shelf_label">文档库 <span class="shelf_count" id="doc_count">0</span></span>
+					<button id="btn_clear_docs" class="shelf_clear" type="button">清空</button>
+				</div>
+
+				<div id="doc_list" class="doc_shelf" role="list"></div>
 			</section>
 
-			<section class="library" aria-label="Document library">
-				<div class="library_head">
-					<span class="library_label">知识库列表 (<span id="doc_count">0</span>)</span>
-					<button id="btn_clear_docs" class="library_clear" type="button">清空</button>
-				</div>
-
-				<div id="doc_list" class="library_list" role="list"></div>
+			<section class="page_view" id="page_queue" data-page="queue" hidden>
+				<div id="queue_shelf" class="doc_shelf"></div>
 			</section>
 
 			<footer class="runtime card">

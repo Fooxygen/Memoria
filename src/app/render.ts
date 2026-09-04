@@ -10,24 +10,58 @@ export function render_lib_items(docs: SourceDoc[], chunks: TextChunk[]): string
     return docs
         .map((doc) => {
             const count = chunks.filter((c) => c.doc_title === doc.title).length;
+            const trimmed = doc.content.trim().replace(/\s+/g, " ");
+            const preview = trimmed.slice(0, 120);
+            const overflow = trimmed.length > 120 ? "…" : "";
             return `
-                <div class="lib_item card" role="listitem">
-                    <span class="lib_item_title">
-                        <i data-lucide="file-text" width="14" height="14" aria-hidden="true"></i>
-                        <span class="lib_item_name" title="${text_escape_html(doc.title)}">${text_escape_html(doc.title)}</span>
-                    </span>
-                    <span class="lib_item_count">${count} 切片</span>
-                </div>`;
+                <article class="doc_card card" role="listitem" data-key="${text_escape_html(doc.title)}">
+                    <div class="doc_card_meta">${count} 切片</div>
+                    <h3 class="doc_card_title" title="${text_escape_html(doc.title)}">${text_escape_html(doc.title)}</h3>
+                    <p class="doc_card_desc">${text_escape_html(preview)}${overflow}</p>
+                </article>`;
         })
         .join("");
 }
 
 export function render_lib_empty(): string {
-    return `
-        <div class="lib_empty">
-            <i data-lucide="folder-open" width="28" height="28" aria-hidden="true"></i>
-            <p>暂无本地文档</p>
-        </div>`;
+    return `<p class="doc_shelf_empty">暂无本地文档</p>`;
+}
+
+export type QueueStatus = "wait" | "run" | "done";
+
+export interface QueueCardItem {
+    title: string;
+    status: QueueStatus;
+}
+
+const QUEUE_STATUS_CLASS: Record<QueueStatus, string> = {
+    wait: "is_wait",
+    run: "is_run",
+    done: "is_done",
+};
+
+const QUEUE_ACTION_ICON: Record<QueueStatus, string> = {
+    wait: "x",
+    run: "circle-stop",
+    done: "x",
+};
+
+export function render_queue_cards(items: QueueCardItem[]): string {
+    return items
+        .map((it) => {
+            const status_class = QUEUE_STATUS_CLASS[it.status];
+            const icon = QUEUE_ACTION_ICON[it.status];
+            const label = it.status === "run" ? "终止任务" : "清除记录";
+            return `
+                <article class="doc_card card ${status_class}" role="listitem" data-key="${text_escape_html(it.title)}">
+                    <span class="doc_card_status" aria-hidden="true"></span>
+                    <h3 class="doc_card_title" title="${text_escape_html(it.title)}">${text_escape_html(it.title)}</h3>
+                    <button class="doc_card_action" type="button" title="${label}" aria-label="${label}">
+                        <i data-lucide="${icon}"></i>
+                    </button>
+                </article>`;
+        })
+        .join("");
 }
 
 export function render_result_card(hit: ResultHit, index: number, query: string): string {
