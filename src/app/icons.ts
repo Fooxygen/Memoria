@@ -17,6 +17,7 @@ import {
     Search,
     SearchCode,
     Sparkles,
+    Trash2,
     UploadCloud,
     X,
 } from "lucide";
@@ -25,6 +26,7 @@ const USED_ICONS = {
     Search,
     UploadCloud,
     Sparkles,
+    Trash2,
     FolderOpen,
     FileText,
     SearchCode,

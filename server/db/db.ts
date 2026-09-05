@@ -135,6 +135,21 @@ export async function documents_add(meta: DocumentMeta) {
     `, [meta.id, meta.title, meta.preview, meta.chunk_count]);
 }
 
+export async function documents_delete(id: string) {
+    const cl = await db_client_get();
+    await documents_create();
+    await cl.execute(`
+        delete from ${TABLE_DOCUMENTS} where id = ?    
+    `, [id]);
+}
+
+export async function chunks_delete_by_document(id_document: string) {
+    const chunk = await chunks_get();
+    await chunk.delete({
+        where: { id_document },
+    });
+}
+
 export async function documents_list() : Promise<DocumentMeta[]> {
     const cl = await db_client_get();
     await documents_create();

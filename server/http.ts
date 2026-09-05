@@ -13,8 +13,10 @@ import {
     db_close,
     documents_create,
     documents_add,
+    documents_delete,
     documents_list,
     chunks_add,
+    chunks_delete_by_document,
 } from "./db/db.ts";
 import type { ChunkRecord } from "./db/meta.ts";
 
@@ -100,6 +102,23 @@ export function seekdb_plugin(): Plugin {
                 if (path === "/api/documents" && req.method === "GET") {
                     const documents = await documents_list();
                     send_json(res, 200, { documents });
+                    return;
+                }
+
+                if (path === "/api/document" && req.method === "DELETE") {
+                    try {
+                        const id = String(url.searchParams.get("id") ?? "");
+                        if (!id) {
+                            send_json(res, 400, { ok: false, error: "missing id" });
+                            return;
+                        }
+                        await chunks_delete_by_document(id);
+                        await documents_delete(id);
+                        send_json(res, 200, { ok: true });
+                    } catch (error) {
+                        console.error("[delete] error:", error);
+                        send_json(res, 500, { ok: false, error: String(error) });
+                    }
                     return;
                 }
 

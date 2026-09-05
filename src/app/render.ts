@@ -18,6 +18,9 @@ export function render_lib_items(docs: LibDoc[]): string {
         .map((doc) => {
             return `
                 <article class="doc_card card" role="listitem" data-key="${text_escape_html(doc.id)}">
+                    <button class="doc_card_more" type="button" aria-label="更多操作">
+                        <i data-lucide="ellipsis"></i>
+                    </button>
                     <div class="doc_card_meta">${doc.chunk_count} 切片</div>
                     <h3 class="doc_card_title" title="${text_escape_html(doc.title)}">${text_escape_html(doc.title)}</h3>
                     <p class="doc_card_desc">${text_escape_html(doc.preview ?? "")}</p>

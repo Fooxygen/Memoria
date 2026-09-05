@@ -43,7 +43,6 @@ function by_id<T extends HTMLElement = HTMLElement>(id: string): T {
 
 const drop_zone         = by_id("drop_zone");
 const file_input        = by_id<HTMLInputElement>("file_input");
-const btn_clear_docs    = by_id("btn_clear_docs");
 const doc_list          = by_id("doc_list");
 const doc_count         = by_id("doc_count");
 const page_switch       = by_id("page_switch");
@@ -58,6 +57,8 @@ const top_k_dec         = by_id<HTMLButtonElement>("top_k_dec");
 const top_k_inc         = by_id<HTMLButtonElement>("top_k_inc");
 const results_list      = by_id("results_list");
 const initial_state     = by_id("initial_state");
+const card_menu         = by_id("card_menu");
+const card_menu_delete  = by_id("card_menu_delete");
 const logs_box          = by_id("logs");
 const logs_trigger      = by_id("logs_trigger");
 const logs_panel        = by_id("logs_panel");
@@ -136,13 +137,28 @@ function       mount_waterfall(container: HTMLElement, html: string, empty_html:
 
 // HTTP
 
+async function json_error(res: Response): Promise<Error> {
+    let detail = "";
+    try {
+        const data = (await res.json()) as { error?: string };
+        detail = data.error ?? "";
+    } catch {}
+    return new Error(detail ? `${res.status}: ${detail}` : `request failed ${res.status}`);
+}
+
 async function json_post(url: string, payload: unknown): Promise<unknown> {
     const res = await fetch(url, {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify(payload),
     });
-    if (!res.ok) throw new Error(`request failed ${res.status}`);
+    if (!res.ok) throw await json_error(res);
+    return res.json();
+}
+
+async function json_delete(url: string): Promise<unknown> {
+    const res = await fetch(url, { method: "DELETE" });
+    if (!res.ok) throw await json_error(res);
     return res.json();
 }
 
@@ -325,7 +341,6 @@ async function documents_refresh(): Promise<void> {
     doc_count.textContent = String(docs.length);
 
     mount_waterfall(doc_list, docs.length === 0 ? "" : render_lib_items(docs), render_lib_empty());
-    btn_clear_docs.hidden = docs.length === 0;
     refresh_icons();
 }
 
@@ -518,14 +533,6 @@ file_input.addEventListener("change", (event) => {
     documents_ingest_insert((event.target as HTMLInputElement).files);
 });
 
-btn_clear_docs.addEventListener("click", () => {
-    documents_ingest = [];
-    document_opening.clear();
-    void documents_refresh();
-    show_initial_state();
-    render_toast("已重置界面（数据库持久保留，重新上传即可更新）");
-});
-
 btn_search.addEventListener("click", search_execute);
 
 top_k_dec.addEventListener("click", () => search_topk_update(search_topk_read() - 1));
@@ -539,6 +546,7 @@ search_input.addEventListener("keydown", (event) => {
 
 doc_list.addEventListener("click", (event) => {
     const target = event.target as HTMLElement;
+    if (target.closest<HTMLElement>(".doc_card_more")) return;
     const action = target.closest<HTMLElement>(".doc_card_action");
     const card = target.closest<HTMLElement>(".doc_card");
     if (!card) return;
@@ -569,6 +577,52 @@ queue_shelf.addEventListener("click", (event) => {
         return;
     }
     page_ingest_cards_status_sync(key);
+});
+
+// Card menu
+
+let card_menu_doc: string | null = null;
+
+function card_menu_hide(): void {
+    card_menu.classList.remove("is_open");
+    card_menu_doc = null;
+}
+
+doc_list.addEventListener("pointerdown", (event) => {
+    const target = event.target as HTMLElement;
+    const more = target.closest<HTMLElement>(".doc_card_more");
+    if (more) {
+        const card = more.closest<HTMLElement>(".doc_card");
+        card_menu_doc = card?.dataset.key ?? null;
+        const rect = more.getBoundingClientRect();
+        const sidebar = card_menu.closest<HTMLElement>(".sidebar");
+        const srect = sidebar?.getBoundingClientRect();
+        const left = srect ? rect.right - srect.left - 132 : rect.left;
+        const top = srect ? rect.top - srect.top : rect.top;
+        card_menu.style.left = `${left}px`;
+        card_menu.style.top = `${top}px`;
+        card_menu.classList.remove("is_open");
+        void card_menu.offsetWidth;
+        card_menu.classList.add("is_open");
+        return;
+    }
+    if (!target.closest(".card_menu")) card_menu_hide();
+});
+
+card_menu_delete.addEventListener("click", async () => {
+    const id = card_menu_doc;
+    card_menu_hide();
+    if (!id) return;
+    try {
+        await json_delete(`/api/document?id=${encodeURIComponent(id)}`);
+        document_opening.delete(id);
+        await documents_refresh();
+        render_toast("已删除文档");
+        log_push("已删除文档", "已从知识库移除");
+    } catch (error) {
+        render_toast(`删除失败：${String(error)}`);
+        log_push("删除失败", String(error));
+    }
 });
 
 page_switchs_button_create();

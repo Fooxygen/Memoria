@@ -1087,11 +1087,11 @@ mark.highlight_mark,
 	align-items: center;
 	justify-content: space-between;
 	min-height: 34px;
-	padding: 2px 2px 10px;
+	padding: 2px 2px 16px;
 }
 
 .sidebar_head .app_title {
-	padding: 0 4px;
+	padding: 0 4px 0 12px;
 	margin-right: 76px;
 }
 
@@ -1187,12 +1187,12 @@ mark.highlight_mark,
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 10px 2px 8px;
+	padding: 16px 14px 8px;
 }
 
 .shelf_label {
 	font-size: 11px;
-	font-weight: var(--text-faint-w);
+	font-weight: 700;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
 	color: var(--text-faint-c);
@@ -1237,7 +1237,7 @@ mark.highlight_mark,
 	overflow-x: hidden;
 	display: flex;
 	gap: 12px;
-	padding: 18px 0 26px;
+	padding: 9px 0 26px;
 	overscroll-behavior: contain;
 }
 
@@ -1407,6 +1407,90 @@ mark.highlight_mark,
 	font-weight: var(--text-soft-w);
 	color: var(--text-faint-c);
 	opacity: 0.85;
+}
+
+.doc_card_more {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	width: 28px;
+	height: 28px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border: var(--bd-w) solid transparent;
+	border-radius: 50%;
+	outline: none;
+	background: transparent;
+	color: var(--text-soft-c);
+	cursor: pointer;
+	transition: background 0.15s, color 0.15s;
+}
+
+.doc_card_more:hover {
+	background: rgba(255, 255, 255, 0.6);
+	color: var(--text-strong-c);
+}
+
+.doc_card_more [data-lucide="ellipsis"] {
+	width: 18px;
+	height: 18px;
+	stroke-width: 3;
+}
+
+.card_menu {
+	position: absolute;
+	z-index: 60;
+	display: flex;
+	flex-direction: column;
+	min-width: 132px;
+	padding: 4px;
+	background: rgba(255, 255, 255, 0.78);
+	-webkit-backdrop-filter: var(--blur-medium);
+	backdrop-filter: var(--blur-medium);
+	border: var(--bd-w) solid var(--bd-c);
+	border-radius: 14px;
+	box-shadow: var(--shadow-hover), var(--glass-specular);
+	transform-origin: top right;
+	transform: scale(0.2);
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+	transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.28s ease,
+		visibility 0.28s;
+}
+
+.card_menu.is_open {
+	transform: scale(1);
+	opacity: 1;
+	visibility: visible;
+	pointer-events: auto;
+}
+
+.card_menu button {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+	border: none;
+	background: none;
+	padding: 7px 10px;
+	border-radius: 9px;
+	font-size: 12px;
+	font-weight: var(--text-body-w);
+	color: var(--text-body-c);
+	cursor: pointer;
+	transition: background 0.15s;
+}
+
+.card_menu button:hover {
+	background: rgba(255, 255, 255, 0.6);
+}
+
+.card_menu button [data-lucide="trash-2"] {
+	width: 14px;
+	height: 14px;
+	color: #ef4444;
 }
 
 .logs {
