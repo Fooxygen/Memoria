@@ -612,17 +612,17 @@ select {
 }
 
 .empty_title {
-	font-size: 15px;
+	font-size: 22.5px;
 	font-weight: var(--text-strong-w);
 	color: var(--text-strong-c);
 }
 
 .empty_hint {
-	font-size: 12px;
+	font-size: 16px;
 	font-weight: var(--text-faint-w);
 	color: var(--text-faint-c);
 	margin-top: 6px;
-	max-width: 360px;
+	max-width: 420px;
 	margin-left: auto;
 	margin-right: auto;
 }
@@ -720,7 +720,7 @@ select {
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	padding: 8px;
+	padding: 5px;
 	background: rgba(255, 255, 255, 0.38);
 	-webkit-backdrop-filter: blur(40px) saturate(220%);
 	backdrop-filter: blur(40px) saturate(220%);
@@ -752,9 +752,9 @@ select {
 	outline: none;
 	background: transparent;
 	color: var(--text-strong-c);
-	font-size: 14px;
+	font-size: 13px;
 	font-weight: var(--text-body-w);
-	padding: 8px 0;
+	padding: 5px 0;
 }
 
 .searchbar input::placeholder {
@@ -767,7 +767,7 @@ select {
 	align-items: center;
 	gap: 8px;
 	flex-shrink: 0;
-	padding: 10px 20px;
+	padding: 7px 16px;
 	border: var(--bd-w) solid var(--bd-c);
 	border-radius: 18px;
 	background: rgba(255, 255, 255, 0.52);
@@ -778,6 +778,12 @@ select {
 	-webkit-backdrop-filter: blur(24px);
 	backdrop-filter: blur(24px);
 	transition: var(--transition);
+}
+
+.searchbtn [data-lucide="arrow-right"] {
+	width: 18px;
+	height: 18px;
+	color: var(--text-soft-c);
 }
 
 .searchbtn:hover {
@@ -797,7 +803,7 @@ select {
 	gap: 16px;
 	margin-top: 12px;
 	padding: 0 8px;
-	font-size: 12px;
+	font-size: 13px;
 	font-weight: var(--text-soft-w);
 	color: var(--text-soft-c);
 }
@@ -810,6 +816,7 @@ select {
 
 .field > label,
 .field_label {
+	font-size: 13px;
 	font-weight: var(--text-soft-w);
 	color: var(--text-soft-c);
 }
@@ -837,10 +844,10 @@ select {
 	outline: none;
 	background: rgba(255, 255, 255, 0.35);
 	color: var(--text-soft-c);
-	font-size: 12px;
+	font-size: 13px;
 	font-weight: var(--text-soft-w);
 	border-radius: 14px;
-	padding: 5px 28px 5px 12px;
+	padding: 6px 30px 6px 13px;
 	cursor: pointer;
 	box-shadow: var(--glass-specular);
 	-webkit-backdrop-filter: blur(20px);
@@ -854,8 +861,8 @@ select {
 }
 
 .select_numeric {
-	width: 40px;
-	padding: 5px 6px;
+	width: 44px;
+	padding: 6px 6px;
 	text-align: center;
 	-webkit-appearance: none;
 	-moz-appearance: textfield;
@@ -875,8 +882,8 @@ select {
 }
 
 .step_btn {
-	width: 20px;
-	height: 20px;
+	width: 22px;
+	height: 22px;
 	flex-shrink: 0;
 	display: inline-flex;
 	align-items: center;
@@ -886,7 +893,7 @@ select {
 	outline: none;
 	background: rgba(255, 255, 255, 0.35);
 	color: var(--text-soft-c);
-	font-size: 15px;
+	font-size: 16px;
 	line-height: 1;
 	cursor: pointer;
 	box-shadow: var(--glass-specular);
@@ -987,13 +994,13 @@ mark.highlight_mark,
 	display: inline-flex;
 	align-items: center;
 	gap: 8px;
-	padding: 5px 12px;
+	padding: 6px 13px;
 	border: var(--bd-w) solid var(--bd-c);
 	border-radius: 14px;
 	outline: none;
 	background: rgba(255, 255, 255, 0.35);
 	color: var(--text-soft-c);
-	font-size: 12px;
+	font-size: 13px;
 	font-weight: var(--text-soft-w);
 	cursor: pointer;
 	box-shadow: var(--glass-specular);
@@ -1393,12 +1400,13 @@ mark.highlight_mark,
 }
 
 .doc_shelf_empty {
+	margin: auto;
 	text-align: center;
-	padding: 30px 12px;
-	font-size: 12px;
-	font-weight: var(--text-faint-w);
+	padding: 0 24px;
+	font-size: 16px;
+	font-weight: var(--text-soft-w);
 	color: var(--text-faint-c);
-	opacity: 0.7;
+	opacity: 0.85;
 }
 
 @media (max-width: 1024px) {

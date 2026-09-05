@@ -30,18 +30,13 @@
 						<input type="file" id="file_input" class="visually_hidden" multiple
 							accept=".txt,.md,.json,.csv,.js,.py" />
 						<span class="dropzone_icon" aria-hidden="true"><i data-lucide="upload-cloud"></i></span>
-						<p class="dropzone_title">拖拽文件到此处 或 点击上传</p>
-						<p class="dropzone_hint">支持 TXT, MD, JSON, Code 等</p>
+						<p class="dropzone_title">拖入文档，或点按上传</p>
 					</div>
 
-					<button id="btn_load_sample" class="load_sample card" type="button">
-						<i data-lucide="sparkles" aria-hidden="true"></i>
-						<span>加载默认演示文档库</span>
-					</button>
 				</div>
 
 				<div class="shelf_head">
-					<span class="shelf_label">文档库 <span class="shelf_count" id="doc_count">0</span></span>
+					<span class="shelf_label">我的文档 <span class="shelf_count" id="doc_count">0</span></span>
 					<button id="btn_clear_docs" class="shelf_clear" type="button">清空</button>
 				</div>
 
@@ -49,7 +44,7 @@
 			</section>
 
 			<section class="page_view" id="page_queue" data-page="queue" hidden>
-				<div id="queue_shelf" class="doc_shelf"></div>
+				<div id="queue_shelf" class="doc_waterfall"></div>
 			</section>
 
 			<footer class="runtime card">
@@ -88,8 +83,8 @@
 					<div id="results_list" class="results_list" aria-live="polite">
 						<div id="initial_state" class="empty">
 							<span class="empty_icon card" aria-hidden="true"><i data-lucide="search-code"></i></span>
-							<p class="empty_title">探索您的私密知识库</p>
-							<p class="empty_hint">在下方输入框中用自然语言提问，即刻检索调取最相关的带出处的证据片段</p>
+							<p class="empty_title">你读过的每一份文档，都在 Memoria</p>
+							<p class="empty_hint">添加文档，然后用一句话找到它。</p>
 						</div>
 					</div>
 				</div>
@@ -99,7 +94,7 @@
 				<div class="searchbar">
 					<i data-lucide="search" class="searchbar_icon" aria-hidden="true"></i>
 					<input id="search_input" type="text" autocomplete="off"
-						placeholder="搜索知识库文档，例如：‘数据安全规范’、‘RAG 架构’ 或 ‘模型部署’..." />
+						placeholder="搜索或浏览你的文档" />
 					<button id="btn_search" class="searchbtn" type="button">
 						<span>检索</span>
 						<i data-lucide="arrow-right" aria-hidden="true"></i>
@@ -113,11 +108,11 @@
 					</div>
 
 					<div class="field">
-						<label for="top_k">Top-K 结果</label>
+						<label for="top_k">显示数量</label>
 						<div class="stepper">
-							<button id="top_k_dec" class="step_btn" type="button" aria-label="减少 Top-K 值">−</button>
+							<button id="top_k_dec" class="step_btn" type="button" aria-label="减少显示数量">−</button>
 							<input id="top_k" class="select select_numeric" type="number" inputmode="numeric" min="1" max="20" />
-							<button id="top_k_inc" class="step_btn" type="button" aria-label="增加 Top-K 值">+</button>
+							<button id="top_k_inc" class="step_btn" type="button" aria-label="增加显示数量">+</button>
 						</div>
 					</div>
 				</div>

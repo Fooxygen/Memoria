@@ -7,8 +7,7 @@ import {
     type ResultHit,
     type TextChunk
 } from "./app/types";
-import { SAMPLE_DOCS }          from "./app/samples";
-import { text_chunk_document }  from "./app/text";
+import { text_chunk_document } from "./app/text";
 import { score_chunk }          from "./app/scoring";
 import { dropdown_create }      from "./app/dropdown";
 import { infer_get, infer_local_available } from "./app/infer";
@@ -44,7 +43,6 @@ function by_id<T extends HTMLElement = HTMLElement>(id: string): T {
 
 const drop_zone         = by_id("drop_zone");
 const file_input        = by_id<HTMLInputElement>("file_input");
-const btn_load_sample   = by_id("btn_load_sample");
 const btn_clear_docs    = by_id("btn_clear_docs");
 const doc_list          = by_id("doc_list");
 const doc_count         = by_id("doc_count");
@@ -368,7 +366,7 @@ function page_switch_button_create(page: PageName, icon: string, label_text: str
 }
 
 function page_switchs_button_create(): void {
-    page_switch.appendChild(page_switch_button_create("home", "upload-cloud", "上传文档"));
+    page_switch.appendChild(page_switch_button_create("home", "upload-cloud", "我的内容"));
     page_switch.appendChild(page_switch_button_create("ingest", "loader-circle", "处理队列"));
     page_active_show("home");
 }
@@ -413,12 +411,6 @@ drop_zone.addEventListener("drop", (event) => {
 
 file_input.addEventListener("change", (event) => {
     documents_ingest_insert((event.target as HTMLInputElement).files);
-});
-
-btn_load_sample.addEventListener("click", () => {
-    const files = SAMPLE_DOCS.map((d) => new File([d.content], d.title, { type: "text/plain" }));
-    documents_ingest_insert(files);
-    render_toast("正在导入演示文档库…");
 });
 
 btn_clear_docs.addEventListener("click", () => {
