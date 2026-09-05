@@ -3,12 +3,15 @@
 // Copyright (c) 2026 BaseTUT.
 // Licensed under the MIT License.
 
-import type { ResultHit, TextChunk } from "./app/types";
-import { SAMPLE_DOCS } from "./app/samples";
-import { text_chunk_document } from "./app/text";
-import { score_chunk } from "./app/scoring";
-import { dropdown_create } from "./app/dropdown";
-import { create_embedder, type Embedder } from "./app/embed";
+import { 
+    type ResultHit,
+    type TextChunk
+} from "./app/types";
+import { SAMPLE_DOCS }          from "./app/samples";
+import { text_chunk_document }  from "./app/text";
+import { score_chunk }          from "./app/scoring";
+import { dropdown_create }      from "./app/dropdown";
+import { infer_get }            from "./app/infer";
 import {
     render_lib_empty,
     render_lib_items,
@@ -19,13 +22,16 @@ import {
     type LibDoc,
     type QueueCardItem,
 } from "./app/render";
-import { refresh_icons } from "./app/icons";
+import { refresh_icons }        from "./app/icons";
 import {
-    RUNTIME_INFO,
-    SEARCH_DEFAULTS,
-    SEARCH_MODES,
-    type RuntimeInfo,
+    INFER_SETTING_DEFAULT,
+    SEARCH_SETTING_DEFAULT,
+    SEARCH_MODE_OPTIONS,
+    type InferSetting,
     type SearchMode,
+    INFER_MODEL_NAME,
+    INFER_MODEL_SRC,
+    INFER_MODEL_DIM,
 } from "./app/settings";
 
 // DOM
@@ -69,10 +75,6 @@ let documents_ingest:       File[]          = [];
 let documents_ingest_busy:  boolean         = false;
 let documents_ingest_cards: QueueCardItem[] = [];
 
-// Embedding
-
-let embedder: Embedder | null = null;
-
 // Page
 
 type  PageName = "home" | "ingest";
@@ -84,7 +86,7 @@ const document_opening = new Set<string>();
 // Search
 
 let chunks:             TextChunk[] = [];
-let search_mode_value:  SearchMode  = SEARCH_DEFAULTS.mode;
+let search_mode_value:  SearchMode  = SEARCH_SETTING_DEFAULT.mode;
 
 
 
@@ -124,21 +126,23 @@ async function json_post(url: string, payload: unknown): Promise<unknown> {
     return res.json();
 }
 
-// Embedding
+// Infer
 
-async function embedder_get(): Promise<Embedder> {
-    if (!embedder) {
-        embedder = await create_embedder();
-        const info = embedder.info();
-        runtime_update({
-            ...RUNTIME_INFO,
-            source: "HuggingFace · Transformers.js",
-            dimension: info.dimension,
-            backend: info.backend,
-            ready: true,
-        });
-    }
-    return embedder;
+function infer_ui_sync(setting: InferSetting = INFER_SETTING_DEFAULT): void {
+
+    // Fixed
+    rt_model.textContent  = INFER_MODEL_NAME;
+    rt_source.textContent = INFER_MODEL_SRC;
+    rt_dim.textContent    = `${INFER_MODEL_DIM} 维`;
+
+    // Quant
+    rt_quant.textContent = setting.quant;
+
+    // Backend
+    const backend = setting.backend === "webgpu" ? "WebGPU" : "WASM";
+    rt_backend.textContent = backend;
+    rt_backend_badge.classList.toggle("is_webgpu", setting.backend === "webgpu");
+    rt_backend_badge.classList.toggle("is_wasm", setting.backend === "wasm");
 }
 
 // Process
@@ -155,8 +159,9 @@ async function document_process(file: File): Promise<void> {
     const chunks = text_chunk_document(doc);
 
     // Embedding
-    const embedder = await embedder_get();
-    const vecs     = await embedder.encode(chunks.map((c) => c.content));
+    const infer = await infer_get();
+    const vecs  = await infer.encode(chunks.map((c) => c.content));
+    infer_ui_sync(infer.setting);
     
     // Records: Chunks + Embedding + Metadata
     const records  = chunks.map((c, i) => ({
@@ -240,29 +245,15 @@ function show_initial_state(): void {
     results_list.replaceChildren(initial_state);
 }
 
-// Runtime
-
-function runtime_update(info: RuntimeInfo = RUNTIME_INFO): void {
-    rt_model.textContent  = info.model_name;
-    rt_source.textContent = info.source;
-    rt_dim.textContent    = `${info.dimension} 维`;
-    rt_quant.textContent  = info.quant;
-
-    const backend_label = info.backend === "webgpu" ? "WebGPU" : "WASM";
-    rt_backend.textContent = backend_label;
-    rt_backend_badge.classList.toggle("is_webgpu", info.backend === "webgpu");
-    rt_backend_badge.classList.toggle("is_wasm", info.backend === "wasm");
-}
-
 // Search
 
 function search_init(): void {
-    dropdown_create<SearchMode>(search_mode_dd, SEARCH_MODES, SEARCH_DEFAULTS.mode, (value) => {
+    dropdown_create<SearchMode>(search_mode_dd, SEARCH_MODE_OPTIONS, SEARCH_SETTING_DEFAULT.mode, (value) => {
         search_mode_value = value;
     });
-    top_k_input.min = String(SEARCH_DEFAULTS.top_k_min);
-    top_k_input.max = String(SEARCH_DEFAULTS.top_k_max);
-    top_k_input.value = String(SEARCH_DEFAULTS.top_k);
+    top_k_input.min = String(SEARCH_SETTING_DEFAULT.top_k_min);
+    top_k_input.max = String(SEARCH_SETTING_DEFAULT.top_k_max);
+    top_k_input.value = String(SEARCH_SETTING_DEFAULT.top_k);
 }
 
 function search_execute(): void {
@@ -293,15 +284,15 @@ function search_execute(): void {
 
 function search_topk_read(): number {
     return Math.min(
-        SEARCH_DEFAULTS.top_k_max,
-        Math.max(SEARCH_DEFAULTS.top_k_min, parseInt(top_k_input.value, 10) || SEARCH_DEFAULTS.top_k),
+        SEARCH_SETTING_DEFAULT.top_k_max,
+        Math.max(SEARCH_SETTING_DEFAULT.top_k_min, parseInt(top_k_input.value, 10) || SEARCH_SETTING_DEFAULT.top_k),
     );
 }
 
 function search_topk_modifier_update(): void {
     const value = search_topk_read();
-    top_k_dec.disabled = value <= SEARCH_DEFAULTS.top_k_min;
-    top_k_inc.disabled = value >= SEARCH_DEFAULTS.top_k_max;
+    top_k_dec.disabled = value <= SEARCH_SETTING_DEFAULT.top_k_min;
+    top_k_inc.disabled = value >= SEARCH_SETTING_DEFAULT.top_k_max;
 }
 
 function search_topk_update(value: number): void {
@@ -392,14 +383,11 @@ function page_ingest_cards_status_sync(title: string): void {
 // Event Listener
 
 drop_zone.addEventListener("click", () => file_input.click());
-
 drop_zone.addEventListener("dragover", (event) => {
     event.preventDefault();
     drop_zone.classList.add("is_dragover");
 });
-
 drop_zone.addEventListener("dragleave", () => drop_zone.classList.remove("is_dragover"));
-
 drop_zone.addEventListener("drop", (event) => {
     event.preventDefault();
     drop_zone.classList.remove("is_dragover");
@@ -472,10 +460,7 @@ queue_shelf.addEventListener("click", (event) => {
 page_switchs_button_create();
 page_ingest_cards_render();
 refresh_icons();
-runtime_update({
-    ...RUNTIME_INFO,
-    backend: navigator.gpu ? "webgpu" : "wasm",
-});
+infer_ui_sync();
 search_init();
 search_topk_modifier_update();
 show_initial_state();
