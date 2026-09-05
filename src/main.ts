@@ -17,7 +17,6 @@ import {
     render_queue_cards,
     render_result_card,
     render_result_empty,
-    render_toast,
     type LibDoc,
     type QueueCardItem,
 } from "./app/render";
@@ -318,7 +317,6 @@ async function document_process(file: File): Promise<void> {
         },
         chunks: records,
     });
-    render_toast(`已入库：【${doc.title}】· ${records.length} 切片`);
     log_push(`处理成功：${doc.title}`, `${records.length} 个切片已写入知识库`);
 }
 
@@ -334,7 +332,6 @@ async function documents_refresh(): Promise<void> {
     try {
         docs = await documents_fetch();
     } catch (error) {
-        render_toast(`无法加载知识库：${String(error)}`);
         log_push("无法加载知识库", String(error));
     }
 
@@ -351,7 +348,6 @@ async function documents_ingest_loop(): Promise<void> {
         try {
             await document_process(file);
         } catch (error) {
-            render_toast(`处理失败：${String(error)}`);
             log_push("处理失败", String(error));
         }
     }
@@ -399,7 +395,7 @@ function search_execute(): void {
     if (!query) return;
 
     if (chunks.length === 0) {
-        render_toast("知识库中暂无文档切片，请先上传或加载示例文档！");
+        log_push("知识库中暂无文档切片", "请先上传文档，再开始检索");
         return;
     }
 
@@ -617,10 +613,8 @@ card_menu_delete.addEventListener("click", async () => {
         await json_delete(`/api/document?id=${encodeURIComponent(id)}`);
         document_opening.delete(id);
         await documents_refresh();
-        render_toast("已删除文档");
         log_push("已删除文档", "已从知识库移除");
     } catch (error) {
-        render_toast(`删除失败：${String(error)}`);
         log_push("删除失败", String(error));
     }
 });
