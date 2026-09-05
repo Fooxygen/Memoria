@@ -5,7 +5,7 @@
 
 // Infer
 
-export const INFER_MODEL      = "onnx-community/all-MiniLM-L6-v2-ONNX";
+export const INFER_MODEL      = "Xenova/all-MiniLM-L6-v2";
 export const INFER_MODEL_NAME = "all-MiniLM-L6-v2";
 export const INFER_MODEL_SRC  = "Xenova · HuggingFace";
 export const INFER_MODEL_DIM  = 384;

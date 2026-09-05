@@ -5,6 +5,9 @@
 
 import type { Plugin, ViteDevServer } from "vite";
 import type { ServerResponse, IncomingMessage } from "node:http";
+import { createReadStream } from "node:fs";
+import { existsSync, statSync } from "node:fs";
+import { join, normalize, resolve } from "node:path";
 import {
     db_client_get,
     db_close,
@@ -14,6 +17,44 @@ import {
     chunks_add,
 } from "./db/db.ts";
 import type { ChunkRecord } from "./db/meta.ts";
+
+const MODELS_ROOT = resolve(process.cwd(), "data", "models");
+
+const MIME_BY_EXT: Record<string, string> = {
+    ".onnx": "application/octet-stream",
+    ".json": "application/json",
+    ".txt":  "text/plain",
+    ".map":  "application/json",
+};
+
+function serve_models(req: IncomingMessage, res: ServerResponse, next: () => void): void {
+    const path = new URL(req.url ?? "", "http://localhost").pathname;
+    if (!path.startsWith("/models/")) {
+        next();
+        return;
+    }
+    const rel = decodeURIComponent(path.slice("/models/".length)).replace(/\\/g, "/");
+    const file = normalize(join(MODELS_ROOT, rel));
+    if (!file.startsWith(MODELS_ROOT)) {
+        res.statusCode = 403;
+        res.end();
+        return;
+    }
+    if (!existsSync(file) || !statSync(file).isFile()) {
+        res.statusCode = 404;
+        res.end();
+        return;
+    }
+    const type = MIME_BY_EXT[file.slice(file.lastIndexOf(".")).toLowerCase()] ?? "application/octet-stream";
+    res.statusCode = 200;
+    res.setHeader("Content-Type", type);
+    if (req.method === "HEAD") {
+        res.setHeader("Content-Length", statSync(file).size);
+        res.end();
+        return;
+    }
+    createReadStream(file).pipe(res);
+}
 
 function read_json(req: IncomingMessage): Promise<unknown> {
     return new Promise((resolve, reject) => {
@@ -44,6 +85,8 @@ export function seekdb_plugin(): Plugin {
         async configureServer(server: ViteDevServer) {
             await db_client_get();
             await documents_create();
+
+            server.middlewares.use(serve_models);
 
             server.middlewares.use(async (req, res, next) => {
                 const url = new URL(req.url ?? "", "http://localhost");

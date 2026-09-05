@@ -8,6 +8,7 @@ import {
     ArrowRight,
     ChevronDown,
     CircleStop,
+    Download,
     FileText,
     FolderOpen,
     Ghost,
@@ -30,6 +31,7 @@ const USED_ICONS = {
     ChevronDown,
     LoaderCircle,
     CircleStop,
+    Download,
     X,
     Ghost,
 };

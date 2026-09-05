@@ -10,6 +10,17 @@ import {
     type InferBackend
 } from "./settings";
 
+export const INFER_MODEL_ONNX_URL = `/models/${INFER_MODEL}/onnx/model_quantized.onnx`;
+
+export async function infer_local_available(): Promise<boolean> {
+    try {
+        const res = await fetch(INFER_MODEL_ONNX_URL, { method: "HEAD" });
+        return res.ok;
+    } catch {
+        return false;
+    }
+}
+
 export interface Infer {
     setting: InferSetting;
 
@@ -28,14 +39,17 @@ export async function infer_get(): Promise<Infer> {
 }
 
 export async function infer_create(): Promise<Infer> {
-    const { pipeline } = await import("@huggingface/transformers");
+    const { pipeline, env } = await import("@huggingface/transformers");
+
+    env.localModelPath   = "/models/";
+    env.allowLocalModels = true;
 
     let error = "";
 
     async function executor_load(backend: InferBackend): Promise<unknown> {
         return pipeline("feature-extraction", INFER_MODEL, {
             device: backend,
-            dtype:  backend === "webgpu" ? "fp16" : "fp32",
+            dtype:  "q8",
         });
     }
 

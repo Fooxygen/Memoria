@@ -11,7 +11,7 @@ import { SAMPLE_DOCS }          from "./app/samples";
 import { text_chunk_document }  from "./app/text";
 import { score_chunk }          from "./app/scoring";
 import { dropdown_create }      from "./app/dropdown";
-import { infer_get }            from "./app/infer";
+import { infer_get, infer_local_available } from "./app/infer";
 import {
     render_lib_empty,
     render_lib_items,
@@ -63,6 +63,8 @@ const initial_state     = by_id("initial_state");
 const stat_chunks       = by_id("stat_chunks");
 const stat_latency      = by_id("stat_latency");
 const rt_model          = by_id("rt_model");
+const rt_download       = by_id("rt_download");
+const rt_loader         = by_id("rt_loader");
 const rt_source         = by_id("rt_source");
 const rt_dim            = by_id("rt_dim");
 const rt_backend        = by_id("rt_backend");
@@ -145,6 +147,11 @@ function infer_ui_sync(setting: InferSetting = INFER_SETTING_DEFAULT): void {
     rt_backend_badge.classList.toggle("is_wasm", setting.backend === "wasm");
 }
 
+function infer_phase_set(mode: "load" | "download" | null): void {
+    rt_download.hidden = mode !== "download";
+    rt_loader.hidden   = mode !== "load";
+}
+
 // Process
 
 async function document_process(file: File): Promise<void> {
@@ -160,7 +167,17 @@ async function document_process(file: File): Promise<void> {
 
     // Embedding
     const infer = await infer_get();
-    const vecs  = await infer.encode(chunks.map((c) => c.content));
+
+    if (!infer.setting.ready) {
+        const local = await infer_local_available();
+        infer_phase_set(local ? "load" : "download");
+    }
+    let vecs: number[][];
+    try {
+        vecs = await infer.encode(chunks.map((c) => c.content));
+    } finally {
+        infer_phase_set(null);
+    }
     infer_ui_sync(infer.setting);
     
     // Records: Chunks + Embedding + Metadata
