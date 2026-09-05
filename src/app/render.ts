@@ -7,6 +7,7 @@ import type { ResultHit } from "./types";
 import { text_escape_html, text_highlight } from "./text";
 
 export interface LibDoc {
+    id: string;
     title: string;
     preview: string;
     chunk_count: number;
@@ -16,7 +17,7 @@ export function render_lib_items(docs: LibDoc[]): string {
     return docs
         .map((doc) => {
             return `
-                <article class="doc_card card" role="listitem" data-key="${text_escape_html(doc.title)}">
+                <article class="doc_card card" role="listitem" data-key="${text_escape_html(doc.id)}">
                     <div class="doc_card_meta">${doc.chunk_count} 切片</div>
                     <h3 class="doc_card_title" title="${text_escape_html(doc.title)}">${text_escape_html(doc.title)}</h3>
                     <p class="doc_card_desc">${text_escape_html(doc.preview ?? "")}</p>
