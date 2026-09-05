@@ -3,8 +3,8 @@
 // Copyright (c) 2026 BaseTUT.
 // Licensed under the MIT License.
 
-import type { ResultHit } from "./types";
-import { text_escape_html, text_highlight } from "./text";
+import type { ResultHit } from "../store/types";
+import { text_escape_html, text_highlight } from "../store/text";
 
 export interface LibDoc {
     id: string;
@@ -99,18 +99,4 @@ export function render_result_empty(): string {
             <p class="empty_title">没有找到相关内容</p>
             <p class="empty_hint">尝试使用更宽泛的关键词或切换检索模式</p>
         </div>`;
-}
-
-export function render_toast(message: string): void {
-    const toast = document.createElement("div");
-    toast.className = "toast card";
-    toast.textContent = message;
-    document.body.appendChild(toast);
-
-    requestAnimationFrame(() => toast.classList.add("is_visible"));
-
-    setTimeout(() => {
-        toast.classList.remove("is_visible");
-        setTimeout(() => toast.remove(), 400);
-    }, 3000);
 }

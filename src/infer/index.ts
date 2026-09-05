@@ -8,7 +8,7 @@ import {
     INFER_SETTING_DEFAULT,
     type InferSetting,
     type InferBackend
-} from "./settings";
+} from "../store/settings";
 
 export const INFER_MODEL_ONNX_URL = `/models/${INFER_MODEL}/onnx/model_quantized.onnx`;
 

@@ -6,11 +6,11 @@
 import { 
     type ResultHit,
     type TextChunk
-} from "./app/types";
-import { text_chunk_document } from "./app/text";
-import { score_chunk }          from "./app/scoring";
-import { dropdown_create }      from "./app/dropdown";
-import { infer_get, infer_local_available } from "./app/infer";
+} from "./store/types";
+import { text_chunk_document } from "./store/text";
+import { score_chunk }          from "./store/scoring";
+import { dropdown_create }      from "./ui/dropdown";
+import { infer_get, infer_local_available } from "./infer";
 import {
     render_lib_empty,
     render_lib_items,
@@ -19,8 +19,8 @@ import {
     render_result_empty,
     type LibDoc,
     type QueueCardItem,
-} from "./app/render";
-import { refresh_icons }        from "./app/icons";
+} from "./ui/render";
+import { refresh_icons }        from "./ui/icons";
 import {
     INFER_SETTING_DEFAULT,
     SEARCH_SETTING_DEFAULT,
@@ -30,7 +30,7 @@ import {
     INFER_MODEL_NAME,
     INFER_MODEL_SRC,
     INFER_MODEL_DIM,
-} from "./app/settings";
+} from "./store/settings";
 
 // DOM
 

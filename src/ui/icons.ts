@@ -16,7 +16,6 @@ import {
     LoaderCircle,
     Search,
     SearchCode,
-    Sparkles,
     Trash2,
     UploadCloud,
     X,
@@ -25,7 +24,6 @@ import {
 const USED_ICONS = {
     Search,
     UploadCloud,
-    Sparkles,
     Trash2,
     FolderOpen,
     FileText,
