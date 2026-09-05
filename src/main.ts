@@ -58,8 +58,10 @@ const top_k_dec         = by_id<HTMLButtonElement>("top_k_dec");
 const top_k_inc         = by_id<HTMLButtonElement>("top_k_inc");
 const results_list      = by_id("results_list");
 const initial_state     = by_id("initial_state");
-const stat_chunks       = by_id("stat_chunks");
-const stat_latency      = by_id("stat_latency");
+const logs_box          = by_id("logs");
+const logs_trigger      = by_id("logs_trigger");
+const logs_panel        = by_id("logs_panel");
+const logs_list         = by_id("logs_list");
 const rt_model          = by_id("rt_model");
 const rt_download       = by_id("rt_download");
 const rt_loader         = by_id("rt_loader");
@@ -87,6 +89,24 @@ const document_opening = new Set<string>();
 
 let chunks:             TextChunk[] = [];
 let search_mode_value:  SearchMode  = SEARCH_SETTING_DEFAULT.mode;
+
+// Logs
+
+type LogState = "collapsed" | "peek" | "expanded";
+
+interface LogEntry {
+    id:      number;
+    message: string;
+    detail:  string;
+    time:    number;
+}
+
+const LOG_PAGE = 10;
+
+let logs:          LogEntry[]     = [];
+let log_next_id:   number         = 0;
+let logs_state:    LogState       = "collapsed";
+let logs_visible:  number         = LOG_PAGE;
 
 
 
@@ -150,7 +170,89 @@ function infer_phase_set(mode: "load" | "download" | null): void {
     rt_loader.hidden   = mode !== "load";
 }
 
-// Process
+// Logs
+
+function log_time_ago(ts: number): string {
+    const min = Math.floor((Date.now() - ts) / 60000);
+    if (min < 1) return "刚刚";
+    if (min < 60) return `${min} 分钟前`;
+    const hr = Math.floor(min / 60);
+    return `${hr} 小时前`;
+}
+
+function log_escape(text: string): string {
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+}
+
+function log_render_item(entry: LogEntry, open: boolean): string {
+    const detail = entry.detail ? `<p class="log_item_detail">${log_escape(entry.detail)}</p>` : "";
+    return `
+        <li class="log_item${open ? " is_open" : ""}" data-id="${entry.id}">
+            <p class="log_item_msg">${log_escape(entry.message)}</p>
+            <span class="log_item_time">${log_time_ago(entry.time)}</span>
+            ${detail}
+        </li>`;
+}
+
+function log_state_set(state: LogState): void {
+    logs_state = state;
+    logs_visible = LOG_PAGE;
+    logs_box.classList.toggle("is_open", state !== "collapsed");
+    logs_render();
+}
+
+function logs_render(): void {
+    const items = logs_state === "expanded" ? logs : logs.slice(0, 1);
+    const limited = items.slice(0, logs_visible);
+    logs_list.innerHTML = limited.map((entry) => log_render_item(entry, false)).join("");
+}
+
+function log_push(message: string, detail = "", open = true): void {
+    logs.unshift({ id: log_next_id++, message, detail, time: Date.now() });
+    if (logs.length > 500) logs.length = 500;
+    if (open && logs_state === "collapsed") log_state_set("peek");
+    else logs_render();
+}
+
+function logs_open_item(id: number): void {
+    for (const item of logs_list.children) {
+        const el = item as HTMLElement;
+        el.classList.toggle("is_open", Number(el.dataset.id) === id);
+    }
+}
+
+logs_trigger.addEventListener("click", () => {
+    if (logs_state === "collapsed") log_state_set("expanded");
+});
+
+logs_panel.addEventListener("click", (event) => {
+    const item = (event.target as HTMLElement).closest<HTMLElement>(".log_item");
+    if (item) {
+        logs_open_item(Number(item.dataset.id));
+        return;
+    }
+    if (logs_state === "peek") log_state_set("expanded");
+});
+
+logs_list.addEventListener("scroll", () => {
+    if (logs_state !== "expanded") return;
+    const el = logs_list;
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 8) {
+        logs_visible += LOG_PAGE;
+        logs_render();
+    }
+});
+
+document.addEventListener("pointerdown", (event) => {
+    const target = event.target as HTMLElement;
+    if (logs_state === "collapsed") return;
+    if (target.closest(".logs")) return;
+    log_state_set("collapsed");
+});
 
 async function document_process(file: File): Promise<void> {
 
@@ -197,6 +299,7 @@ async function document_process(file: File): Promise<void> {
         chunks: records,
     });
     render_toast(`已入库：【${doc.title}】· ${records.length} 切片`);
+    log_push(`已入库：${doc.title}`, `${records.length} 个切片已写入知识库`);
 }
 
 async function documents_fetch(): Promise<LibDoc[]> {
@@ -212,10 +315,10 @@ async function documents_refresh(): Promise<void> {
         docs = await documents_fetch();
     } catch (error) {
         render_toast(`无法加载知识库：${String(error)}`);
+        log_push("无法加载知识库", String(error));
     }
 
     doc_count.textContent = String(docs.length);
-    stat_chunks.textContent = `切分切片: ${docs.reduce((sum, d) => sum + d.chunk_count, 0)}`;
 
     mount_waterfall(doc_list, docs.length === 0 ? "" : render_lib_items(docs), render_lib_empty());
     btn_clear_docs.hidden = docs.length === 0;
@@ -230,6 +333,7 @@ async function documents_ingest_loop(): Promise<void> {
             await document_process(file);
         } catch (error) {
             render_toast(`处理失败：${String(error)}`);
+            log_push("处理失败", String(error));
         }
     }
     documents_ingest_busy = false;
@@ -280,7 +384,6 @@ function search_execute(): void {
         return;
     }
 
-    const start = performance.now();
     const mode = search_mode_value;
     const top_k = Math.min(Math.max(parseInt(top_k_input.value, 10) || 4, 1), 20);
 
@@ -289,8 +392,6 @@ function search_execute(): void {
         .filter((hit) => hit.score > 0.05)
         .sort((a, b) => b.score - a.score)
         .slice(0, top_k);
-
-    stat_latency.textContent = `匹配响应: ${Math.round(performance.now() - start)} ms`;
 
     results_list.innerHTML =
         hits.length === 0 ? render_result_empty() : hits.map((hit, i) => render_result_card(hit, i, query)).join("");
@@ -473,4 +574,5 @@ infer_ui_sync();
 search_init();
 search_topk_modifier_update();
 show_initial_state();
+log_push("已启动 Memoria", "端侧向量化已就绪，上传文档即可开始", false);
 void documents_refresh();

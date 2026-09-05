@@ -72,11 +72,14 @@
 		</aside>
 
 		<main class="workspace pane">
-			<header class="status card">
-				<span class="status_label">端侧计算状态</span>
-				<span id="stat_chunks" class="chip">切分切片: 0</span>
-				<span id="stat_latency" class="chip">匹配响应: 0 ms</span>
-			</header>
+			<div class="logs" id="logs">
+				<button id="logs_trigger" class="logs_trigger" type="button" aria-label="查看日志">
+					<i data-lucide="ellipsis"></i>
+				</button>
+				<div id="logs_panel" class="logs_panel">
+					<ul id="logs_list" class="logs_list"></ul>
+				</div>
+			</div>
 
 			<section class="results" aria-label="Search results">
 				<div class="results_inner">
