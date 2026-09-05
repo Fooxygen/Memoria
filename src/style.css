@@ -1492,6 +1492,16 @@ mark.highlight_mark,
 	gap: 2px;
 }
 
+.logs_empty {
+	margin: 13px;
+	text-align: center;
+	padding: 0 24px;
+	font-size: 13px;
+	font-weight: var(--text-soft-w);
+	color: var(--text-faint-c);
+	opacity: 0.85;
+}
+
 .log_item {
 	padding: 8px 10px;
 	border-radius: 12px;

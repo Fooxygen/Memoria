@@ -206,6 +206,10 @@ function log_state_set(state: LogState): void {
 }
 
 function logs_render(): void {
+    if (logs.length === 0) {
+        logs_list.innerHTML = `<li class="logs_empty">日志队列为空</li>`;
+        return;
+    }
     const items = logs_state === "expanded" ? logs : logs.slice(0, 1);
     const limited = items.slice(0, logs_visible);
     logs_list.innerHTML = limited.map((entry) => log_render_item(entry, false)).join("");
@@ -299,7 +303,7 @@ async function document_process(file: File): Promise<void> {
         chunks: records,
     });
     render_toast(`已入库：【${doc.title}】· ${records.length} 切片`);
-    log_push(`已入库：${doc.title}`, `${records.length} 个切片已写入知识库`);
+    log_push(`处理成功：${doc.title}`, `${records.length} 个切片已写入知识库`);
 }
 
 async function documents_fetch(): Promise<LibDoc[]> {
@@ -574,5 +578,4 @@ infer_ui_sync();
 search_init();
 search_topk_modifier_update();
 show_initial_state();
-log_push("已启动 Memoria", "端侧向量化已就绪，上传文档即可开始", false);
 void documents_refresh();
