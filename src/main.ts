@@ -10,7 +10,7 @@ import {
     render_lib_empty,
     render_lib_items,
     render_queue_cards,
-    render_result_card,
+    render_result_collection,
     type LibDoc,
     type QueueCardItem,
     type SearchHit,
@@ -449,9 +449,31 @@ async function search_execute(): Promise<void> {
 
     const collection = document.createElement("div");
     collection.className = "result_collection";
-    collection.innerHTML = hits.map((hit) => render_result_card(hit)).join("");
+    collection.innerHTML = render_result_collection(hits);
     results_list.appendChild(collection);
-    collection.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    const n = hits.length;
+    let best_diff = Infinity;
+    let cols = n;
+    for (let c = 1; c <= n; c++) {
+        if (n % c !== 0) continue;
+        const diff = Math.abs(c - n / c);
+        if (diff < best_diff) {
+            best_diff = diff;
+            cols = c;
+        }
+    }
+    collection.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+
+    const scroller = results_list.closest<HTMLElement>(".results");
+    if (scroller) {
+        const top =
+            collection.getBoundingClientRect().top -
+            scroller.getBoundingClientRect().top +
+            scroller.scrollTop -
+            24;
+        scroller.scrollTo({ top, behavior: "smooth" });
+    }
     refresh_icons();
 }
 

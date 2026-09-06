@@ -66,14 +66,18 @@ export interface SearchHit {
     pct: number;
 }
 
-export function render_result_card(hit: SearchHit): string {
-    return `
-        <article class="result_card card">
-            <div class="result_card_score">
-                <span class="pct_num">${hit.pct}</span><span class="pct_sym">%</span>
-            </div>
-            <p class="result_card_text"><span class="quote_mark">“</span>${text_escape_html(hit.content)}<span class="quote_mark">”</span></p>
-        </article>`;
+export function render_result_collection(hits: SearchHit[]): string {
+    return hits
+        .map((hit) => {
+            return `
+                <article class="result_card card" data-pct="${hit.pct}">
+                    <div class="result_card_score">
+                        <span class="pct_num">${hit.pct}</span><span class="pct_sym">%</span>
+                    </div>
+                    <p class="result_card_text"><span class="quote_mark">“</span>${text_escape_html(hit.content)}<span class="quote_mark">”</span></p>
+                </article>`;
+        })
+        .join("");
 }
 
 export function render_result_empty(): string {
