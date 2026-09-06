@@ -47,8 +47,8 @@ export interface SearchSetting {
 }
 
 export const SEARCH_SETTING_DEFAULT: SearchSetting = {
-    mode:      "hybrid",
-    top_k:     4,
-    top_k_min: 1,
-    top_k_max: 20,
+	mode:      "semantic",
+	top_k:     4,
+	top_k_min: 1,
+	top_k_max: 20,
 };

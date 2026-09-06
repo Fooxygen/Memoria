@@ -3,12 +3,7 @@
 // Copyright (c) 2026 BaseTUT.
 // Licensed under the MIT License.
 
-import { 
-    type ResultHit,
-    type TextChunk
-} from "./store/types";
 import { text_chunk_document } from "./store/text";
-import { score_chunk }          from "./store/scoring";
 import { dropdown_create }      from "./ui/dropdown";
 import { infer_get, infer_local_available } from "./infer";
 import {
@@ -16,9 +11,9 @@ import {
     render_lib_items,
     render_queue_cards,
     render_result_card,
-    render_result_empty,
     type LibDoc,
     type QueueCardItem,
+    type SearchHit,
 } from "./ui/render";
 import { refresh_icons }        from "./ui/icons";
 import {
@@ -88,7 +83,6 @@ const document_opening = new Set<string>();
 
 // Search
 
-let chunks:             TextChunk[] = [];
 let search_mode_value:  SearchMode  = SEARCH_SETTING_DEFAULT.mode;
 
 // Logs
@@ -429,26 +423,35 @@ function search_init(): void {
     top_k_input.value = String(SEARCH_SETTING_DEFAULT.top_k);
 }
 
-function search_execute(): void {
+async function search_execute(): Promise<void> {
     const query = search_input.value.trim();
     if (!query) return;
 
-    if (chunks.length === 0) {
-        log_push("知识库中暂无文档切片", "请先上传文档，再开始检索");
+    if (search_mode_value !== "semantic") return;
+
+    const top_k = Math.min(Math.max(parseInt(top_k_input.value, 10) || 4, 1), 20);
+
+    let hits: SearchHit[];
+    try {
+        const infer = await infer_get();
+        const vec = (await infer.encode([query]))[0];
+        const res = (await json_post("/api/search", { vec, top_k })) as { hits: SearchHit[] };
+        hits = (res.hits ?? []) as SearchHit[];
+    } catch (error) {
+        log_push("检索失败", String(error));
         return;
     }
 
-    const mode = search_mode_value;
-    const top_k = Math.min(Math.max(parseInt(top_k_input.value, 10) || 4, 1), 20);
+    if (hits.length === 0) {
+        log_push("没有找到相关内容", "换个说法再试");
+        return;
+    }
 
-    const hits: ResultHit[] = chunks
-        .map((chunk) => ({ ...chunk, score: score_chunk(chunk.content, query, mode) }))
-        .filter((hit) => hit.score > 0.05)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, top_k);
-
-    results_list.innerHTML =
-        hits.length === 0 ? render_result_empty() : hits.map((hit, i) => render_result_card(hit, i, query)).join("");
+    const collection = document.createElement("div");
+    collection.className = "result_collection";
+    collection.innerHTML = hits.map((hit) => render_result_card(hit)).join("");
+    results_list.appendChild(collection);
+    collection.scrollIntoView({ behavior: "smooth", block: "start" });
     refresh_icons();
 }
 

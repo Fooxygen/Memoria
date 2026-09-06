@@ -3,8 +3,7 @@
 // Copyright (c) 2026 BaseTUT.
 // Licensed under the MIT License.
 
-import type { ResultHit } from "../store/types";
-import { text_escape_html, text_highlight } from "../store/text";
+import { text_escape_html } from "../store/text";
 
 export interface LibDoc {
     id: string;
@@ -62,23 +61,18 @@ export function render_queue_cards(items: QueueCardItem[]): string {
         .join("");
 }
 
-export function render_result_card(hit: ResultHit, index: number, query: string): string {
-    const normalized = Math.min(Math.round(hit.score * 100), 99);
+export interface SearchHit {
+    content: string;
+    pct: number;
+}
+
+export function render_result_card(hit: SearchHit): string {
     return `
         <article class="result_card card">
-            <div class="result_card_head">
-                <span class="result_card_source">
-                    <span class="result_card_rank">${index + 1}</span>
-                    <span class="result_card_title" title="${text_escape_html(hit.doc_title)}">${text_escape_html(hit.doc_title)}</span>
-                </span>
-                <span class="result_card_score">
-                    <span class="scorebar" aria-hidden="true">
-                        <span class="scorebar_fill" style="width: ${normalized}%"></span>
-                    </span>
-                    <span class="result_card_pct">${normalized}% 匹配</span>
-                </span>
+            <div class="result_card_score">
+                <span class="pct_num">${hit.pct}</span><span class="pct_sym">%</span>
             </div>
-            <p class="result_card_text">${text_highlight(hit.content, query)}</p>
+            <p class="result_card_text"><span class="quote_mark">“</span>${text_escape_html(hit.content)}<span class="quote_mark">”</span></p>
         </article>`;
 }
 

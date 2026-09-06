@@ -17,6 +17,7 @@ import {
     documents_list,
     chunks_add,
     chunks_delete_by_document,
+    chunks_search,
 } from "./db/db.ts";
 import type { ChunkRecord } from "./db/meta.ts";
 
@@ -117,6 +118,35 @@ export function seekdb_plugin(): Plugin {
                         send_json(res, 200, { ok: true });
                     } catch (error) {
                         console.error("[delete] error:", error);
+                        send_json(res, 500, { ok: false, error: String(error) });
+                    }
+                    return;
+                }
+
+                if (path === "/api/search" && req.method === "POST") {
+                    try {
+                        const body = (await read_json(req)) as { vec?: number[]; top_k?: number };
+                        const vec = body.vec ?? [];
+                        if (!vec.length) {
+                            send_json(res, 400, { ok: false, error: "missing vec" });
+                            return;
+                        }
+                        const result = (await chunks_search(vec, Number(body.top_k) || 5)) as {
+                            documents?: (string | null)[] | (string | null)[][];
+                            distances?: number[] | number[][];
+                        };
+                        const docs = result.documents as (string | null)[] | undefined;
+                        const dists = result.distances as number[] | undefined;
+                        const raw_docs = Array.isArray(docs) && Array.isArray(docs[0]) ? (docs[0] as (string|null)[]) : (docs ?? []);
+                        const raw_dist = Array.isArray(dists) && Array.isArray(dists[0]) ? (dists[0] as number[]) : (dists ?? []);
+                        const hits = raw_docs.map((content, i) => {
+                            const d = raw_dist[i] ?? 0;
+                            const pct = Math.min(99, Math.max(1, Math.round(((d + 1) / 2) * 100)));
+                            return { content: String(content ?? ""), pct };
+                        });
+                        send_json(res, 200, { hits });
+                    } catch (error) {
+                        console.error("[search] error:", error);
                         send_json(res, 500, { ok: false, error: String(error) });
                     }
                     return;

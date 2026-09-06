@@ -618,8 +618,7 @@ select {
 }
 
 .results_inner {
-	max-width: 720px;
-	margin: 0 auto;
+	width: 80%;
 	display: flex;
 	flex-direction: column;
 	gap: 16px;
@@ -628,7 +627,16 @@ select {
 .results_list {
 	display: flex;
 	flex-direction: column;
-	gap: 12px;
+	gap: 56px;
+}
+
+.result_collection {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0;
+	width: 75%;
+	border-radius: 18px;
+	overflow: hidden;
 }
 
 .empty {
@@ -666,18 +674,13 @@ select {
 }
 
 #initial_state {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 50%;
-	transform: translateX(-50%);
-	width: calc(100% * 0.8);
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
 	justify-content: flex-start;
 	text-align: left;
-	padding: clamp(150px, 29vh, 340px) 0 0;
+	width: 100%;
+	margin-top: 12vh;
 }
 
 #initial_state .empty_title {
@@ -716,82 +719,54 @@ select {
 }
 
 .result_card {
-	padding: 20px;
-}
-
-.result_card_head {
+	position: relative;
 	display: flex;
-	align-items: center;
-	justify-content: space-between;
+	flex-direction: column;
 	gap: 12px;
-	padding-bottom: 12px;
-	margin-bottom: 12px;
-	border-bottom: var(--bd-w) solid var(--divider);
-}
-
-.result_card_source {
-	display: flex;
-	align-items: center;
-	gap: 8px;
+	padding: 18px 20px;
+	text-align: left;
 	min-width: 0;
-}
-
-.result_card_rank {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 20px;
-	height: 20px;
-	flex-shrink: 0;
-	border-radius: 50%;
-	background: rgba(59, 130, 246, 0.15);
-	color: var(--accent);
-	font-size: 10px;
-	font-weight: 700;
-}
-
-.result_card_title {
-	font-size: 12px;
-	font-weight: var(--text-body-w);
-	color: var(--text-body-c);
-	white-space: nowrap;
+	border-radius: 0;
+	height: 240px;
 	overflow: hidden;
-	text-overflow: ellipsis;
+	background: rgba(255, 255, 255, 0.82);
+	border-color: rgba(255, 255, 255, 0.28);
 }
 
 .result_card_score {
+	position: absolute;
+	top: 14px;
+	right: 16px;
 	display: flex;
-	align-items: center;
-	gap: 8px;
-	flex-shrink: 0;
-}
-
-.scorebar {
-	width: 64px;
-	height: 6px;
-	border-radius: 999px;
-	background: rgba(148, 163, 184, 0.35);
-	overflow: hidden;
-}
-
-.scorebar_fill {
-	height: 100%;
-	border-radius: inherit;
-	background: var(--accent);
-	transition: width 0.5s var(--ease-silk);
-}
-
-.result_card_pct {
-	font-size: 11px;
+	align-items: baseline;
+	gap: 1px;
 	font-family: var(--mono);
+	color: rgba(120, 90, 240, 0.75);
+}
+
+.result_card_score .pct_num {
+	font-size: 24px;
+	font-weight: 700;
+}
+
+.result_card_score .pct_sym {
+	font-size: 14px;
 	font-weight: var(--text-soft-w);
-	color: var(--text-soft-c);
 }
 
 .result_card_text {
-	font-size: 13px;
-	line-height: 1.75;
+	font-size: 18px;
+	line-height: 1.7;
+	font-weight: 700;
 	color: var(--text-body-c);
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+.result_card_text .quote_mark {
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--text-faint-c);
 }
 
 .searchdock {
