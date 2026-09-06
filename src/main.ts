@@ -130,6 +130,7 @@ function       mount_waterfall(container: HTMLElement, html: string, empty_html:
     container.append(col_a, col_b);
 
     cards.forEach((card, index) => {
+        card.style.animationDelay = `${(0.5 + index * 0.06).toFixed(2)}s`;
         if (index % 2 === 0) col_a.appendChild(card);
         else col_b.appendChild(card);
     });
