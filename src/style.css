@@ -145,22 +145,54 @@ select {
 	width: 700px;
 	height: 700px;
 	border-radius: 50%;
-	filter: blur(120px);
+	filter: blur(90px);
 	pointer-events: none;
 	z-index: 0;
 }
 
 .orb_one {
-	background: radial-gradient(circle, rgba(0, 113, 227, 0.32), rgba(168, 85, 247, 0.2));
-	animation: orbOrbitOne 12s infinite linear;
+	left: 40%;
+	top: 46%;
+	background: radial-gradient(circle, rgba(96, 160, 255, 0.5), rgba(122, 182, 255, 0.16));
+	animation: orbGrowOne 5s linear, orbOrbitOne 12s linear infinite;
 }
 
 .orb_two {
 	width: 750px;
 	height: 750px;
-	background: radial-gradient(circle, rgba(124, 100, 245, 0.28), rgba(88, 130, 240, 0.22));
-	filter: blur(130px);
-	animation: orbOrbitTwo 15s infinite linear;
+	left: 62%;
+	top: 56%;
+	background: radial-gradient(circle, rgba(128, 58, 214, 0.5), rgba(92, 42, 176, 0.18));
+	filter: blur(96px);
+	animation: orbGrowTwo 5s linear, orbOrbitTwo 15s linear infinite;
+}
+
+@keyframes orbGrowOne {
+	from {
+		width: 0;
+		height: 0;
+		opacity: 0;
+	}
+
+	to {
+		width: 700px;
+		height: 700px;
+		opacity: 1;
+	}
+}
+
+@keyframes orbGrowTwo {
+	from {
+		width: 0;
+		height: 0;
+		opacity: 0;
+	}
+
+	to {
+		width: 750px;
+		height: 750px;
+		opacity: 1;
+	}
 }
 
 @keyframes orbOrbitOne {
