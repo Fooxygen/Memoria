@@ -86,6 +86,10 @@
 				</div>
 			</div>
 
+			<button id="search_state" class="search_state" type="button" hidden aria-label="展开检索">
+				<i data-lucide="search"></i>
+			</button>
+
 			<section class="results" aria-label="Search results">
 				<div class="results_inner">
 					<div id="results_list" class="results_list" aria-live="polite">
@@ -97,7 +101,7 @@
 				</div>
 			</section>
 
-			<footer class="searchdock">
+			<footer class="searchdock" id="searchdock">
 				<div class="searchbar">
 					<i data-lucide="search" class="searchbar_icon" aria-hidden="true"></i>
 					<input id="search_input" type="text" autocomplete="off"

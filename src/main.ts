@@ -57,6 +57,8 @@ const logs_box          = by_id("logs");
 const logs_trigger      = by_id("logs_trigger");
 const logs_panel        = by_id("logs_panel");
 const logs_list         = by_id("logs_list");
+const searchdock        = by_id("searchdock");
+const search_state      = by_id("search_state");
 const rt_model          = by_id("rt_model");
 const rt_download       = by_id("rt_download");
 const rt_loader         = by_id("rt_loader");
@@ -84,6 +86,7 @@ const document_opening = new Set<string>();
 // Search
 
 let search_mode_value:  SearchMode  = SEARCH_SETTING_DEFAULT.mode;
+let searchdock_docked:  boolean     = false;
 
 // Logs
 
@@ -452,18 +455,7 @@ async function search_execute(): Promise<void> {
     collection.innerHTML = render_result_collection(hits);
     results_list.appendChild(collection);
 
-    const n = hits.length;
-    let best_diff = Infinity;
-    let cols = n;
-    for (let c = 1; c <= n; c++) {
-        if (n % c !== 0) continue;
-        const diff = Math.abs(c - n / c);
-        if (diff < best_diff) {
-            best_diff = diff;
-            cols = c;
-        }
-    }
-    collection.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+    masonry_into(collection, hits.length <= 4 ? 2 : hits.length <= 8 ? 3 : 4);
 
     const scroller = results_list.closest<HTMLElement>(".results");
     if (scroller) {
@@ -474,8 +466,47 @@ async function search_execute(): Promise<void> {
             24;
         scroller.scrollTo({ top, behavior: "smooth" });
     }
+    dock_search();
     refresh_icons();
 }
+
+function masonry_into(container: HTMLElement, cols: number): void {
+    const cards = Array.from(container.children) as HTMLElement[];
+    const columns: HTMLElement[] = [];
+    container.innerHTML = "";
+    for (let i = 0; i < cols; i++) {
+        const col = document.createElement("div");
+        col.className = "result_column";
+        container.appendChild(col);
+        columns.push(col);
+    }
+    if (!cards.length) return;
+    columns[0].append(...cards);
+    void container.offsetHeight;
+    const heights = cards.map((c) => c.offsetHeight);
+    columns[0].innerHTML = "";
+    const heights_sum = new Array(cols).fill(0);
+    cards.forEach((card, i) => {
+        let min = 0;
+        for (let j = 1; j < cols; j++) {
+            if (heights_sum[j] < heights_sum[min]) min = j;
+        }
+        columns[min].appendChild(card);
+        heights_sum[min] += heights[i];
+    });
+}
+
+function dock_search(): void {
+    if (searchdock_docked) return;
+    searchdock_docked = true;
+    searchdock.classList.add("is_docked");
+    search_state.hidden = false;
+}
+
+search_state.addEventListener("click", () => {
+    searchdock.classList.remove("is_docked");
+    search_input.focus();
+});
 
 function search_topk_read(): number {
     return Math.min(
