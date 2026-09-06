@@ -36,6 +36,7 @@ export function render_lib_empty(): string {
 export type QueueStatus = "wait" | "run" | "done";
 
 export interface QueueCardItem {
+    id: string;
     title: string;
     status: QueueStatus;
 }
@@ -46,27 +47,16 @@ const QUEUE_STATUS_CLASS: Record<QueueStatus, string> = {
     done: "is_done",
 };
 
-const QUEUE_ACTION_ICON: Record<QueueStatus, string> = {
-    wait: "x",
-    run: "circle-stop",
-    done: "x",
-};
-
 export function render_queue_cards(items: QueueCardItem[]): string {
     return items
         .map((it) => {
             const status_class = QUEUE_STATUS_CLASS[it.status];
-            const icon = QUEUE_ACTION_ICON[it.status];
-            const label = it.status === "run" ? "终止任务" : "清除记录";
             return `
-                <article class="doc_card card ${status_class}" role="listitem" data-key="${text_escape_html(it.title)}">
+                <article class="doc_card card ${status_class}" role="listitem" data-key="${text_escape_html(it.id)}">
                     <div class="doc_card_head">
                         <span class="doc_card_status" aria-hidden="true"></span>
                         <h3 class="doc_card_title" title="${text_escape_html(it.title)}">${text_escape_html(it.title)}</h3>
                     </div>
-                    <button class="doc_card_action" type="button" title="${label}" aria-label="${label}">
-                        <i data-lucide="${icon}"></i>
-                    </button>
                 </article>`;
         })
         .join("");

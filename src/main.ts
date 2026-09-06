@@ -76,6 +76,7 @@ const rt_quant          = by_id("rt_quant");
 let documents_ingest:       File[]          = [];
 let documents_ingest_busy:  boolean         = false;
 let documents_ingest_cards: QueueCardItem[] = [];
+let ingest_task_id:         number          = 0;
 
 // Page
 
@@ -341,17 +342,42 @@ async function documents_refresh(): Promise<void> {
     refresh_icons();
 }
 
+function file_title(name: string): string {
+    return name.replace(/\.[^.]+$/, "");
+}
+
+function ingest_cards_render(): void {
+    page_ingest_cards_render();
+    ingest_spin_sync();
+}
+
+function ingest_spin_sync(): void {
+    const entry = page_switchs_content.get("ingest");
+    if (!entry) return;
+    const busy =
+        documents_ingest_busy ||
+        documents_ingest_cards.some((it) => it.status === "run" || it.status === "wait");
+    entry.btn.dataset.spin = busy ? "true" : "false";
+}
+
 async function documents_ingest_loop(): Promise<void> {
     while (documents_ingest.length > 0) {
         const file = documents_ingest.shift();
         if (!file) break;
+        const task = documents_ingest_cards.find((it) => it.status === "wait");
+        if (task) task.status = "run";
+        ingest_cards_render();
         try {
             await document_process(file);
+            if (task) task.status = "done";
         } catch (error) {
             log_push("处理失败", String(error));
+            if (task) task.status = "done";
         }
+        ingest_cards_render();
     }
     documents_ingest_busy = false;
+    ingest_spin_sync();
     await documents_refresh();
 }
 
@@ -367,8 +393,20 @@ function       documents_ingest_insert(data: File[] | FileList | null): void {
     else {
         files = Array.from(data);
     }
+    if (files.length === 0) return;
 
-    documents_ingest.push(...files);
+    documents_ingest_cards = documents_ingest_cards.filter(
+        (it) => it.status === "run" || it.status === "wait",
+    );
+    for (const file of files) {
+        documents_ingest.push(file);
+        documents_ingest_cards.push({
+            id: `ingest_${ingest_task_id++}`,
+            title: file_title(file.name),
+            status: "wait",
+        });
+    }
+    ingest_cards_render();
     if (!documents_ingest_busy) {
         documents_ingest_busy = true;
         void documents_ingest_loop();
@@ -441,11 +479,9 @@ function page_active_set(page: PageName, active: boolean): void {
         const label_w = entry.label.scrollWidth;
         entry.btn.classList.add("is_active");
         entry.btn.style.width = `${icon_w + label_w + 18}px`;
-        entry.btn.dataset.spin = page === "ingest" ? "true" : "false";
     } else {
         entry.btn.classList.remove("is_active");
         entry.btn.style.removeProperty("width");
-        delete entry.btn.dataset.spin;
     }
 }
 
@@ -543,35 +579,18 @@ search_input.addEventListener("keydown", (event) => {
 doc_list.addEventListener("click", (event) => {
     const target = event.target as HTMLElement;
     if (target.closest<HTMLElement>(".doc_card_more")) return;
-    const action = target.closest<HTMLElement>(".doc_card_action");
     const card = target.closest<HTMLElement>(".doc_card");
     if (!card) return;
     const key = card.dataset.key;
     if (!key) return;
-    if (action) {
-        documents_ingest_cards = documents_ingest_cards.filter((it) => it.title !== key);
-        page_ingest_cards_render();
-        page_ingest_cards_status_render();
-        refresh_icons();
-        return;
-    }
     page_ingest_cards_status_sync(key);
 });
 
 queue_shelf.addEventListener("click", (event) => {
-    const target = event.target as HTMLElement;
-    const action = target.closest<HTMLElement>(".doc_card_action");
-    const card = target.closest<HTMLElement>(".doc_card");
+    const card = (event.target as HTMLElement).closest<HTMLElement>(".doc_card");
     if (!card) return;
     const key = card.dataset.key;
     if (!key) return;
-    if (action) {
-        documents_ingest_cards = documents_ingest_cards.filter((it) => it.title !== key);
-        page_ingest_cards_render();
-        page_ingest_cards_status_render();
-        refresh_icons();
-        return;
-    }
     page_ingest_cards_status_sync(key);
 });
 
@@ -621,6 +640,7 @@ card_menu_delete.addEventListener("click", async () => {
 
 page_switchs_button_create();
 page_ingest_cards_render();
+ingest_spin_sync();
 refresh_icons();
 infer_ui_sync();
 search_init();
