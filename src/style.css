@@ -847,7 +847,7 @@ select {
 	left: 100%;
 	top: 100%;
 	transform: translate(calc(-100% - 24px), calc(-100% - 24px));
-	width: calc((100% * 0.4 - 24px) * 0.8);
+	width: calc((100% * 0.4 - 24px) * 0.95);
 }
 
 .searchbar {
