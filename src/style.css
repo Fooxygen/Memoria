@@ -636,7 +636,8 @@ select {
 	gap: 0;
 	width: 100%;
 	border-radius: 0;
-	overflow: hidden;
+	overflow: visible;
+	min-height: 60vh;
 }
 
 .result_column {
@@ -768,6 +769,7 @@ select {
 	color: var(--text-body-c);
 	white-space: pre-wrap;
 	overflow-wrap: break-word;
+	user-select: text;
 }
 
 .result_card_text .quote_mark {
