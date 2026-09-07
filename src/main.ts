@@ -58,7 +58,6 @@ const logs_trigger      = by_id("logs_trigger");
 const logs_panel        = by_id("logs_panel");
 const logs_list         = by_id("logs_list");
 const searchdock        = by_id("searchdock");
-const search_state      = by_id("search_state");
 const rt_model          = by_id("rt_model");
 const rt_download       = by_id("rt_download");
 const rt_loader         = by_id("rt_loader");
@@ -493,22 +492,29 @@ function page_bind(): void {
     const sc = page_scroller_get();
     if (!sc || page_handlers) return;
     page_handlers = true;
-    let lock = false;
     sc.addEventListener(
         "wheel",
         (event) => {
             const cols = Array.from(sc.querySelectorAll<HTMLElement>(".result_collection"));
             if (cols.length === 0) return;
-            event.preventDefault();
-            if (cols.length === 1 || lock) return;
-            lock = true;
+            if (page_focus < 0 || !cols[page_focus]) return;
+            const g = cols[page_focus];
+            const st = sc.scrollTop;
+            const view = sc.clientHeight;
             const dir = event.deltaY > 0 ? 1 : -1;
-            const cur = Math.max(0, page_focus);
-            const next = Math.min(cols.length - 1, Math.max(0, cur + dir));
-            if (next !== cur) page_apply_focus(cols[next]);
-            setTimeout(() => {
-                lock = false;
-            }, 450);
+            const g_top = g.offsetTop;
+            const g_bottom = g_top + g.offsetHeight;
+            const tall = g.offsetHeight > view;
+
+            if (dir === 1) {
+                if (tall && g_bottom - st - view > 16) return;
+                event.preventDefault();
+                if (page_focus < cols.length - 1) page_apply_focus(cols[page_focus + 1]);
+            } else {
+                if (tall && st - g_top > 16) return;
+                event.preventDefault();
+                if (page_focus > 0) page_apply_focus(cols[page_focus - 1]);
+            }
         },
         { passive: false },
     );
@@ -544,13 +550,7 @@ function dock_search(): void {
     if (searchdock_docked) return;
     searchdock_docked = true;
     searchdock.classList.add("is_docked");
-    search_state.hidden = false;
 }
-
-search_state.addEventListener("click", () => {
-    searchdock.classList.remove("is_docked");
-    search_input.focus();
-});
 
 function search_topk_read(): number {
     return Math.min(

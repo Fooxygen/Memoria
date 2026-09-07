@@ -69,9 +69,10 @@ export interface SearchHit {
 export function render_result_collection(hits: SearchHit[]): string {
     return hits
         .map((hit) => {
+            const opacity = 0.3 + (Math.min(100, Math.max(0, hit.pct)) / 100) * 0.7;
             return `
                 <article class="result_card card" data-pct="${hit.pct}">
-                    <div class="result_card_score">
+                    <div class="result_card_score" style="opacity: ${opacity.toFixed(2)}">
                         <span class="pct_num">${hit.pct}</span><span class="pct_sym">%</span>
                     </div>
                     <p class="result_card_text"><span class="quote_mark">“</span>${text_escape_html(hit.content)}<span class="quote_mark">”</span></p>
