@@ -479,8 +479,10 @@ function page_apply_focus(el: HTMLElement): void {
         const view = sc.clientHeight;
         const rect = el.getBoundingClientRect();
         const view_top = sc.getBoundingClientRect().top;
+        const last = page_focus === cols.length - 1;
+        const tall = rect.height >= view * 0.9;
         const target =
-            rect.height >= view * 0.9
+            last || tall
                 ? sc.scrollTop + (rect.top - view_top) - 24
                 : sc.scrollTop + (rect.top - view_top) + rect.height / 2 - view / 2;
         sc.scrollTo({ top: Math.max(0, target), behavior: "smooth" });
@@ -496,9 +498,9 @@ function page_bind(): void {
         "wheel",
         (event) => {
             const cols = Array.from(sc.querySelectorAll<HTMLElement>(".result_collection"));
-            if (cols.length < 2) return;
+            if (cols.length === 0) return;
             event.preventDefault();
-            if (lock) return;
+            if (cols.length === 1 || lock) return;
             lock = true;
             const dir = event.deltaY > 0 ? 1 : -1;
             const cur = Math.max(0, page_focus);
