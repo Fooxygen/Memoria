@@ -694,7 +694,7 @@ select {
 	font-size: 56px;
 	line-height: 1.1;
 	letter-spacing: -0.02em;
-	color: #2b49b4;
+	color: #551ebf;
 	animation: heroIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
 }
 
@@ -1200,19 +1200,24 @@ mark.highlight_mark,
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	min-height: 34px;
-	padding: 2px 2px 16px;
+	height: 34px;
+	padding: 0;
+	margin-bottom: 16px;
 }
 
-.sidebar_head .app_title {
-	padding: 0 4px 0 12px;
-	margin-right: 76px;
+.app_logo {
+	height: 20px;
+	width: auto;
+	display: block;
+	flex-shrink: 0;
+	margin-left: 14px;
 }
 
 .page_switch {
 	position: absolute;
-	top: 0;
+	top: 50%;
 	right: 0;
+	transform: translateY(-50%);
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;

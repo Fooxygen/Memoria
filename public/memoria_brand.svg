@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="brand" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1276 241">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#_未命名的渐变_234);
+      }
+
+      .cls-2 {
+        clip-path: url(#clippath);
+      }
+
+      .cls-3 {
+        fill: none;
+        font-family: MonuTitl-CnBd, 'MonuTitl Cond';
+        font-size: 320px;
+      }
+    </style>
+    <clipPath id="clippath">
+      <text class="cls-3" transform="translate(-5.3132 238.6466)"><tspan x="0" y="0">Memoria</tspan></text>
+    </clipPath>
+    <linearGradient id="_未命名的渐变_234" data-name="未命名的渐变 234" x1="18.7846" y1="288.7912" x2="1258.8941" y2="-43.4951" gradientUnits="userSpaceOnUse">
+      <stop offset=".15" stop-color="#7c2dfc"/>
+      <stop offset=".1531" stop-color="#762bf4"/>
+      <stop offset=".1673" stop-color="#6325da"/>
+      <stop offset=".1835" stop-color="#521fc4"/>
+      <stop offset=".2024" stop-color="#461bb3"/>
+      <stop offset=".2259" stop-color="#3d19a7"/>
+      <stop offset=".2587" stop-color="#3817a0"/>
+      <stop offset=".35" stop-color="#37179f"/>
+      <stop offset=".4912" stop-color="#29197c"/>
+      <stop offset=".6313" stop-color="#1e1a61"/>
+      <stop offset=".7553" stop-color="#181b50"/>
+      <stop offset=".85" stop-color="#161c4b"/>
+    </linearGradient>
+  </defs>
+  <g class="cls-2">
+    <rect class="cls-1" x="6.2053" y="3.4513" width="1265.2681" height="238.3936"/>
+  </g>
+</svg>
