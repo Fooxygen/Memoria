@@ -457,17 +457,67 @@ async function search_execute(): Promise<void> {
 
     masonry_into(collection, hits.length <= 4 ? 2 : hits.length <= 8 ? 3 : 4);
 
-    const scroller = results_list.closest<HTMLElement>(".results");
-    if (scroller) {
-        const top =
-            collection.getBoundingClientRect().top -
-            scroller.getBoundingClientRect().top +
-            scroller.scrollTop -
-            24;
-        scroller.scrollTo({ top, behavior: "smooth" });
-    }
+    page_apply_focus(collection);
+    page_bind();
     dock_search();
     refresh_icons();
+}
+
+let page_focus = -1;
+let page_handlers = false;
+
+function page_scroller_get(): HTMLElement | null {
+    return results_list.closest<HTMLElement>(".results");
+}
+
+function page_apply_focus(el: HTMLElement): void {
+    const sc = page_scroller_get();
+    if (!sc) return;
+    const cols = Array.from(sc.querySelectorAll<HTMLElement>(".result_collection"));
+    page_focus = cols.indexOf(el);
+    for (const c of cols) {
+        if (c === el) {
+            c.style.height = "";
+            c.style.minHeight = "60vh";
+            c.style.overflow = "visible";
+        } else {
+            c.style.height = "30vh";
+            c.style.minHeight = "0";
+            c.style.overflow = "hidden";
+        }
+    }
+    requestAnimationFrame(() => {
+        const view = sc.clientHeight;
+        const rect = el.getBoundingClientRect();
+        const scroll_top = sc.getBoundingClientRect().top;
+        const target = sc.scrollTop + (rect.top - scroll_top) + rect.height / 2 - view / 2;
+        sc.scrollTo({ top: Math.max(0, target), behavior: "smooth" });
+    });
+}
+
+function page_bind(): void {
+    const sc = page_scroller_get();
+    if (!sc || page_handlers) return;
+    page_handlers = true;
+    let lock = false;
+    sc.addEventListener(
+        "wheel",
+        (event) => {
+            const cols = Array.from(sc.querySelectorAll<HTMLElement>(".result_collection"));
+            if (cols.length < 2) return;
+            event.preventDefault();
+            if (lock) return;
+            lock = true;
+            const dir = event.deltaY > 0 ? 1 : -1;
+            const cur = Math.max(0, page_focus);
+            const next = Math.min(cols.length - 1, Math.max(0, cur + dir));
+            if (next !== cur) page_apply_focus(cols[next]);
+            setTimeout(() => {
+                lock = false;
+            }, 450);
+        },
+        { passive: false },
+    );
 }
 
 function masonry_into(container: HTMLElement, cols: number): void {
