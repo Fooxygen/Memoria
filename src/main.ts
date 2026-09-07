@@ -431,7 +431,7 @@ async function search_execute(): Promise<void> {
 
     if (search_mode_value !== "semantic") return;
 
-    const top_k = Math.min(Math.max(parseInt(top_k_input.value, 10) || 4, 1), 20);
+    const top_k = Math.min(Math.max(parseInt(top_k_input.value, 10) || 12, 1), 48);
 
     let hits: SearchHit[];
     try {

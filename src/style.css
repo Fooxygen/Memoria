@@ -17,6 +17,19 @@
 
 	--accent: #2563eb;
 	--accent-soft: #eff6ff;
+
+	--brand-core: #791df9;
+	--brand-core-soft: rgba(121, 29, 249, 0.5);
+
+	--brand-light-bg: #9a4df6;
+	--brand-light-border: #b78cff;
+	--brand-light-ink: #f5efff;
+
+	--brand-dark-bg: #5712b8;
+	--brand-dark-border: #9458f7;
+	--brand-dark-ink-strong: #efe4ff;
+	--brand-dark-ink-soft: #dcc9ff;
+	--brand-dark-ink-faint: #c5a5ff;
 	--mark-bg: rgba(255, 230, 0, 0.38);
 	--mark-border: #e6b800;
 
@@ -29,11 +42,11 @@
 	--state-cpu-label: #f6ecc9;
 	--state-cpu-val: #fffdf0;
 
-	--state-open-bg: #3a54d8;
-	--state-open-border: #6f8cf0;
-	--state-open-meta: #9faaff;
-	--state-open-desc: #c2d0ff;
-	--state-open-title: #eef3ff;
+	--state-open-bg: var(--brand-dark-bg);
+	--state-open-border: var(--brand-dark-border);
+	--state-open-meta: var(--brand-dark-ink-faint);
+	--state-open-desc: var(--brand-dark-ink-soft);
+	--state-open-title: var(--brand-dark-ink-strong);
 
 	/* Text scale: darker -> heavier, lighter -> thinner (regular..bold). */
 	--text-strong-c: var(--ink-900);
@@ -95,6 +108,10 @@ body {
 	font-size: 14px;
 	overflow: hidden;
 	-webkit-font-smoothing: antialiased;
+}
+
+::selection {
+	background: rgba(121, 29, 249, 0.5);
 }
 
 button {
@@ -277,8 +294,8 @@ select {
 	height: 40px;
 	margin: 0 auto 8px;
 	border-radius: 12px;
-	background: rgba(59, 130, 246, 0.12);
-	color: var(--accent);
+	background: rgba(121, 29, 249, 0.12);
+	color: #791df9;
 	transition: transform 0.5s var(--ease-silk);
 }
 
@@ -1586,7 +1603,7 @@ mark.highlight_mark,
 .logs {
 	position: absolute;
 	top: 14px;
-	left: 14px;
+	left: 34px;
 	z-index: 12;
 }
 
