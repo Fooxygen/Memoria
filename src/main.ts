@@ -475,22 +475,14 @@ function page_apply_focus(el: HTMLElement): void {
     if (!sc) return;
     const cols = Array.from(sc.querySelectorAll<HTMLElement>(".result_collection"));
     page_focus = cols.indexOf(el);
-    for (const c of cols) {
-        if (c === el) {
-            c.style.height = "";
-            c.style.minHeight = "60vh";
-            c.style.overflow = "visible";
-        } else {
-            c.style.height = "30vh";
-            c.style.minHeight = "0";
-            c.style.overflow = "hidden";
-        }
-    }
     requestAnimationFrame(() => {
         const view = sc.clientHeight;
         const rect = el.getBoundingClientRect();
-        const scroll_top = sc.getBoundingClientRect().top;
-        const target = sc.scrollTop + (rect.top - scroll_top) + rect.height / 2 - view / 2;
+        const view_top = sc.getBoundingClientRect().top;
+        const target =
+            rect.height >= view * 0.9
+                ? sc.scrollTop + (rect.top - view_top) - 24
+                : sc.scrollTop + (rect.top - view_top) + rect.height / 2 - view / 2;
         sc.scrollTo({ top: Math.max(0, target), behavior: "smooth" });
     });
 }
