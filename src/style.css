@@ -854,13 +854,13 @@ select {
 	background: transparent;
 	color: var(--text-strong-c);
 	font-size: 13px;
-	font-weight: var(--text-body-w);
+	font-weight: var(--text-strong-w);
 	padding: 5px 0;
 }
 
 .searchbar input::placeholder {
 	color: var(--text-faint-c);
-	font-weight: var(--text-faint-w);
+	font-weight: var(--text-body-w);
 }
 
 .searchbtn {
@@ -874,7 +874,7 @@ select {
 	background: rgba(255, 255, 255, 0.52);
 	color: var(--text-strong-c);
 	font-size: 12px;
-	font-weight: var(--text-body-w);
+	font-weight: var(--text-strong-w);
 	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03), var(--glass-specular);
 	-webkit-backdrop-filter: blur(24px);
 	backdrop-filter: blur(24px);
@@ -905,7 +905,7 @@ select {
 	margin-top: 12px;
 	padding: 0 8px;
 	font-size: 13px;
-	font-weight: var(--text-soft-w);
+	font-weight: var(--text-strong-w);
 	color: var(--text-soft-c);
 	transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), max-height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -919,7 +919,7 @@ select {
 .field > label,
 .field_label {
 	font-size: 13px;
-	font-weight: var(--text-soft-w);
+	font-weight: var(--text-strong-w);
 	color: var(--text-soft-c);
 }
 
@@ -947,7 +947,7 @@ select {
 	background: rgba(255, 255, 255, 0.35);
 	color: var(--text-soft-c);
 	font-size: 13px;
-	font-weight: var(--text-soft-w);
+	font-weight: var(--text-strong-w);
 	border-radius: 14px;
 	padding: 6px 30px 6px 13px;
 	cursor: pointer;
@@ -996,6 +996,7 @@ select {
 	background: rgba(255, 255, 255, 0.35);
 	color: var(--text-soft-c);
 	font-size: 16px;
+	font-weight: var(--text-strong-w);
 	line-height: 1;
 	cursor: pointer;
 	box-shadow: var(--glass-specular);
@@ -1084,103 +1085,64 @@ mark.highlight_mark,
 	background: rgba(0, 0, 0, 0.22);
 }
 
-.dd_host {
-	display: inline-flex;
-}
-
-.dd {
+.seg {
 	position: relative;
-}
-
-.dd_trigger {
-	display: inline-flex;
-	align-items: center;
-	gap: 8px;
-	padding: 6px 13px;
-	border: var(--bd-w) solid var(--bd-c);
-	border-radius: 14px;
-	outline: none;
+	display: inline-grid;
+	grid-template-columns: 1fr 1fr;
+	height: 28px;
 	background: rgba(255, 255, 255, 0.35);
-	color: var(--text-soft-c);
-	font-size: 13px;
-	font-weight: var(--text-soft-w);
-	cursor: pointer;
+	border: var(--bd-w) solid var(--bd-c);
+	border-radius: 999px;
 	box-shadow: var(--glass-specular);
 	-webkit-backdrop-filter: blur(20px);
 	backdrop-filter: blur(20px);
-	transition: var(--transition);
 }
 
-.dd_trigger:hover {
-	background: rgba(255, 255, 255, 0.7);
-	border-color: var(--bd-c-hover);
-}
-
-.dd_value {
-	white-space: nowrap;
-}
-
-.dd_trigger [data-lucide="chevron-down"] {
-	width: 14px;
-	height: 14px;
-	color: var(--text-soft-c);
-	transition: transform 0.3s var(--ease-silk);
-}
-
-.dd.is_open .dd_trigger [data-lucide="chevron-down"] {
-	transform: rotate(180deg);
-}
-
-.dd_menu {
+.seg_thumb {
 	position: absolute;
-	top: calc(100% + 8px);
-	right: 0;
-	z-index: 20;
-	min-width: 100%;
-	margin: 0;
-	padding: 4px;
-	list-style: none;
-	background: rgba(255, 255, 255, 0.62);
-	-webkit-backdrop-filter: var(--blur-medium);
-	backdrop-filter: var(--blur-medium);
-	border: var(--bd-w) solid var(--bd-c);
-	border-radius: 14px;
-	box-shadow: var(--shadow-hover), var(--glass-specular);
-	opacity: 0;
-	visibility: hidden;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: 50%;
+	background: rgba(255, 255, 255, 0.86);
+	border-radius: 999px;
+	box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.7),
+		0 1px 4px rgba(0, 0, 0, 0.08);
+	transition: transform 0.42s var(--ease-silk);
 	pointer-events: none;
-	transform: translateY(-4px);
-	transition: opacity 0.22s var(--ease-silk), transform 0.26s var(--ease-silk),
-		visibility 0.26s;
 }
 
-.dd.is_open .dd_menu {
-	opacity: 1;
-	visibility: visible;
-	pointer-events: auto;
-	transform: translateY(0);
+.seg[data-index="1"] .seg_thumb {
+	transform: translateX(100%);
 }
 
-.dd_item {
+.seg_btn {
 	position: relative;
-	padding: 7px 12px;
-	border-radius: 10px;
+	z-index: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 0;
+	padding: 0 10px;
+	border: 0;
+	outline: none;
+	background: transparent;
 	font-size: 12px;
-	font-weight: var(--text-soft-w);
+	font-weight: var(--text-strong-w);
 	color: var(--text-soft-c);
-	cursor: pointer;
 	white-space: nowrap;
-	transition: background 0.15s, color 0.15s;
+	cursor: pointer;
+	user-select: none;
+	transition: color 0.3s var(--ease-silk);
 }
 
-.dd_item:hover {
-	background: rgba(255, 255, 255, 0.75);
+.seg_btn:hover {
 	color: var(--text-strong-c);
 }
 
-.dd_item.is_active {
-	color: var(--accent);
-	font-weight: var(--text-body-w);
+.seg_btn.is_active {
+	color: var(--brand-dark-bg);
+	font-weight: var(--text-strong-w);
 }
 
 .sidebar_head {

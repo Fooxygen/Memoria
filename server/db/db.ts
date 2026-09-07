@@ -113,6 +113,22 @@ export async function chunks_search(vec: number[], result_limit: number = 5) {
     });
 }
 
+export async function chunks_hybrid_search(query: string, vec: number[], result_limit: number = 5) {
+    const c = await chunks_get();
+    return await c.hybridSearch({
+        query: {
+            whereDocument: { $contains: query },
+            nResults:      result_limit,
+        },
+        knn: {
+            queryEmbeddings: [vec],
+            nResults:        result_limit,
+        },
+        nResults: result_limit,
+        include:  ["documents", "metadatas", "distances"],
+    });
+}
+
 // Documents
 
 export async function documents_create() {

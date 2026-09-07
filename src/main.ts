@@ -4,7 +4,6 @@
 // Licensed under the MIT License.
 
 import { text_chunk_document } from "./store/text";
-import { dropdown_create }      from "./ui/dropdown";
 import { infer_get, infer_local_available } from "./infer";
 import {
     render_lib_empty,
@@ -416,8 +415,57 @@ function show_initial_state(): void {
 
 // Search
 
+// 检索方式：左右分段切换（混合 / 向量），不可滑动切换。
+
+function mode_toggle_create(
+    host: HTMLElement,
+    options: { value: SearchMode; label: string }[],
+    initial: SearchMode,
+    on_change: (value: SearchMode) => void,
+): void {
+    let value: SearchMode = initial;
+
+    const seg = document.createElement("div");
+    seg.className = "seg";
+    seg.setAttribute("role", "group");
+    seg.setAttribute("aria-label", "检索方式");
+
+    const thumb = document.createElement("span");
+    thumb.className = "seg_thumb";
+    thumb.setAttribute("aria-hidden", "true");
+    seg.appendChild(thumb);
+
+    const buttons = options.map((option) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "seg_btn";
+        btn.dataset.value = option.value;
+        btn.textContent = option.label;
+        btn.addEventListener("click", () => {
+            if (option.value === value) return;
+            value = option.value;
+            sync();
+            on_change(value);
+        });
+        seg.appendChild(btn);
+        return { option, btn };
+    });
+
+    function sync(): void {
+        seg.dataset.index = String(buttons.findIndex((n) => n.option.value === value));
+        for (const { option, btn } of buttons) {
+            const active = option.value === value;
+            btn.classList.toggle("is_active", active);
+            btn.setAttribute("aria-pressed", active ? "true" : "false");
+        }
+    }
+
+    host.replaceChildren(seg);
+    sync();
+}
+
 function search_init(): void {
-    dropdown_create<SearchMode>(search_mode_dd, SEARCH_MODE_OPTIONS, SEARCH_SETTING_DEFAULT.mode, (value) => {
+    mode_toggle_create(search_mode_dd, SEARCH_MODE_OPTIONS, SEARCH_SETTING_DEFAULT.mode, (value) => {
         search_mode_value = value;
     });
     top_k_input.min = String(SEARCH_SETTING_DEFAULT.top_k_min);
@@ -429,15 +477,13 @@ async function search_execute(): Promise<void> {
     const query = search_input.value.trim();
     if (!query) return;
 
-    if (search_mode_value !== "semantic") return;
-
     const top_k = Math.min(Math.max(parseInt(top_k_input.value, 10) || 12, 1), 48);
 
     let hits: SearchHit[];
     try {
         const infer = await infer_get();
         const vec = (await infer.encode([query]))[0];
-        const res = (await json_post("/api/search", { vec, top_k })) as { hits: SearchHit[] };
+        const res = (await json_post("/api/search", { vec, top_k, mode: search_mode_value, query })) as { hits: SearchHit[] };
         hits = (res.hits ?? []) as SearchHit[];
     } catch (error) {
         log_push("检索失败", String(error));

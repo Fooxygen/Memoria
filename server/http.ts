@@ -18,6 +18,7 @@ import {
     chunks_add,
     chunks_delete_by_document,
     chunks_search,
+    chunks_hybrid_search,
 } from "./db/db.ts";
 import type { ChunkRecord } from "./db/meta.ts";
 
@@ -82,6 +83,12 @@ function send_json(res: ServerResponse, status: number, data: unknown): void {
     res.end(JSON.stringify(data));
 }
 
+// RRF 融合分不具备统一相似度语义：混合检索的匹配度按命中名次相对映射（0-100）。
+function hybrid_pct(index: number, total: number): number {
+    if (total <= 1) return 100;
+    return Math.max(5, Math.round(100 - (index / (total - 1)) * 95));
+}
+
 export function seekdb_plugin(): Plugin {
     return {
         name: "memoria-seekdb",
@@ -125,23 +132,31 @@ export function seekdb_plugin(): Plugin {
 
                 if (path === "/api/search" && req.method === "POST") {
                     try {
-                        const body = (await read_json(req)) as { vec?: number[]; top_k?: number };
+                        const body = (await read_json(req)) as { vec?: number[]; top_k?: number; mode?: string; query?: string };
                         const vec = body.vec ?? [];
                         if (!vec.length) {
                             send_json(res, 400, { ok: false, error: "missing vec" });
                             return;
                         }
-                        const result = (await chunks_search(vec, Number(body.top_k) || 5)) as {
-                            documents?: (string | null)[] | (string | null)[][];
-                            distances?: number[] | number[][];
-                        };
-                        const docs = result.documents as (string | null)[] | undefined;
-                        const dists = result.distances as number[] | undefined;
-                        const raw_docs = Array.isArray(docs) && Array.isArray(docs[0]) ? (docs[0] as (string|null)[]) : (docs ?? []);
-                        const raw_dist = Array.isArray(dists) && Array.isArray(dists[0]) ? (dists[0] as number[]) : (dists ?? []);
-                        const hits = raw_docs.map((content, i) => {
-                            const d = raw_dist[i] ?? 0;
-                            const pct = Math.min(99, Math.max(1, Math.round(((d + 1) / 2) * 100)));
+                        const limit = Number(body.top_k) || 5;
+                        const mode = body.mode === "hybrid" && typeof body.query === "string" && body.query.trim()
+                            ? "hybrid"
+                            : "semantic";
+                        const raw = (mode === "hybrid"
+                            ? await chunks_hybrid_search(body.query as string, vec, limit)
+                            : await chunks_search(vec, limit)) as {
+                                documents?: (string | null)[] | (string | null)[][];
+                                distances?: number[] | number[][];
+                            };
+                        const docs = raw.documents as (string | null)[] | undefined;
+                        const dists = raw.distances as number[] | undefined;
+                        const row_docs = Array.isArray(docs) && Array.isArray(docs[0]) ? (docs[0] as (string | null)[]) : (docs ?? []);
+                        const row_dists = Array.isArray(dists) && Array.isArray(dists[0]) ? (dists[0] as number[]) : (dists ?? []);
+                        const hits = row_docs.map((content, i) => {
+                            const d = row_dists[i];
+                            const pct = mode === "hybrid" || d == null || !Number.isFinite(d)
+                                ? hybrid_pct(i, row_docs.length)
+                                : Math.min(99, Math.max(1, Math.round(((d + 1) / 2) * 100)));
                             return { content: String(content ?? ""), pct };
                         });
                         send_json(res, 200, { hits });

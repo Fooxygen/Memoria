@@ -26,7 +26,7 @@ export const INFER_SETTING_DEFAULT: InferSetting = {
 
 // Search
 
-export type SearchMode = "hybrid" | "semantic" | "keyword";
+export type SearchMode = "hybrid" | "semantic";
 
 export interface SearchModeOption {
     value: SearchMode;
@@ -36,7 +36,6 @@ export interface SearchModeOption {
 export const SEARCH_MODE_OPTIONS: SearchModeOption[] = [
     { value: "hybrid",   label: "混合检索" },
     { value: "semantic", label: "向量检索" },
-    { value: "keyword",  label: "全文检索" },
 ];
 
 export interface SearchSetting {
@@ -47,7 +46,7 @@ export interface SearchSetting {
 }
 
 export const SEARCH_SETTING_DEFAULT: SearchSetting = {
-	mode:      "semantic",
+	mode:      "hybrid",
 	top_k:     12,
 	top_k_min: 1,
 	top_k_max: 48,
