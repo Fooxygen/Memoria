@@ -4,16 +4,43 @@
   Licensed under the MIT License.
 */
 
+/* App-wide typeface: Sarasa UI SC, shipped in /public/fonts (OFL). */
+@font-face {
+	font-family: "Sarasa UI SC";
+	src: url("/fonts/SarasaUiSC-Light.ttf") format("truetype");
+	font-weight: 300;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Sarasa UI SC";
+	src: url("/fonts/SarasaUiSC-Regular.ttf") format("truetype");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Sarasa UI SC";
+	src: url("/fonts/SarasaUiSC-Bold.ttf") format("truetype");
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
+
 :root {
 	--bg-color: #eef0fa;
 
-	/* Ink palette (kept as raw colors for reference). */
-	--ink-900: #0f172a;
-	--ink-800: #1e293b;
-	--ink-700: #334155;
-	--ink-600: #475569;
-	--ink-500: #64748b;
-	--ink-400: #94a3b8;
+	/* Neutral gray ramp: single source for every black/gray text token.
+	   (900 = darkest, descending toward lighter/more muted.) */
+	--gray-900: #0e1628;
+	--gray-800: #1a2439;
+	--gray-700: #2a3550;
+	--gray-600: #3f4d69;
+	--gray-500: #58657f;
+	--gray-400: #7987a0;
+	--gray-300: #a7b0c2;
 
 	--accent: #2563eb;
 	--accent-soft: #eff6ff;
@@ -48,14 +75,20 @@
 	--state-open-desc: var(--brand-dark-ink-soft);
 	--state-open-title: var(--brand-dark-ink-strong);
 
-	/* Text scale: darker -> heavier, lighter -> thinner (regular..bold). */
-	--text-strong-c: var(--ink-900);
+	/* Text semantics over the gray ramp — darker = heavier, lighter = thinner.
+	   Emphasis ordering (high → low): strong > body > soft > faint.
+	     strong: headings / titles / key values        (emphasized)
+	     body:   primary readable paragraphs            (default)
+	     soft:   secondary labels, captions             (de-emphasized)
+	     faint:  meta hints, timestamps, counts         (least emphasis)
+	   Only brand / status colors are non-gray text in the app. */
+	--text-strong-c: var(--gray-900);
 	--text-strong-w: 700;
-	--text-body-c: var(--ink-700);
+	--text-body-c: var(--gray-700);
 	--text-body-w: 600;
-	--text-soft-c: var(--ink-500);
+	--text-soft-c: var(--gray-500);
 	--text-soft-w: 500;
-	--text-faint-c: var(--ink-400);
+	--text-faint-c: var(--gray-400);
 	--text-faint-w: 400;
 
 	--glass-window-bg: rgba(255, 255, 255, 0.26);
@@ -83,9 +116,9 @@
 	--bd-c-hover: rgba(255, 255, 255, 0.95);
 	--divider: rgba(0, 0, 0, 0.08);
 
-	--font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
-		"Segoe UI", Roboto, "Inter", sans-serif;
-	--mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+	/* Single app-wide typeface — Sarasa UI SC. No other family is used. */
+	--font-sans: "Sarasa UI SC";
+	--mono: "Sarasa UI SC";
 
 	--ease-silk: cubic-bezier(0.16, 1, 0.3, 1);
 	--transition: all 0.55s var(--ease-silk);
@@ -725,7 +758,7 @@ select {
 	animation: heroIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.62s both;
 }
 
-#doc_list .doc_card {
+.doc_waterfall .doc_card {
 	animation: heroIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -859,7 +892,7 @@ select {
 }
 
 .searchbar input::placeholder {
-	color: var(--text-faint-c);
+	color: var(--gray-400);
 	font-weight: var(--text-body-w);
 }
 
@@ -872,7 +905,7 @@ select {
 	border: var(--bd-w) solid var(--bd-c);
 	border-radius: 18px;
 	background: rgba(255, 255, 255, 0.52);
-	color: var(--text-strong-c);
+	color: var(--gray-800);
 	font-size: 12px;
 	font-weight: var(--text-strong-w);
 	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03), var(--glass-specular);
@@ -949,6 +982,7 @@ select {
 	font-size: 13px;
 	font-weight: var(--text-strong-w);
 	border-radius: 14px;
+	height: 32px;
 	padding: 6px 30px 6px 13px;
 	cursor: pointer;
 	box-shadow: var(--glass-specular);
@@ -1089,7 +1123,7 @@ mark.highlight_mark,
 	position: relative;
 	display: inline-grid;
 	grid-template-columns: 1fr 1fr;
-	height: 28px;
+	height: 32px;
 	background: rgba(255, 255, 255, 0.35);
 	border: var(--bd-w) solid var(--bd-c);
 	border-radius: 999px;
