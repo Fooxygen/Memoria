@@ -15,6 +15,3 @@ export interface TextChunk {
     content: string;
 }
 
-export interface ResultHit extends TextChunk {
-    score: number;
-}

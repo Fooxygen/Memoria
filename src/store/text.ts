@@ -14,10 +14,6 @@ export function text_escape_html(text: string): string {
         .replace(/'/g, "&#39;");
 }
 
-export function text_escape_regexp(text: string): string {
-    return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
 export function text_chunk_document(doc: SourceDoc): TextChunk[] {
     const chunks: TextChunk[] = [];
     let chunk_index = 0;
@@ -50,18 +46,3 @@ export function text_chunk_document(doc: SourceDoc): TextChunk[] {
     return chunks;
 }
 
-export function text_highlight(text: string, query: string): string {
-    let output = text_escape_html(text);
-    if (!query) return output;
-
-    const terms = query.split(/\s+/).filter((t) => t.length > 0);
-    for (const term of terms) {
-        if (term.length === 0) continue;
-        const pattern = text_escape_regexp(text_escape_html(term));
-        output = output.replace(
-            new RegExp(`(${pattern})`, "gi"),
-            (_match, captured: string) => `<mark class="highlight_mark">${captured}</mark>`,
-        );
-    }
-    return output;
-}

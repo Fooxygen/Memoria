@@ -80,12 +80,3 @@ export function render_result_collection(hits: SearchHit[]): string {
         })
         .join("");
 }
-
-export function render_result_empty(): string {
-    return `
-        <div class="empty card">
-            <span class="empty_icon" aria-hidden="true"><i data-lucide="ghost"></i></span>
-            <p class="empty_title">没有找到相关内容</p>
-            <p class="empty_hint">尝试使用更宽泛的关键词或切换检索模式</p>
-        </div>`;
-}

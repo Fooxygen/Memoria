@@ -38,7 +38,7 @@ export async function infer_get(): Promise<Infer> {
     return infer;
 }
 
-export async function infer_create(): Promise<Infer> {
+async function infer_create(): Promise<Infer> {
     const { pipeline, env } = await import("@huggingface/transformers");
 
     env.localModelPath   = "/models/";

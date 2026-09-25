@@ -477,7 +477,7 @@ async function search_execute(): Promise<void> {
     const query = search_input.value.trim();
     if (!query) return;
 
-    const top_k = Math.min(Math.max(parseInt(top_k_input.value, 10) || 12, 1), 48);
+    const top_k = search_topk_read();
 
     let hits: SearchHit[];
     try {
