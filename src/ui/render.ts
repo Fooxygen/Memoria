@@ -80,3 +80,16 @@ export function render_result_collection(hits: SearchHit[]): string {
         })
         .join("");
 }
+
+export function render_reader_document(content: string): string {
+    const paragraphs = content
+        .split(/\n{2,}/)
+        .map((p) => p.trim())
+        .filter((p) => p.length > 0);
+    if (paragraphs.length === 0) {
+        return `<p class="reader_hint">（空文档）</p>`;
+    }
+    return paragraphs
+        .map((p) => `<p class="reader_paragraph">${text_escape_html(p).replace(/\n/g, "<br />")}</p>`)
+        .join("");
+}

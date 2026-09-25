@@ -6,7 +6,6 @@
 import {
     createIcons,
     ArrowRight,
-    BookOpen,
     ChevronsLeft,
     Download,
     Ellipsis,
@@ -22,7 +21,6 @@ const USED_ICONS = {
     UploadCloud,
     Trash2,
     ArrowRight,
-    BookOpen,
     ChevronsLeft,
     LoaderCircle,
     Download,

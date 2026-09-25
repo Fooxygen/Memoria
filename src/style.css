@@ -358,29 +358,6 @@ select {
 	transform: rotate(180deg);
 }
 
-.reader_toggle {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 6px;
-	width: 100%;
-	margin: 8px 0;
-	padding: 9px 10px;
-	font-size: 12px;
-	font-weight: var(--text-body-w);
-	color: var(--text-body-c);
-	cursor: pointer;
-}
-
-.reader_toggle_icon {
-	display: inline-flex;
-}
-
-.reader_toggle_icon [data-lucide] {
-	width: 15px;
-	height: 15px;
-}
-
 .import_block {
 	display: flex;
 	flex-direction: column;
@@ -713,6 +690,24 @@ select {
 	flex: 1;
 	min-height: 0;
 	overflow-y: auto;
+}
+
+.reader_paragraph {
+	font-size: 15px;
+	line-height: 1.9;
+	font-weight: var(--text-soft-w);
+	color: var(--text-body-c);
+	margin-bottom: 1.1em;
+	user-select: text;
+}
+
+.reader_paragraph:last-child {
+	margin-bottom: 0;
+}
+
+.reader_hint {
+	font-size: 14px;
+	color: var(--text-soft-c);
 }
 
 .page_group.is_split .page_search .results_inner {

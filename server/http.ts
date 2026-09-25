@@ -15,6 +15,10 @@ import {
     documents_add,
     documents_delete,
     documents_list,
+    document_contents_create,
+    document_contents_add,
+    document_contents_delete,
+    document_content_get,
     chunks_add,
     chunks_delete_by_document,
     chunks_search,
@@ -95,6 +99,7 @@ export function seekdb_plugin(): Plugin {
         async configureServer(server: ViteDevServer) {
             await db_client_get();
             await documents_create();
+            await document_contents_create();
 
             server.middlewares.use(serve_models);
 
@@ -113,6 +118,26 @@ export function seekdb_plugin(): Plugin {
                     return;
                 }
 
+                if (path === "/api/document/content" && req.method === "GET") {
+                    try {
+                        const id = String(url.searchParams.get("id") ?? "");
+                        if (!id) {
+                            send_json(res, 400, { ok: false, error: "missing id" });
+                            return;
+                        }
+                        const content = await document_content_get(id);
+                        if (content === null) {
+                            send_json(res, 404, { ok: false, error: "not found" });
+                            return;
+                        }
+                        send_json(res, 200, { id, content });
+                    } catch (error) {
+                        console.error("[content] error:", error);
+                        send_json(res, 500, { ok: false, error: String(error) });
+                    }
+                    return;
+                }
+
                 if (path === "/api/document" && req.method === "DELETE") {
                     try {
                         const id = String(url.searchParams.get("id") ?? "");
@@ -122,6 +147,7 @@ export function seekdb_plugin(): Plugin {
                         }
                         await chunks_delete_by_document(id);
                         await documents_delete(id);
+                        await document_contents_delete(id);
                         send_json(res, 200, { ok: true });
                     } catch (error) {
                         console.error("[delete] error:", error);
@@ -184,6 +210,10 @@ export function seekdb_plugin(): Plugin {
                             preview: String(doc.preview ?? ""),
                             chunk_count: Number(doc.chunk_count ?? 0),
                         });
+
+                        if (typeof doc.content === "string") {
+                            await document_contents_add(String(doc.id), doc.content);
+                        }
 
                         if (chunks?.length) {
                             const records: ChunkRecord[] = chunks.map((c) => {

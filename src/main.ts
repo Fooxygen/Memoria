@@ -10,6 +10,7 @@ import {
     render_lib_items,
     render_queue_cards,
     render_result_collection,
+    render_reader_document,
     type LibDoc,
     type QueueCardItem,
     type SearchHit,
@@ -67,15 +68,16 @@ const rt_backend_badge  = by_id("rt_backend_badge");
 const rt_quant          = by_id("rt_quant");
 const app               = by_id("app");
 const sidebar_toggle    = by_id("sidebar_toggle");
-const reader_toggle     = by_id("reader_toggle");
 const reader_close      = by_id("reader_close");
 const page_group        = by_id("page_group");
 const page_reader       = by_id("page_reader");
+const page_reader_body  = by_id("page_reader_body");
+const page_reader_title = page_reader.querySelector<HTMLElement>(".page_reader_title");
 
 // Layout
 
 let sidebar_collapsed = false;
-let reader_visible    = false;
+let reader_doc_id: string | null = null;
 
 function sidebar_collapsed_set(value: boolean): void {
     sidebar_collapsed = value;
@@ -83,9 +85,33 @@ function sidebar_collapsed_set(value: boolean): void {
 }
 
 function reader_visible_set(value: boolean): void {
-    reader_visible = value;
     page_group.classList.toggle("is_split", value);
     page_reader.hidden = !value;
+    document_opening.clear();
+    if (value && reader_doc_id) {
+        document_opening.add(reader_doc_id);
+    }
+    page_ingest_cards_status_render();
+}
+
+async function reader_open(id: string, title: string): Promise<void> {
+    reader_doc_id = id;
+    reader_visible_set(true);
+    if (page_reader_title) page_reader_title.textContent = title;
+    page_reader_body.innerHTML = `<p class="reader_hint">加载中…</p>`;
+    try {
+        const res = await fetch(`/api/document/content?id=${encodeURIComponent(id)}`);
+        if (res.status === 404) {
+            page_reader_body.innerHTML = `<p class="reader_hint">该文档没有保存原文，请重新导入。</p>`;
+            return;
+        }
+        if (!res.ok) throw await json_error(res);
+        const data = (await res.json()) as { content?: string };
+        page_reader_body.innerHTML = render_reader_document(data.content ?? "");
+    } catch (error) {
+        page_reader_body.innerHTML = `<p class="reader_hint">原文加载失败</p>`;
+        log_push("原文加载失败", String(error));
+    }
 }
 
 // Process
@@ -332,7 +358,8 @@ async function document_process(file: File): Promise<void> {
             id:          doc.id,
             title:       doc.title,
             preview:     preview,
-            chunk_count: records.length
+            chunk_count: records.length,
+            content:     doc.content
         },
         chunks: records,
     });
@@ -737,7 +764,6 @@ file_input.addEventListener("change", (event) => {
 btn_search.addEventListener("click", search_execute);
 
 sidebar_toggle.addEventListener("click", () => sidebar_collapsed_set(!sidebar_collapsed));
-reader_toggle.addEventListener("click", () => reader_visible_set(!reader_visible));
 reader_close.addEventListener("click", () => reader_visible_set(false));
 
 top_k_dec.addEventListener("click", () => search_topk_update(search_topk_read() - 1));
@@ -756,7 +782,12 @@ doc_list.addEventListener("click", (event) => {
     if (!card) return;
     const key = card.dataset.key;
     if (!key) return;
-    page_ingest_cards_status_sync(key);
+    if (!page_reader.hidden && reader_doc_id === key) {
+        reader_visible_set(false);
+        return;
+    }
+    const title = card.querySelector<HTMLElement>(".doc_card_title")?.textContent ?? "";
+    void reader_open(key, title);
 });
 
 queue_shelf.addEventListener("click", (event) => {

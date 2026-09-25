@@ -24,6 +24,7 @@ const DB_NAME = "memoria";
 // Data
 
 const TABLE_DOCUMENTS   = "documents";
+const TABLE_CONTENTS    = "document_contents";
 const COLLECTION_CHUNKS = "chunks";
 
 // Embedding
@@ -181,4 +182,42 @@ export async function documents_list() : Promise<DocumentMeta[]> {
         preview:      String(r.preview ?? ""),
         chunk_count:  Number(r.chunk_count ?? 0),
     }));
+}
+
+// Document Contents
+
+export async function document_contents_create() {
+    const cl = await db_client_get();
+    await cl.execute(`
+        create table if not exists ${TABLE_CONTENTS} (
+            id      varchar(255) primary key,
+            content text
+        )
+    `);
+}
+
+export async function document_contents_add(id: string, content: string) {
+    const cl = await db_client_get();
+    await document_contents_create();
+    await cl.execute(`
+        insert into ${TABLE_CONTENTS} values (?, ?)
+    `, [id, content]);
+}
+
+export async function document_contents_delete(id: string) {
+    const cl = await db_client_get();
+    await document_contents_create();
+    await cl.execute(`
+        delete from ${TABLE_CONTENTS} where id = ?
+    `, [id]);
+}
+
+export async function document_content_get(id: string): Promise<string | null> {
+    const cl = await db_client_get();
+    await document_contents_create();
+    const rows = await cl.execute(`
+        select content from ${TABLE_CONTENTS} where id = ?
+    `, [id]) as Record<string, unknown>[] | null;
+    if (!rows || rows.length === 0) return null;
+    return String(rows[0].content ?? "");
 }
