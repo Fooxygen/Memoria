@@ -88,6 +88,7 @@ export async function chunks_get() {
         collection_chunks = await cl.getOrCreateCollection({
             name:   COLLECTION_CHUNKS,
             schema: chunks_schema_create(),
+            embeddingFunction: null,
         });
     }
     return collection_chunks;

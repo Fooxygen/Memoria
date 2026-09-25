@@ -101,6 +101,8 @@
 	--radius-card: 20px;
 	--radius-search: 24px;
 
+	--sidebar-w: 435px;
+
 	--bd-w: 0.5px;
 	--bd-c: rgba(255, 255, 255, 0.5);
 	--bd-c-hover: rgba(255, 255, 255, 0.95);
@@ -164,6 +166,7 @@ select {
 	padding: 18px;
 	overflow: hidden;
 	user-select: none;
+	transition: gap 0.55s var(--ease-silk);
 }
 
 .pane {
@@ -282,10 +285,100 @@ select {
 
 .sidebar {
 	flex-shrink: 0;
-	width: 435px;
+	width: var(--sidebar-w);
 	display: flex;
 	flex-direction: column;
 	padding: 14px;
+	overflow: hidden;
+	transition: width 0.55s var(--ease-silk), padding 0.55s var(--ease-silk),
+		opacity 0.4s ease, border-width 0.4s ease;
+}
+
+.app.is_sidebar_collapsed {
+	gap: 0;
+}
+
+.app.is_sidebar_collapsed .sidebar {
+	width: 0;
+	padding-left: 0;
+	padding-right: 0;
+	opacity: 0;
+	border-width: 0;
+	pointer-events: none;
+}
+
+.sidebar_toggle {
+	position: absolute;
+	top: 50%;
+	left: calc(18px + var(--sidebar-w));
+	transform: translate(-50%, -50%);
+	z-index: 20;
+	width: 30px;
+	height: 56px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border: var(--bd-w) solid var(--bd-c);
+	border-radius: 15px;
+	outline: none;
+	background: var(--glass-card-bg);
+	-webkit-backdrop-filter: var(--blur-medium);
+	backdrop-filter: var(--blur-medium);
+	box-shadow: var(--glass-specular);
+	color: var(--text-soft-c);
+	cursor: pointer;
+	opacity: 0;
+	transition: left 0.55s var(--ease-silk), opacity 0.3s ease,
+		background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.sidebar_toggle:hover {
+	opacity: 1;
+	background: var(--glass-card-hover);
+	border-color: var(--bd-c-hover);
+	color: var(--text-strong-c);
+}
+
+.app.is_sidebar_collapsed .sidebar_toggle {
+	left: 18px;
+	opacity: 1;
+}
+
+.sidebar_toggle_icon {
+	display: inline-flex;
+	transition: transform 0.45s var(--ease-silk);
+}
+
+.sidebar_toggle_icon [data-lucide] {
+	width: 18px;
+	height: 18px;
+}
+
+.app.is_sidebar_collapsed .sidebar_toggle_icon {
+	transform: rotate(180deg);
+}
+
+.reader_toggle {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	width: 100%;
+	margin: 8px 0;
+	padding: 9px 10px;
+	font-size: 12px;
+	font-weight: var(--text-body-w);
+	color: var(--text-body-c);
+	cursor: pointer;
+}
+
+.reader_toggle_icon {
+	display: inline-flex;
+}
+
+.reader_toggle_icon [data-lucide] {
+	width: 15px;
+	height: 15px;
 }
 
 .import_block {
@@ -480,6 +573,97 @@ select {
 	box-shadow: none;
 	-webkit-backdrop-filter: none;
 	backdrop-filter: none;
+}
+
+.page_group {
+	position: relative;
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	align-items: stretch;
+}
+
+.page {
+	min-width: 0;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.page_search {
+	position: relative;
+	flex: 1 1 0;
+	min-width: 60%;
+}
+
+.page_reader {
+	flex: 1 1 0;
+	min-width: 0;
+	border-left: var(--bd-w) solid var(--bd-c);
+	padding: 20px 24px;
+}
+
+.page_reader[hidden] {
+	display: none;
+}
+
+.page_reader_head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding-bottom: 12px;
+	margin-bottom: 12px;
+}
+
+.page_reader_title {
+	font-size: 15px;
+	font-weight: var(--text-strong-w);
+	color: var(--text-strong-c);
+}
+
+.page_reader_close {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border: var(--bd-w) solid var(--bd-c);
+	border-radius: 50%;
+	outline: none;
+	background: rgba(255, 255, 255, 0.35);
+	color: var(--text-soft-c);
+	cursor: pointer;
+	transition: var(--transition);
+}
+
+.page_reader_close:hover {
+	background: rgba(255, 255, 255, 0.72);
+	border-color: var(--bd-c-hover);
+	color: var(--text-strong-c);
+}
+
+.page_reader_close [data-lucide] {
+	width: 15px;
+	height: 15px;
+}
+
+.page_reader_body {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+}
+
+.page_group.is_split .page_search .results_inner {
+	width: 100%;
+}
+
+.page_group.is_split .searchdock.is_docked {
+	left: 50%;
+	top: 100%;
+	transform: translate(-50%, calc(-100% - 24px));
+	width: calc(100% - 48px);
+	max-width: 720px;
 }
 
 .results {
@@ -1429,7 +1613,7 @@ select {
 }
 
 @media (max-width: 1024px) {
-	.sidebar {
-		width: 345px;
+	:root {
+		--sidebar-w: 345px;
 	}
 }

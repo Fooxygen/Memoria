@@ -15,11 +15,11 @@
 </head>
 
 <body>
-	<div class="app">
+	<div class="app" id="app">
 		<div class="orb orb_one"></div>
 		<div class="orb orb_two"></div>
 
-		<aside class="sidebar pane">
+		<aside class="sidebar pane" id="sidebar">
 			<header class="sidebar_head">
 				<img src="/memoria_brand.svg" alt="Memoria" class="app_logo" title="Memoria"/>
 				<nav class="page_switch" id="page_switch" aria-label="视图切换"></nav>
@@ -53,6 +53,11 @@
 				<div id="queue_shelf" class="doc_waterfall"></div>
 			</section>
 
+			<button id="reader_toggle" class="reader_toggle card" type="button">
+				<span class="reader_toggle_icon" aria-hidden="true"><i data-lucide="book-open"></i></span>
+				<span>原文阅览</span>
+			</button>
+
 			<footer class="runtime card">
 				<div class="runtime_model_row">
 					<p class="runtime_model" id="rt_model">—</p>
@@ -77,6 +82,10 @@
 			</footer>
 		</aside>
 
+		<button id="sidebar_toggle" class="sidebar_toggle" type="button" aria-label="收起侧栏">
+			<span class="sidebar_toggle_icon" aria-hidden="true"><i data-lucide="chevrons-left"></i></span>
+		</button>
+
 		<main class="workspace pane">
 			<div class="logs" id="logs">
 				<button id="logs_trigger" class="logs_trigger" type="button" aria-label="查看日志">
@@ -87,44 +96,58 @@
 				</div>
 			</div>
 
-			<section class="results" aria-label="Search results">
-				<div class="results_inner">
-					<div id="results_list" class="results_list" aria-live="polite">
-					<div id="initial_state" class="empty">
-						<p class="empty_title">字里行间，<br />自有出处</p>
-						<p class="empty_hint">Once upon a word, trace the source.</p>
-					</div>
-					</div>
-				</div>
-			</section>
-
-			<footer class="searchdock" id="searchdock">
-				<div class="searchbar">
-					<i data-lucide="search" class="searchbar_icon" aria-hidden="true"></i>
-					<input id="search_input" type="text" autocomplete="off"
-						placeholder="想找什么？" />
-					<button id="btn_search" class="searchbtn" type="button">
-						<span>检索</span>
-						<i data-lucide="arrow-right" aria-hidden="true"></i>
-					</button>
-				</div>
-
-				<div class="dock_options">
-					<div class="field">
-						<span class="field_label">检索方式</span>
-						<div id="search_mode_dd"></div>
-					</div>
-
-					<div class="field">
-						<label for="top_k">显示数量</label>
-						<div class="stepper">
-							<button id="top_k_dec" class="step_btn" type="button" aria-label="减少显示数量">−</button>
-							<input id="top_k" class="select select_numeric" type="number" inputmode="numeric" min="1" max="48" />
-							<button id="top_k_inc" class="step_btn" type="button" aria-label="增加显示数量">+</button>
+			<div class="page_group" id="page_group">
+				<section class="page page_search" id="page_search">
+					<section class="results" aria-label="Search results">
+						<div class="results_inner">
+							<div id="results_list" class="results_list" aria-live="polite">
+								<div id="initial_state" class="empty">
+									<p class="empty_title">字里行间，<br />自有出处</p>
+									<p class="empty_hint">Once upon a word, trace the source.</p>
+								</div>
+							</div>
 						</div>
-					</div>
-				</div>
-			</footer>
+					</section>
+
+					<footer class="searchdock" id="searchdock">
+						<div class="searchbar">
+							<i data-lucide="search" class="searchbar_icon" aria-hidden="true"></i>
+							<input id="search_input" type="text" autocomplete="off"
+								placeholder="想找什么？" />
+							<button id="btn_search" class="searchbtn" type="button">
+								<span>检索</span>
+								<i data-lucide="arrow-right" aria-hidden="true"></i>
+							</button>
+						</div>
+
+						<div class="dock_options">
+							<div class="field">
+								<span class="field_label">检索方式</span>
+								<div id="search_mode_dd"></div>
+							</div>
+
+							<div class="field">
+								<label for="top_k">显示数量</label>
+								<div class="stepper">
+									<button id="top_k_dec" class="step_btn" type="button" aria-label="减少显示数量">−</button>
+									<input id="top_k" class="select select_numeric" type="number" inputmode="numeric" min="1" max="48" />
+									<button id="top_k_inc" class="step_btn" type="button" aria-label="增加显示数量">+</button>
+								</div>
+							</div>
+						</div>
+					</footer>
+				</section>
+
+				<section class="page page_reader" id="page_reader" hidden>
+					<header class="page_reader_head">
+						<span class="page_reader_title">原文阅览</span>
+						<button id="reader_close" class="page_reader_close" type="button" aria-label="关闭原文阅览">
+							<i data-lucide="x"></i>
+						</button>
+					</header>
+					<div class="page_reader_body" id="page_reader_body"></div>
+				</section>
+			</div>
 		</main>
 	</div>
 

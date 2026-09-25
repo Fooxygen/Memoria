@@ -65,6 +65,28 @@ const rt_dim            = by_id("rt_dim");
 const rt_backend        = by_id("rt_backend");
 const rt_backend_badge  = by_id("rt_backend_badge");
 const rt_quant          = by_id("rt_quant");
+const app               = by_id("app");
+const sidebar_toggle    = by_id("sidebar_toggle");
+const reader_toggle     = by_id("reader_toggle");
+const reader_close      = by_id("reader_close");
+const page_group        = by_id("page_group");
+const page_reader       = by_id("page_reader");
+
+// Layout
+
+let sidebar_collapsed = false;
+let reader_visible    = false;
+
+function sidebar_collapsed_set(value: boolean): void {
+    sidebar_collapsed = value;
+    app.classList.toggle("is_sidebar_collapsed", value);
+}
+
+function reader_visible_set(value: boolean): void {
+    reader_visible = value;
+    page_group.classList.toggle("is_split", value);
+    page_reader.hidden = !value;
+}
 
 // Process
 
@@ -714,6 +736,10 @@ file_input.addEventListener("change", (event) => {
 
 btn_search.addEventListener("click", search_execute);
 
+sidebar_toggle.addEventListener("click", () => sidebar_collapsed_set(!sidebar_collapsed));
+reader_toggle.addEventListener("click", () => reader_visible_set(!reader_visible));
+reader_close.addEventListener("click", () => reader_visible_set(false));
+
 top_k_dec.addEventListener("click", () => search_topk_update(search_topk_read() - 1));
 top_k_inc.addEventListener("click", () => search_topk_update(search_topk_read() + 1));
 top_k_input.addEventListener("input", search_topk_modifier_update);
@@ -792,5 +818,7 @@ refresh_icons();
 infer_ui_sync();
 search_init();
 search_topk_modifier_update();
+reader_visible_set(false);
+sidebar_collapsed_set(false);
 show_initial_state();
 void documents_refresh();

@@ -6,12 +6,15 @@
 import {
     createIcons,
     ArrowRight,
+    BookOpen,
+    ChevronsLeft,
     Download,
     Ellipsis,
     LoaderCircle,
     Search,
     Trash2,
     UploadCloud,
+    X,
 } from "lucide";
 
 const USED_ICONS = {
@@ -19,9 +22,12 @@ const USED_ICONS = {
     UploadCloud,
     Trash2,
     ArrowRight,
+    BookOpen,
+    ChevronsLeft,
     LoaderCircle,
     Download,
     Ellipsis,
+    X,
 };
 
 export function refresh_icons(): void {
