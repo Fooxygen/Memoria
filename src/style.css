@@ -658,6 +658,11 @@ select {
 	width: 100%;
 }
 
+.page_group.is_split .page_search .results {
+	padding-left: 34px;
+	padding-right: 6.8px;
+}
+
 .page_group.is_split .searchdock.is_docked {
 	left: 50%;
 	top: 100%;
