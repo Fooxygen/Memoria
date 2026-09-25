@@ -596,6 +596,67 @@ select {
 	min-width: 60%;
 }
 
+.blur_layers {
+	position: absolute;
+	inset: 0;
+	z-index: 6;
+	pointer-events: none;
+}
+
+.blur_layer {
+	position: absolute;
+	left: 0;
+	right: 0;
+	height: 198px;
+	pointer-events: none;
+	backdrop-filter: blur(var(--blur));
+	-webkit-backdrop-filter: blur(var(--blur));
+	-webkit-mask-image: var(--mask);
+	mask-image: var(--mask);
+}
+
+.blur_layer.top1,
+.blur_layer.top2,
+.blur_layer.top3 {
+	top: -18px;
+}
+
+.blur_layer.bottom1,
+.blur_layer.bottom2,
+.blur_layer.bottom3 {
+	bottom: -18px;
+}
+
+.blur_layer.top1 {
+	--blur: 24px;
+	--mask: linear-gradient(to bottom, #000 18px, transparent 88px);
+}
+
+.blur_layer.top2 {
+	--blur: 12px;
+	--mask: linear-gradient(to bottom, #000 18px, transparent 148px);
+}
+
+.blur_layer.top3 {
+	--blur: 6px;
+	--mask: linear-gradient(to bottom, #000 18px, transparent 198px);
+}
+
+.blur_layer.bottom1 {
+	--blur: 24px;
+	--mask: linear-gradient(to top, #000 18px, transparent 88px);
+}
+
+.blur_layer.bottom2 {
+	--blur: 12px;
+	--mask: linear-gradient(to top, #000 18px, transparent 148px);
+}
+
+.blur_layer.bottom3 {
+	--blur: 6px;
+	--mask: linear-gradient(to top, #000 18px, transparent 198px);
+}
+
 .page_reader {
 	flex: 1 1 0;
 	min-width: 0;
