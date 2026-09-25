@@ -325,7 +325,7 @@ async function document_process(file: File): Promise<void> {
         embedding: vecs[i],
         meta: { id_document: doc.id, idx_chunk: i },
     }));
-    const preview = (doc.content.trim().replace(/\s+/g, " ").slice(0, 120) || "") + "…";
+    const preview = doc.content.trim().replace(/\s+/g, " ");
 
     await json_post("/api/ingest", {
         doc: {

@@ -815,6 +815,10 @@ select {
 	white-space: pre-wrap;
 	overflow-wrap: break-word;
 	user-select: text;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 9;
+	overflow: hidden;
 }
 
 .result_card_text .quote_mark {
@@ -1331,7 +1335,7 @@ select {
 	font-weight: var(--text-soft-w);
 	color: var(--text-soft-c);
 	display: -webkit-box;
-	-webkit-line-clamp: 8;
+	-webkit-line-clamp: 9;
 	-webkit-box-orient: vertical;
 	overflow: hidden;
 }
@@ -1465,7 +1469,6 @@ select {
 
 .logs {
 	position: absolute;
-	top: 14px;
 	left: 34px;
 	z-index: 12;
 }
