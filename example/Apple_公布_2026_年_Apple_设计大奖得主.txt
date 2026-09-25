@@ -1,0 +1,71 @@
+Apple 公布 2026 年 Apple 设计大奖得主
+
+六个类别的获奖开发者将在 WWDC26 期间受到表彰
+
+Apple 公布 2026 年 Apple 设计大奖得主，表彰 12 款展现创新、艺术和技术成就的杰出 app 与游戏。
+
+Apple 今日公布 2026 年 Apple 设计大奖得主，表彰 12 款杰出 app 与游戏。今年的获奖者包括来自世界各地的开发团队，他们的工作展示了 app 和游戏设计的创新、艺术和技术成就。获奖者从 36 款全球入围作品中选出，这些作品全部呈现了卓越的 app 体验。奖项包括“乐趣横生”、“多元包容”、“创新思维”、“出色互动”、“社会影响”和“视觉图像”六个类别，每个类别各有一款 app 和一款游戏获奖。
+
+“今年的 Apple 设计大奖获奖作品都是开发者创造非凡体验的杰出体现，”Apple 全球开发者关系副总裁 Susan Prescott 表示，“无论是提供直观易用的功能还是令人兴奋的游戏玩法，这些 app 和游戏都代表了通过我们平台实现的最佳体验。我们非常自豪可以表彰这些开发者，并感谢他们为丰富世界各地用户生活所付出的努力。”
+
+隆重介绍 2026 Apple 设计大奖得主与入围作品。
+
+乐趣横生类
+
+此类别的获奖作品提供了令人愉悦、着迷且难忘的体验，并通过 Apple 技术进一步增强了其出彩之处。
+
+乐趣横生类的获奖 App 是 grug，由 Ocho（荷兰）开发。grug 通过轻松活泼的方式帮助用户发现和拥抱日常智慧点滴。这款 app 提供了令人愉悦的方式，供用户阅读简单而暖心的话语。每个提示词都将简单的想法加以精心呈现，为用户带来短暂而隽永的思索时刻。
+
+乐趣横生类的获奖游戏是 Is This Seat Taken?，由 Poti Poti Studio（西班牙）开发。Is This Seat Taken? 呈现了体验与破解复杂逻辑谜题的绝妙方式。这款卡通风格的游戏提供了许多妙趣横生的场景，玩家需要协调千奇百怪的座位需求。游戏以俏皮互动元素营造迷人氛围，供用户在安排座位的同时惬意享受舒缓旅程。
+
+此类别的入围作品包括 Panic, Inc. 出品的 Blippo+；Apposite 出品的 Metaballs；Kenny Sun Studios 出品的 BALL x PIT 以及 FuturLab Limited 出品的 PowerWash Simulator。
+
+多元包容类
+
+此类别的获奖作品对来自不同背景、能力和语言的用户都能提供出色的支持，让所有人都能从中获得绝佳体验。
+
+多元包容类的获奖 App 是 Guitar Wiz，由 Bijoy Thangaraj（印度）开发。Guitar Wiz 是一款适用于新手和资深吉他演奏者的 app，通过资源丰富的工具包提供调音、指法等各种技巧的语音指导。它还利用动态字体、增强对比度和不易颜色区分等 Apple 辅助功能技术为所有音乐家提供支持。
+
+多元包容类的获奖游戏是 Pine Hearts，由 Hyper Luminal Games Limited（英国）开发。Pine Hearts 在充满善意的世界里为善举提供奖励，为各种身体条件的玩家带来暖心体验。精心设计的体验利用了多种辅助功能设置，包括增强的文本可读性、可自定义的控制以及可调整的运动和感官反馈等。
+
+此类别的入围作品包括 Lilly Seay 出品的 Hearing Buddy；unorderly GmbH 出品的 Structured；Sago Mini 出品的 Sago Mini Jinja’s Garden 以及 Firaxis Games 出品的 Sid Meier’s Civilization VII。
+
+创新思维类
+
+此类别的获奖作品通过对 Apple 技术的创新运用从同类中脱颖而出，为用户带来超凡体验。
+
+创新思维类的获奖 App 是 NBA: Live Games & Scores，由 NBA Media Ventures, LLC（美国）开发。Apple Vision Pro 版 NBA app 为球迷带来身临其境的观赛体验，支持同时观看最多五场直播比赛，通过悬浮排行榜关注实时球员和比赛统计数据，并可在桌面模式下通过 3D 球场观看球员的移动。用户还可通过空间音频体验比赛，还能通过 Spectrum Front Row 技术，以 Apple 沉浸视频观看湖人队比赛，感受体育直播的未来。
+
+创新思维类的获奖游戏是 Blue Prince，由 Dogubomb（美国）开发。Blue Prince 是一款突破风格界限的冒险游戏，使用探索、解谜和非战斗元素的独特组合，提供深刻的叙事体验。游戏以引人入胜的房间递进结构展开，通过悬挂的画和手写笔记以环境讲述故事。这款游戏具备非凡的深度、精彩的奥秘和足以构成一整个新游戏的丰富故事，生动呈现了一个神秘的世界。
+
+此类别的入围作品包括 TARGO 出品的 D-Day: The Camera Soldier；Detail Technologies B.V. 出品的 Detail：AI 视频编辑器；Resolution Games AB 出品的 Pickle Pro 以及 inkle 出品的 TR-49。
+
+出色互动类
+
+此类别的获奖作品带来了直观友好的界面和轻松易懂的操作，完美地为其所在平台量身而设。
+
+出色互动类的获奖 App 是 Moonlitt: Moon 月相月历与月亮位置，由 Flipping Hues Srls（意大利）开发。Moonlitt 提供多平台支持和设计优雅的界面，供用户跟踪天体事件、规划摄影活动、探索所有与月亮有关的事物。凭借其简单的上手操作和一流的 Liquid Glass 集成体验，这款 app 帮助用户以简单直观的方式关注天空。
+
+出色互动类的获奖游戏是 Sago Mini Jinja’s Garden，由 Sago Mini（加拿大）开发。在 Sago Mini Jinja's Garden 里，小朋友可以使用直观的界面种下种子、收获蔬菜、烹饪美食。这款游戏提供了轻松的滑动控制体验，让孩子们专注于探索快乐花园，而不是阅读说明。
+
+此类别的入围作品包括 Gentler Stories LLC 出品的 The Outsiders：运动与健康数据跟踪器；Condor Digital 出品的 Tide Guide: Charts & Tables；Toppluva AB 出品的 Grand Mountain Adventure 2 以及 inkle 出品的 TR-49。
+
+社会影响类
+
+此类别的获奖和入围作品聚焦重要议题并对用户生活产生积极影响。
+
+社会影响类的获奖 App 是 Primary: News in Depth，由 Wood Metal Rocks LLC（美国）开发。Primary 把新闻带入了空间体验。这款 app 由经验丰富的全球编辑团队提供支持，专为 Apple Vision Pro 设计了空间界面，加以巧妙布局和无缝整合，精心帮助用户与新闻互动。
+
+社会影响类的获奖游戏是 Consume Me，由 Jenny Jiao Hsia 和 AP Thomson（美国）开发。Consume Me 平衡了游戏性与深切的人文关怀，围绕敏感动人的主题呈现了一场极具个人色彩和自传性的体验。游戏以巧妙的机制帮助用户连通了言语未必能准确表达的情感。
+
+此类别的入围作品包括 Parjanya Creative Solutions 出品的 Katha Room；Peak Labs Ltd. 出品的 Harvee；Julián Cordero 和 Sebastián Valbuena 出品的 despelote 以及 Lente Cuenen 出品的 Spilled!。
+
+视觉图像类
+
+此类别的获奖作品拥有令人惊艳的图像、精巧绘制的界面和高质量的动画，由此表达独特而有凝聚力的主题。
+
+视觉图像类的获奖 App 是 Tide Guide: Charts & Tables，由 Developer Digital（美国）开发。Tide Guide 是一款卓越的潮汐追踪工具，提供逐小时潮汐预测和人人都能一目了然的天气数据。这款 app 的全屏图表支持丰富的自定义动画效果，支持 Liquid Glass 效果，提供海洋主题和天空配色，打造精美实用的体验。
+
+视觉图像类的获奖游戏是 Cyberpunk 2077: Ultimate Edition，由 CD Projekt S.A.（波兰）开发。Cyberpunk 2077: Ultimate Edition 是一款视觉效果极为出众的开放世界游戏，充分利用了 Mac 搭载的 Apple 芯片与先进的 Metal 功能。其复杂的室内环境、角色形象和载具设计极具技术难度，给人以真实的沧桑感。
+
+此类别的入围作品包括 PSQV AB 出品的 Caradise；Not Boring Software LLC 出品的 (Not Boring) Camera；Hypergryph 出品的 Arknights：Endfield 以及 Spiral Circus 出品的 SILT。
