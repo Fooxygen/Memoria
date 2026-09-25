@@ -663,11 +663,16 @@ select {
 	padding-right: 6.8px;
 }
 
+.page_group.is_split .searchdock:not(.is_docked) {
+	left: 30%;
+	width: calc(60% - 48px);
+}
+
 .page_group.is_split .searchdock.is_docked {
-	left: 50%;
+	left: 30%;
 	top: 100%;
 	transform: translate(-50%, calc(-100% - 24px));
-	width: calc(100% - 48px);
+	width: calc(60% - 48px);
 	max-width: 720px;
 }
 
@@ -843,7 +848,7 @@ select {
 	transition: left 0.8s cubic-bezier(0.16, 1, 0.3, 1),
 		top 0.8s cubic-bezier(0.16, 1, 0.3, 1),
 		transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-		width 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+		width 0.8s cubic-bezier(0.16, 1, 0.3, 1),
 		opacity 0.6s ease;
 }
 
@@ -851,7 +856,7 @@ select {
 	left: 100%;
 	top: 100%;
 	transform: translate(calc(-100% - 24px), calc(-100% - 24px));
-	width: calc((100% * 0.4 - 24px) * 0.95);
+	width: calc((40% - 24px) * 0.95);
 }
 
 .searchbar {
