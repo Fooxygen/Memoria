@@ -366,6 +366,14 @@ async function document_process(file: File): Promise<void> {
     log_push(`处理成功：${doc.title}`, `${records.length} 个切片已写入知识库`);
 }
 
+async function index_flush(): Promise<void> {
+    try {
+        await json_post("/api/index/flush", {});
+    } catch (error) {
+        log_push("索引刷新失败", String(error));
+    }
+}
+
 async function documents_fetch(): Promise<LibDoc[]> {
     const res = await fetch("/api/documents");
     if (!res.ok) throw new Error(`request failed ${res.status}`);
@@ -423,6 +431,7 @@ async function documents_ingest_loop(): Promise<void> {
     }
     documents_ingest_busy = false;
     ingest_spin_sync();
+    await index_flush();
     await documents_refresh();
 }
 

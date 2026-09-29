@@ -62,6 +62,8 @@ export async function db_close() {
     await client?.close();
     client = null;
     collection_chunks = null;
+    index_pending = null;
+    index_refreshed = 0;
 }
 
 // Chunks
@@ -95,6 +97,38 @@ export async function chunks_get() {
     return collection_chunks;
 }
 
+// Index
+
+let index_writes:    number = 0;
+let index_refreshed: number = 0;
+let index_pending:   Promise<void> | null = null;
+
+function index_mark_dirty(): void {
+    index_writes += 1;
+}
+
+export async function chunks_refresh_if_dirty(): Promise<boolean> {
+    let refreshed = false;
+
+    while (index_refreshed < index_writes) {
+        if (!index_pending) {
+            const target = index_writes;
+            index_pending = (async () => {
+                const chunk = await chunks_get();
+                await chunk.refresh_index();
+                index_refreshed = target;
+            })().finally(() => {
+                index_pending = null;
+            });
+            refreshed = true;
+        }
+
+        await index_pending;
+    }
+
+    return refreshed;
+}
+
 export async function chunks_add(records: ChunkRecord[]) {
     const chunk = await chunks_get();
     await chunk.add({
@@ -103,10 +137,11 @@ export async function chunks_add(records: ChunkRecord[]) {
         embeddings: records.map(r => r.embedding),
         metadatas:  records.map(r => r.meta)
     });
-    await chunk.refresh_index();
+    index_mark_dirty();
 }
 
 export async function chunks_search(vec: number[], result_limit: number = 5) {
+    await chunks_refresh_if_dirty();
     const c = await chunks_get();
     return await c.query({
         queryEmbeddings: [vec],
@@ -116,6 +151,7 @@ export async function chunks_search(vec: number[], result_limit: number = 5) {
 }
 
 export async function chunks_hybrid_search(query: string, vec: number[], result_limit: number = 5) {
+    await chunks_refresh_if_dirty();
     const c = await chunks_get();
     return await c.hybridSearch({
         query: {
@@ -166,6 +202,7 @@ export async function chunks_delete_by_document(id_document: string) {
     await chunk.delete({
         where: { id_document },
     });
+    index_mark_dirty();
 }
 
 export async function documents_list() : Promise<DocumentMeta[]> {

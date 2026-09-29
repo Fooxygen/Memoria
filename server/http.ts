@@ -21,6 +21,7 @@ import {
     document_content_get,
     chunks_add,
     chunks_delete_by_document,
+    chunks_refresh_if_dirty,
     chunks_search,
     chunks_hybrid_search,
 } from "./db/db.ts";
@@ -230,6 +231,18 @@ export function seekdb_plugin(): Plugin {
 
                         send_json(res, 200, { ok: true });
                     } catch (error) {
+                        send_json(res, 500, { ok: false, error: String(error) });
+                    }
+                    return;
+                }
+
+                if (path === "/api/index/flush" && req.method === "POST") {
+                    try {
+                        await read_json(req);
+                        const refreshed = await chunks_refresh_if_dirty();
+                        send_json(res, 200, { ok: true, refreshed });
+                    } catch (error) {
+                        console.error("[flush] error:", error);
                         send_json(res, 500, { ok: false, error: String(error) });
                     }
                     return;

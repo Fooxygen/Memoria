@@ -637,7 +637,13 @@ select {
 .page_reader {
 	flex: 1 1 0;
 	min-width: 0;
-	border-left: var(--bd-w) solid var(--bd-c);
+	margin-left: 18px;
+	background: var(--glass-window-bg);
+	-webkit-backdrop-filter: var(--blur-deep);
+	backdrop-filter: var(--blur-deep);
+	border: var(--bd-w) solid var(--bd-c);
+	border-radius: var(--radius-pane);
+	box-shadow: 0 20px 60px -15px rgba(0, 0, 0, 0.05), var(--glass-specular);
 	padding: 20px 24px;
 }
 
@@ -655,7 +661,8 @@ select {
 }
 
 .page_reader_title {
-	font-size: 15px;
+	font-size: 20px;
+	line-height: 1.4;
 	font-weight: var(--text-strong-w);
 	color: var(--text-strong-c);
 }
