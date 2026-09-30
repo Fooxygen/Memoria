@@ -11,7 +11,6 @@ export interface SourceDoc {
 
 export interface TextChunk {
     id: string;
-    doc_title: string;
     content: string;
 }
 

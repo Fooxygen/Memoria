@@ -45,7 +45,6 @@ export function text_chunk_document(doc: SourceDoc): TextChunk[] {
                 if (line.trim().length > 0) {
                     chunks.push({
                         id: `${doc.id}-c${chunk_index++}`,
-                        doc_title: doc.title,
                         content: line.trim(),
                     });
                 }
@@ -53,7 +52,6 @@ export function text_chunk_document(doc: SourceDoc): TextChunk[] {
         } else {
             chunks.push({
                 id: `${doc.id}-c${chunk_index++}`,
-                doc_title: doc.title,
                 content: trimmed,
             });
         }

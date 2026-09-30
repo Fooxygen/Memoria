@@ -24,10 +24,6 @@ export function render_lib_item(doc: LibDoc): string {
         </article>`;
 }
 
-export function render_lib_items(docs: LibDoc[]): string {
-    return docs.map(render_lib_item).join("");
-}
-
 export function render_lib_empty(): string {
     return `<p class="doc_shelf_empty">这里还没有文档</p>`;
 }
@@ -56,10 +52,6 @@ export function render_queue_card(it: QueueCardItem): string {
                 <h3 class="doc_card_title" title="${text_escape_html(it.title)}">${text_escape_html(it.title)}</h3>
             </div>
         </article>`;
-}
-
-export function render_queue_cards(items: QueueCardItem[]): string {
-    return items.map(render_queue_card).join("");
 }
 
 export interface SearchHit {

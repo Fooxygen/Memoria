@@ -706,6 +706,8 @@ select {
 	color: var(--text-body-c);
 	margin-bottom: 1.1em;
 	user-select: text;
+	text-align: justify;
+	overflow-wrap: break-word;
 }
 
 .reader_paragraph:last-child {
@@ -888,6 +890,7 @@ select {
 	white-space: pre-wrap;
 	overflow-wrap: break-word;
 	user-select: text;
+	text-align: justify;
 	display: -webkit-box;
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 9;
@@ -1411,6 +1414,8 @@ select {
 	-webkit-line-clamp: 9;
 	-webkit-box-orient: vertical;
 	overflow: hidden;
+	text-align: justify;
+	overflow-wrap: break-word;
 }
 
 .doc_card_head {
