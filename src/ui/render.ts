@@ -12,20 +12,20 @@ export interface LibDoc {
     chunk_count: number;
 }
 
+export function render_lib_item(doc: LibDoc): string {
+    return `
+        <article class="doc_card card" role="listitem" data-key="${text_escape_html(doc.id)}">
+            <button class="doc_card_more" type="button" aria-label="更多操作">
+                <i data-lucide="ellipsis"></i>
+            </button>
+            <div class="doc_card_meta">${doc.chunk_count} 切片</div>
+            <h3 class="doc_card_title" title="${text_escape_html(doc.title)}">${text_escape_html(doc.title)}</h3>
+            <p class="doc_card_desc">${text_escape_html(doc.preview ?? "")}</p>
+        </article>`;
+}
+
 export function render_lib_items(docs: LibDoc[]): string {
-    return docs
-        .map((doc) => {
-            return `
-                <article class="doc_card card" role="listitem" data-key="${text_escape_html(doc.id)}">
-                    <button class="doc_card_more" type="button" aria-label="更多操作">
-                        <i data-lucide="ellipsis"></i>
-                    </button>
-                    <div class="doc_card_meta">${doc.chunk_count} 切片</div>
-                    <h3 class="doc_card_title" title="${text_escape_html(doc.title)}">${text_escape_html(doc.title)}</h3>
-                    <p class="doc_card_desc">${text_escape_html(doc.preview ?? "")}</p>
-                </article>`;
-        })
-        .join("");
+    return docs.map(render_lib_item).join("");
 }
 
 export function render_lib_empty(): string {
@@ -40,26 +40,26 @@ export interface QueueCardItem {
     status: QueueStatus;
 }
 
-const QUEUE_STATUS_CLASS: Record<QueueStatus, string> = {
+export const QUEUE_STATUS_CLASS: Record<QueueStatus, string> = {
     wait: "is_wait",
     run: "is_run",
     done: "is_done",
     skip: "is_skip",
 };
 
+export function render_queue_card(it: QueueCardItem): string {
+    const status_class = QUEUE_STATUS_CLASS[it.status];
+    return `
+        <article class="doc_card card ${status_class}" role="listitem" data-key="${text_escape_html(it.id)}">
+            <div class="doc_card_head">
+                <span class="doc_card_status" aria-hidden="true"></span>
+                <h3 class="doc_card_title" title="${text_escape_html(it.title)}">${text_escape_html(it.title)}</h3>
+            </div>
+        </article>`;
+}
+
 export function render_queue_cards(items: QueueCardItem[]): string {
-    return items
-        .map((it) => {
-            const status_class = QUEUE_STATUS_CLASS[it.status];
-            return `
-                <article class="doc_card card ${status_class}" role="listitem" data-key="${text_escape_html(it.id)}">
-                    <div class="doc_card_head">
-                        <span class="doc_card_status" aria-hidden="true"></span>
-                        <h3 class="doc_card_title" title="${text_escape_html(it.title)}">${text_escape_html(it.title)}</h3>
-                    </div>
-                </article>`;
-        })
-        .join("");
+    return items.map(render_queue_card).join("");
 }
 
 export interface SearchHit {

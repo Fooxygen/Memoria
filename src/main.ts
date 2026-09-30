@@ -7,10 +7,11 @@ import { text_chunk_document, text_hash_content } from "./store/text";
 import { infer_get, infer_local_available } from "./infer";
 import {
     render_lib_empty,
-    render_lib_items,
-    render_queue_cards,
+    render_lib_item,
+    render_queue_card,
     render_result_collection,
     render_reader_document,
+    QUEUE_STATUS_CLASS,
     type LibDoc,
     type QueueCardItem,
     type SearchHit,
@@ -156,27 +157,72 @@ let logs_visible:  number         = LOG_PAGE;
 
 // WaterFall
 
-function       mount_waterfall(container: HTMLElement, html: string, empty_html: string): void {
-    if (!html.trim()) {
-        container.innerHTML = empty_html;
-        return;
-    }
-    const host = document.createElement("div");
-    host.innerHTML = html;
-    const cards = Array.from(host.children) as HTMLElement[];
+const queue_cards_el = new Map<string, HTMLElement>();
+const lib_cards_el   = new Map<string, HTMLElement>();
 
+interface WaterfallItem {
+    id:     string;
+    render: () => string;
+    sync:   (el: HTMLElement) => void;
+}
+
+function       waterfall_cols_ensure(host: HTMLElement): HTMLElement[] {
+    const cols = Array.from(host.children).filter(
+        (el) => el.classList.contains("doc_waterfall_col"),
+    ) as HTMLElement[];
+    if (cols.length === 2) return cols;
+
+    host.innerHTML = "";
     const col_a = document.createElement("div");
     col_a.className = "doc_waterfall_col";
     const col_b = document.createElement("div");
     col_b.className = "doc_waterfall_col";
-    container.innerHTML = "";
-    container.append(col_a, col_b);
+    host.append(col_a, col_b);
+    return [col_a, col_b];
+}
 
-    cards.forEach((card, index) => {
-        card.style.animationDelay = `${(0.5 + index * 0.06).toFixed(2)}s`;
-        if (index % 2 === 0) col_a.appendChild(card);
-        else col_b.appendChild(card);
-    });
+function       waterfall_apply(
+    host: HTMLElement,
+    cards: Map<string, HTMLElement>,
+    empty_html: string,
+    items: WaterfallItem[],
+): void {
+    if (items.length === 0) {
+        host.innerHTML = empty_html;
+        cards.clear();
+        return;
+    }
+
+    const cols  = waterfall_cols_ensure(host);
+    const alive = new Set<string>();
+    let   fresh = 0;
+
+    for (const item of items) {
+        alive.add(item.id);
+
+        const existing = cards.get(item.id);
+        if (existing) {
+            item.sync(existing);
+            continue;
+        }
+
+        const wrap = document.createElement("div");
+        wrap.innerHTML = item.render();
+        const card = wrap.firstElementChild as HTMLElement;
+        card.style.animationDelay = `${(fresh * 0.05).toFixed(2)}s`;
+        fresh += 1;
+
+        const target = cols[0].childElementCount <= cols[1].childElementCount ? cols[0] : cols[1];
+        target.appendChild(card);
+        cards.set(item.id, card);
+        item.sync(card);
+    }
+
+    for (const [id, card] of cards) {
+        if (alive.has(id)) continue;
+        card.remove();
+        cards.delete(id);
+    }
 }
 
 // HTTP
@@ -401,7 +447,21 @@ async function documents_refresh(): Promise<void> {
 
     doc_count.textContent = String(docs.length);
 
-    mount_waterfall(doc_list, docs.length === 0 ? "" : render_lib_items(docs), render_lib_empty());
+    waterfall_apply(doc_list, lib_cards_el, render_lib_empty(), docs.map((doc) => ({
+        id:     doc.id,
+        render: () => render_lib_item(doc),
+        sync:   (el) => {
+            const meta = el.querySelector<HTMLElement>(".doc_card_meta");
+            if (meta) meta.textContent = `${doc.chunk_count} 切片`;
+            const title = el.querySelector<HTMLElement>(".doc_card_title");
+            if (title) {
+                title.textContent = doc.title;
+                title.title = doc.title;
+            }
+            const desc = el.querySelector<HTMLElement>(".doc_card_desc");
+            if (desc) desc.textContent = doc.preview ?? "";
+        },
+    })));
     refresh_icons();
 }
 
@@ -739,10 +799,17 @@ function page_switchs_button_create(): void {
 }
 
 function page_ingest_cards_render(): void {
-    mount_waterfall(
-        queue_shelf,
-        documents_ingest_cards.length ? render_queue_cards(documents_ingest_cards) : "",
-        '<p class="doc_shelf_empty">处理队列为空</p>',
+    waterfall_apply(queue_shelf, queue_cards_el, '<p class="doc_shelf_empty">处理队列为空</p>',
+        documents_ingest_cards.map((it) => ({
+            id:     it.id,
+            render: () => render_queue_card(it),
+            sync:   (el) => {
+                el.classList.remove("is_wait", "is_run", "is_done", "is_skip");
+                el.classList.add(QUEUE_STATUS_CLASS[it.status]);
+                const title = el.querySelector<HTMLElement>(".doc_card_title");
+                if (title) title.textContent = it.title;
+            },
+        })),
     );
 }
 
