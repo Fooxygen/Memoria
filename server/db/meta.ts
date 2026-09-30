@@ -8,6 +8,7 @@ export interface DocumentMeta {
     title: string;
     preview: string;
     chunk_count: number;
+    content_hash?: string;
 }
 
 /**

@@ -173,10 +173,11 @@ export async function documents_create() {
     const cl = await db_client_get();
     await cl.execute(`
         create table if not exists ${TABLE_DOCUMENTS} (
-            id    varchar(255) primary key,
-            title varchar(255),
-            preview text,
-            chunk_count int
+            id           varchar(255) primary key,
+            title        varchar(255),
+            preview      text,
+            chunk_count  int,
+            content_hash varchar(16)
         )    
     `);
 }
@@ -185,8 +186,8 @@ export async function documents_add(meta: DocumentMeta) {
     const cl = await db_client_get();
     await documents_create();
     await cl.execute(`
-        insert into ${TABLE_DOCUMENTS} values (?, ?, ?, ?)    
-    `, [meta.id, meta.title, meta.preview, meta.chunk_count]);
+        insert into ${TABLE_DOCUMENTS} values (?, ?, ?, ?, ?)    
+    `, [meta.id, meta.title, meta.preview, meta.chunk_count, meta.content_hash ?? null]);
 }
 
 export async function documents_delete(id: string) {
@@ -219,6 +220,23 @@ export async function documents_list() : Promise<DocumentMeta[]> {
         preview:      String(r.preview ?? ""),
         chunk_count:  Number(r.chunk_count ?? 0),
     }));
+}
+
+export async function document_find_by_hash(content_hash: string): Promise<DocumentMeta | null> {
+    const cl = await db_client_get();
+    await documents_create();
+
+    const rows = await cl.execute(`
+        select id, title, preview, chunk_count, content_hash from ${TABLE_DOCUMENTS} where content_hash = ? limit 1
+    `, [content_hash]) as Record<string, unknown>[] | null;
+    if (!rows || rows.length === 0) return null;
+    return {
+        id:           String(rows[0].id),
+        title:        String(rows[0].title),
+        preview:      String(rows[0].preview ?? ""),
+        chunk_count:  Number(rows[0].chunk_count ?? 0),
+        content_hash: rows[0].content_hash == null ? undefined : String(rows[0].content_hash),
+    };
 }
 
 // Document Contents

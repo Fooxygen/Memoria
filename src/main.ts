@@ -3,7 +3,7 @@
 // Copyright (c) 2026 BaseTUT.
 // Licensed under the MIT License.
 
-import { text_chunk_document } from "./store/text";
+import { text_chunk_document, text_hash_content } from "./store/text";
 import { infer_get, infer_local_available } from "./infer";
 import {
     render_lib_empty,
@@ -318,13 +318,15 @@ document.addEventListener("pointerdown", (event) => {
     log_state_set("collapsed");
 });
 
-async function document_process(file: File): Promise<void> {
+async function document_process(file: File): Promise<"done" | "skip"> {
 
     const doc = {
         id:      `doc_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
         title:   file.name.replace(/\.[^.]+$/, ""),
         content: await file.text()
     };
+
+    const content_hash = text_hash_content(doc.content);
 
     // Chunks
     const chunks = text_chunk_document(doc);
@@ -353,17 +355,25 @@ async function document_process(file: File): Promise<void> {
     }));
     const preview = doc.content.trim().replace(/\s+/g, " ");
 
-    await json_post("/api/ingest", {
+    const res = (await json_post("/api/ingest", {
         doc: {
-            id:          doc.id,
-            title:       doc.title,
-            preview:     preview,
-            chunk_count: records.length,
-            content:     doc.content
+            id:           doc.id,
+            title:        doc.title,
+            preview:      preview,
+            chunk_count:  records.length,
+            content:      doc.content,
+            content_hash: content_hash
         },
         chunks: records,
-    });
+    })) as { duplicate?: boolean };
+
+    if (res.duplicate) {
+        log_push(`内容重复，已跳过：${doc.title}`, "知识库中已存在相同内容的文档");
+        return "skip";
+    }
+
     log_push(`处理成功：${doc.title}`, `${records.length} 个切片已写入知识库`);
+    return "done";
 }
 
 async function index_flush(): Promise<void> {
@@ -421,8 +431,8 @@ async function documents_ingest_loop(): Promise<void> {
         if (task) task.status = "run";
         ingest_cards_render();
         try {
-            await document_process(file);
-            if (task) task.status = "done";
+            const result = await document_process(file);
+            if (task) task.status = result;
         } catch (error) {
             log_push("处理失败", String(error));
             if (task) task.status = "done";

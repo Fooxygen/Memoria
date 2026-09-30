@@ -32,7 +32,7 @@ export function render_lib_empty(): string {
     return `<p class="doc_shelf_empty">这里还没有文档</p>`;
 }
 
-export type QueueStatus = "wait" | "run" | "done";
+export type QueueStatus = "wait" | "run" | "done" | "skip";
 
 export interface QueueCardItem {
     id: string;
@@ -44,6 +44,7 @@ const QUEUE_STATUS_CLASS: Record<QueueStatus, string> = {
     wait: "is_wait",
     run: "is_run",
     done: "is_done",
+    skip: "is_skip",
 };
 
 export function render_queue_cards(items: QueueCardItem[]): string {

@@ -19,6 +19,7 @@ import {
     document_contents_add,
     document_contents_delete,
     document_content_get,
+    document_find_by_hash,
     chunks_add,
     chunks_delete_by_document,
     chunks_refresh_if_dirty,
@@ -205,11 +206,22 @@ export function seekdb_plugin(): Plugin {
                             return;
                         }
 
+                        const content_hash = typeof doc.content_hash === "string" ? doc.content_hash : "";
+
+                        if (content_hash) {
+                            const existing = await document_find_by_hash(content_hash);
+                            if (existing) {
+                                send_json(res, 200, { ok: false, duplicate: true, title: existing.title });
+                                return;
+                            }
+                        }
+
                         await documents_add({
                             id: String(doc.id),
                             title: String(doc.title ?? ""),
                             preview: String(doc.preview ?? ""),
                             chunk_count: Number(doc.chunk_count ?? 0),
+                            content_hash: content_hash || undefined,
                         });
 
                         if (typeof doc.content === "string") {

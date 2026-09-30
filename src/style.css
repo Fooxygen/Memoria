@@ -1446,6 +1446,10 @@ select {
 	background: #28c840;
 }
 
+.doc_card.is_skip {
+	opacity: 0.55;
+}
+
 .doc_shelf_empty {
 	margin: auto;
 	text-align: center;
