@@ -862,6 +862,11 @@ select {
 	overflow-wrap: break-word;
 }
 
+.page_group.is_split .search_ticks,
+.page_group.is_split .search_tip {
+	display: none;
+}
+
 .empty {
 	text-align: center;
 	padding: clamp(110px, 22vh, 320px) 20px 0;

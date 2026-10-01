@@ -95,6 +95,7 @@ function reader_visible_set(value: boolean): void {
     if (value && reader_doc_id) {
         document_opening.add(reader_doc_id);
     }
+    if (value) search_tip_hide();
     page_ingest_cards_status_render();
 }
 
