@@ -1641,6 +1641,7 @@ select {
 .logs {
 	position: absolute;
 	left: 34px;
+	top: 15px;
 	z-index: 12;
 }
 
