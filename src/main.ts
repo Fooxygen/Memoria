@@ -52,6 +52,9 @@ const top_k_dec         = by_id<HTMLButtonElement>("top_k_dec");
 const top_k_inc         = by_id<HTMLButtonElement>("top_k_inc");
 const results_list      = by_id("results_list");
 const initial_state     = by_id("initial_state");
+const search_ticks      = by_id("search_ticks");
+const search_tip        = by_id("search_tip");
+const search_tip_text   = by_id("search_tip_text");
 const card_menu         = by_id("card_menu");
 const card_menu_delete  = by_id("card_menu_delete");
 const logs_box          = by_id("logs");
@@ -627,6 +630,7 @@ async function search_execute(): Promise<void> {
     collection.className = "result_collection";
     collection.innerHTML = render_result_collection(hits);
     results_list.appendChild(collection);
+    search_record_add(query, collection);
 
     masonry_into(collection, hits.length <= 4 ? 2 : hits.length <= 8 ? 3 : 4);
 
@@ -634,6 +638,65 @@ async function search_execute(): Promise<void> {
     page_bind();
     dock_search();
     refresh_icons();
+}
+
+interface SearchRecord {
+    query: string;
+    el:    HTMLElement;
+    tick:  HTMLElement;
+}
+
+const search_records: SearchRecord[] = [];
+
+function search_tip_show(tick: HTMLElement, query: string): void {
+    search_tip_text.textContent = query;
+    search_tip.classList.add("is_open");
+
+    const host      = search_ticks.parentElement as HTMLElement;
+    const host_rect = host.getBoundingClientRect();
+    const tick_rect = tick.getBoundingClientRect();
+    const tip_w     = search_tip.offsetWidth;
+    const tip_h     = search_tip.offsetHeight;
+
+    const top  = tick_rect.top - host_rect.top + tick_rect.height / 2 - tip_h / 2;
+    const left = tick_rect.left - host_rect.left - tip_w - 10;
+
+    search_tip.style.top  = `${top}px`;
+    search_tip.style.left = `${Math.max(8, left)}px`;
+}
+
+function search_tip_hide(): void {
+    search_tip.classList.remove("is_open");
+}
+
+function search_record_add(query: string, el: HTMLElement): void {
+    const tick = document.createElement("button");
+    tick.type = "button";
+    tick.className = "search_tick";
+    tick.title = query;
+
+    const bar = document.createElement("span");
+    bar.className = "search_tick_bar";
+    tick.appendChild(bar);
+
+    tick.addEventListener("pointerenter", () => {
+        tick.classList.add("is_near");
+        search_tip_show(tick, query);
+    });
+    tick.addEventListener("pointerleave", () => {
+        tick.classList.remove("is_near");
+        search_tip_hide();
+    });
+    tick.addEventListener("click", () => page_apply_focus(el));
+
+    search_ticks.appendChild(tick);
+    search_records.push({ query, el, tick });
+}
+
+function search_ticks_focus_sync(el: HTMLElement | null): void {
+    for (const record of search_records) {
+        record.tick.classList.toggle("is_current", record.el === el);
+    }
 }
 
 let page_focus = -1;
@@ -648,6 +711,7 @@ function page_apply_focus(el: HTMLElement): void {
     if (!sc) return;
     const cols = Array.from(sc.querySelectorAll<HTMLElement>(".result_collection"));
     page_focus = cols.indexOf(el);
+    search_ticks_focus_sync(el);
     requestAnimationFrame(() => {
         const view = sc.clientHeight;
         const rect = el.getBoundingClientRect();
