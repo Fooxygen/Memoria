@@ -9,6 +9,7 @@ import {
     type InferSetting,
     type InferBackend
 } from "../store/settings";
+import { perf_end, perf_start } from "../store/perf";
 
 export const INFER_MODEL_ONNX_URL = `/models/${INFER_MODEL}/onnx/model_quantized.onnx`;
 
@@ -67,43 +68,48 @@ async function infer_create(): Promise<Infer> {
         if (!executor_loadevent) {
             setting.status = "loading";
             setting.ready   = false;
+            perf_start("infer:load");
 
             executor_loadevent = (async () => {
-                const has_webgpu = Boolean(navigator.gpu);
-                let webgpu_error = "";
+                try {
+                    const has_webgpu = Boolean(navigator.gpu);
+                    let webgpu_error = "";
 
-                if (has_webgpu) {
+                    if (has_webgpu) {
+                        try {
+                            executor = await executor_load("webgpu");
+                            setting.backend = "webgpu";
+                            setting.ready   = true;
+                            setting.status  = "ready";
+                            setting.notice  = "";
+                            return;
+                        } catch (error) {
+                            webgpu_error = String(error);
+                        }
+                    }
+
                     try {
-                        executor = await executor_load("webgpu");
-                        setting.backend = "webgpu";
+                        executor = await executor_load("wasm");
+                        setting.backend = "wasm";
                         setting.ready   = true;
                         setting.status  = "ready";
-                        setting.notice  = "";
+                        setting.notice  = has_webgpu
+                            ? "WebGPU 初始化失败，已自动降级到 WASM"
+                            : "当前环境不支持 WebGPU，已使用 WASM";
                         return;
                     } catch (error) {
-                        webgpu_error = String(error);
+                        executor = null;
+                        setting.ready  = false;
+                        setting.status = "error";
+                        setting.notice = "";
+
+                        const detail = webgpu_error
+                            ? `webgpu: ${webgpu_error}; wasm: ${String(error)}`
+                            : `wasm: ${String(error)}`;
+                        throw new Error(`模型加载失败：${detail}`);
                     }
-                }
-
-                try {
-                    executor = await executor_load("wasm");
-                    setting.backend = "wasm";
-                    setting.ready   = true;
-                    setting.status  = "ready";
-                    setting.notice  = has_webgpu
-                        ? "WebGPU 初始化失败，已自动降级到 WASM"
-                        : "当前环境不支持 WebGPU，已使用 WASM";
-                    return;
-                } catch (error) {
-                    executor = null;
-                    setting.ready  = false;
-                    setting.status = "error";
-                    setting.notice = "";
-
-                    const detail = webgpu_error
-                        ? `webgpu: ${webgpu_error}; wasm: ${String(error)}`
-                        : `wasm: ${String(error)}`;
-                    throw new Error(`模型加载失败：${detail}`);
+                } finally {
+                    perf_end("infer:load");
                 }
             })();
         }

@@ -1,0 +1,568 @@
+{
+  "generated_at": "2026-10-29T15:25:50.916Z",
+  "model": "Xenova/all-MiniLM-L6-v2",
+  "corpus": {
+    "documents": 2,
+    "queries": 12
+  },
+  "top_k": 10,
+  "device": "Node.js CPU",
+  "results": {
+    "fp32": {
+      "label": "FP32 baseline",
+      "dtype": "fp32",
+      "stages": {
+        "model_load_ms": 390.08,
+        "doc_embed_ms": 1221.54,
+        "query_embed_ms": 27.28,
+        "rank_ms": 3.86
+      },
+      "metrics": {
+        "recall5": 0.875,
+        "recall10": 0.9583,
+        "ndcg5": 0.8229,
+        "ndcg10": 0.8492,
+        "mrr": 0.8438
+      },
+      "per_query": [
+        {
+          "id": "q01",
+          "relevant": [
+            "doc-0-c8"
+          ],
+          "retrieved": [
+            "doc-1-c0",
+            "doc-0-c8",
+            "doc-1-c2",
+            "doc-1-c5",
+            "doc-0-c2",
+            "doc-0-c17",
+            "doc-0-c7",
+            "doc-1-c6",
+            "doc-1-c17",
+            "doc-0-c13"
+          ],
+          "recall5": 1,
+          "ndcg5": 0.6309,
+          "mrr": 0.5
+        },
+        {
+          "id": "q02",
+          "relevant": [
+            "doc-0-c13"
+          ],
+          "retrieved": [
+            "doc-0-c13",
+            "doc-0-c11",
+            "doc-0-c5",
+            "doc-0-c17",
+            "doc-1-c24",
+            "doc-1-c19",
+            "doc-0-c22",
+            "doc-1-c25",
+            "doc-0-c7",
+            "doc-0-c21"
+          ],
+          "recall5": 1,
+          "ndcg5": 1,
+          "mrr": 1
+        },
+        {
+          "id": "q03",
+          "relevant": [
+            "doc-0-c19"
+          ],
+          "retrieved": [
+            "doc-0-c32",
+            "doc-0-c19",
+            "doc-0-c6",
+            "doc-0-c11",
+            "doc-1-c15",
+            "doc-0-c22",
+            "doc-0-c7",
+            "doc-0-c27",
+            "doc-0-c21",
+            "doc-0-c12"
+          ],
+          "recall5": 1,
+          "ndcg5": 0.6309,
+          "mrr": 0.5
+        },
+        {
+          "id": "q04",
+          "relevant": [
+            "doc-0-c23"
+          ],
+          "retrieved": [
+            "doc-0-c23",
+            "doc-1-c15",
+            "doc-0-c22",
+            "doc-0-c32",
+            "doc-1-c19",
+            "doc-0-c11",
+            "doc-1-c4",
+            "doc-0-c8",
+            "doc-0-c21",
+            "doc-1-c5"
+          ],
+          "recall5": 1,
+          "ndcg5": 1,
+          "mrr": 1
+        },
+        {
+          "id": "q05",
+          "relevant": [
+            "doc-0-c28"
+          ],
+          "retrieved": [
+            "doc-0-c16",
+            "doc-0-c3",
+            "doc-0-c2",
+            "doc-1-c0",
+            "doc-0-c26",
+            "doc-1-c5",
+            "doc-0-c17",
+            "doc-0-c28",
+            "doc-0-c32",
+            "doc-1-c19"
+          ],
+          "recall5": 0,
+          "ndcg5": 0,
+          "mrr": 0.125
+        },
+        {
+          "id": "q06",
+          "relevant": [
+            "doc-0-c25",
+            "doc-0-c33"
+          ],
+          "retrieved": [
+            "doc-0-c33",
+            "doc-1-c15",
+            "doc-0-c22",
+            "doc-0-c6",
+            "doc-0-c27",
+            "doc-0-c7",
+            "doc-0-c23",
+            "doc-1-c5",
+            "doc-1-c18",
+            "doc-1-c2"
+          ],
+          "recall5": 0.5,
+          "ndcg5": 0.6131,
+          "mrr": 1
+        },
+        {
+          "id": "q07",
+          "relevant": [
+            "doc-1-c10",
+            "doc-1-c11"
+          ],
+          "retrieved": [
+            "doc-1-c11",
+            "doc-1-c10",
+            "doc-1-c1",
+            "doc-1-c14",
+            "doc-1-c8",
+            "doc-1-c26",
+            "doc-1-c2",
+            "doc-1-c13",
+            "doc-0-c17",
+            "doc-0-c2"
+          ],
+          "recall5": 1,
+          "ndcg5": 1,
+          "mrr": 1
+        },
+        {
+          "id": "q08",
+          "relevant": [
+            "doc-1-c7"
+          ],
+          "retrieved": [
+            "doc-1-c7",
+            "doc-1-c5",
+            "doc-1-c6",
+            "doc-1-c19",
+            "doc-0-c27",
+            "doc-1-c22",
+            "doc-0-c12",
+            "doc-1-c24",
+            "doc-0-c32",
+            "doc-0-c6"
+          ],
+          "recall5": 1,
+          "ndcg5": 1,
+          "mrr": 1
+        },
+        {
+          "id": "q09",
+          "relevant": [
+            "doc-1-c17"
+          ],
+          "retrieved": [
+            "doc-1-c17",
+            "doc-0-c2",
+            "doc-0-c0",
+            "doc-0-c3",
+            "doc-1-c2",
+            "doc-1-c9",
+            "doc-1-c0",
+            "doc-1-c13",
+            "doc-0-c4",
+            "doc-1-c5"
+          ],
+          "recall5": 1,
+          "ndcg5": 1,
+          "mrr": 1
+        },
+        {
+          "id": "q10",
+          "relevant": [
+            "doc-1-c21"
+          ],
+          "retrieved": [
+            "doc-1-c21",
+            "doc-1-c23",
+            "doc-0-c28",
+            "doc-0-c3",
+            "doc-1-c5",
+            "doc-0-c2",
+            "doc-1-c0",
+            "doc-0-c33",
+            "doc-1-c6",
+            "doc-1-c2"
+          ],
+          "recall5": 1,
+          "ndcg5": 1,
+          "mrr": 1
+        },
+        {
+          "id": "q11",
+          "relevant": [
+            "doc-1-c21"
+          ],
+          "retrieved": [
+            "doc-1-c21",
+            "doc-0-c29",
+            "doc-1-c0",
+            "doc-1-c23",
+            "doc-1-c9",
+            "doc-1-c2",
+            "doc-1-c22",
+            "doc-1-c5",
+            "doc-0-c11",
+            "doc-1-c8"
+          ],
+          "recall5": 1,
+          "ndcg5": 1,
+          "mrr": 1
+        },
+        {
+          "id": "q12",
+          "relevant": [
+            "doc-1-c24"
+          ],
+          "retrieved": [
+            "doc-1-c24",
+            "doc-0-c16",
+            "doc-1-c0",
+            "doc-1-c5",
+            "doc-0-c13",
+            "doc-1-c8",
+            "doc-0-c5",
+            "doc-0-c15",
+            "doc-0-c17",
+            "doc-1-c17"
+          ],
+          "recall5": 1,
+          "ndcg5": 1,
+          "mrr": 1
+        }
+      ]
+    },
+    "int8": {
+      "label": "INT8",
+      "dtype": "q8",
+      "stages": {
+        "model_load_ms": 181.52,
+        "doc_embed_ms": 670.63,
+        "query_embed_ms": 18.02,
+        "rank_ms": 4.45
+      },
+      "metrics": {
+        "recall5": 0.875,
+        "recall10": 0.9583,
+        "ndcg5": 0.7812,
+        "ndcg10": 0.8109,
+        "mrr": 0.7917
+      },
+      "per_query": [
+        {
+          "id": "q01",
+          "relevant": [
+            "doc-0-c8"
+          ],
+          "retrieved": [
+            "doc-1-c0",
+            "doc-0-c8",
+            "doc-1-c2",
+            "doc-0-c7",
+            "doc-0-c17",
+            "doc-1-c5",
+            "doc-0-c16",
+            "doc-1-c6",
+            "doc-0-c13",
+            "doc-1-c20"
+          ],
+          "recall5": 1,
+          "ndcg5": 0.6309,
+          "mrr": 0.5
+        },
+        {
+          "id": "q02",
+          "relevant": [
+            "doc-0-c13"
+          ],
+          "retrieved": [
+            "doc-0-c13",
+            "doc-0-c5",
+            "doc-0-c11",
+            "doc-0-c17",
+            "doc-0-c7",
+            "doc-0-c32",
+            "doc-0-c22",
+            "doc-1-c20",
+            "doc-0-c24",
+            "doc-1-c19"
+          ],
+          "recall5": 1,
+          "ndcg5": 1,
+          "mrr": 1
+        },
+        {
+          "id": "q03",
+          "relevant": [
+            "doc-0-c19"
+          ],
+          "retrieved": [
+            "doc-0-c32",
+            "doc-0-c19",
+            "doc-0-c11",
+            "doc-0-c6",
+            "doc-1-c15",
+            "doc-0-c7",
+            "doc-0-c17",
+            "doc-0-c22",
+            "doc-0-c21",
+            "doc-0-c27"
+          ],
+          "recall5": 1,
+          "ndcg5": 0.6309,
+          "mrr": 0.5
+        },
+        {
+          "id": "q04",
+          "relevant": [
+            "doc-0-c23"
+          ],
+          "retrieved": [
+            "doc-0-c23",
+            "doc-1-c15",
+            "doc-0-c32",
+            "doc-0-c11",
+            "doc-0-c22",
+            "doc-1-c19",
+            "doc-1-c4",
+            "doc-0-c8",
+            "doc-0-c5",
+            "doc-0-c19"
+          ],
+          "recall5": 1,
+          "ndcg5": 1,
+          "mrr": 1
+        },
+        {
+          "id": "q05",
+          "relevant": [
+            "doc-0-c28"
+          ],
+          "retrieved": [
+            "doc-0-c16",
+            "doc-0-c3",
+            "doc-1-c0",
+            "doc-0-c2",
+            "doc-0-c17",
+            "doc-0-c28",
+            "doc-1-c20",
+            "doc-1-c5",
+            "doc-0-c26",
+            "doc-0-c5"
+          ],
+          "recall5": 0,
+          "ndcg5": 0,
+          "mrr": 0.1667
+        },
+        {
+          "id": "q06",
+          "relevant": [
+            "doc-0-c25",
+            "doc-0-c33"
+          ],
+          "retrieved": [
+            "doc-0-c33",
+            "doc-1-c15",
+            "doc-0-c22",
+            "doc-0-c7",
+            "doc-0-c16",
+            "doc-0-c17",
+            "doc-0-c27",
+            "doc-0-c6",
+            "doc-1-c0",
+            "doc-0-c23"
+          ],
+          "recall5": 0.5,
+          "ndcg5": 0.6131,
+          "mrr": 1
+        },
+        {
+          "id": "q07",
+          "relevant": [
+            "doc-1-c10",
+            "doc-1-c11"
+          ],
+          "retrieved": [
+            "doc-1-c11",
+            "doc-1-c10",
+            "doc-1-c8",
+            "doc-1-c14",
+            "doc-1-c1",
+            "doc-1-c26",
+            "doc-1-c2",
+            "doc-1-c13",
+            "doc-0-c17",
+            "doc-1-c0"
+          ],
+          "recall5": 1,
+          "ndcg5": 1,
+          "mrr": 1
+        },
+        {
+          "id": "q08",
+          "relevant": [
+            "doc-1-c7"
+          ],
+          "retrieved": [
+            "doc-1-c7",
+            "doc-1-c6",
+            "doc-1-c5",
+            "doc-1-c13",
+            "doc-0-c32",
+            "doc-0-c12",
+            "doc-0-c17",
+            "doc-1-c24",
+            "doc-0-c7",
+            "doc-1-c22"
+          ],
+          "recall5": 1,
+          "ndcg5": 1,
+          "mrr": 1
+        },
+        {
+          "id": "q09",
+          "relevant": [
+            "doc-1-c17"
+          ],
+          "retrieved": [
+            "doc-0-c0",
+            "doc-0-c2",
+            "doc-1-c17",
+            "doc-1-c2",
+            "doc-0-c3",
+            "doc-1-c9",
+            "doc-1-c0",
+            "doc-0-c5",
+            "doc-0-c4",
+            "doc-1-c13"
+          ],
+          "recall5": 1,
+          "ndcg5": 0.5,
+          "mrr": 0.3333
+        },
+        {
+          "id": "q10",
+          "relevant": [
+            "doc-1-c21"
+          ],
+          "retrieved": [
+            "doc-1-c21",
+            "doc-1-c23",
+            "doc-0-c28",
+            "doc-0-c3",
+            "doc-0-c2",
+            "doc-1-c5",
+            "doc-0-c0",
+            "doc-1-c0",
+            "doc-0-c26",
+            "doc-0-c19"
+          ],
+          "recall5": 1,
+          "ndcg5": 1,
+          "mrr": 1
+        },
+        {
+          "id": "q11",
+          "relevant": [
+            "doc-1-c21"
+          ],
+          "retrieved": [
+            "doc-1-c21",
+            "doc-1-c23",
+            "doc-1-c9",
+            "doc-1-c0",
+            "doc-0-c11",
+            "doc-0-c29",
+            "doc-1-c22",
+            "doc-1-c2",
+            "doc-0-c1",
+            "doc-1-c4"
+          ],
+          "recall5": 1,
+          "ndcg5": 1,
+          "mrr": 1
+        },
+        {
+          "id": "q12",
+          "relevant": [
+            "doc-1-c24"
+          ],
+          "retrieved": [
+            "doc-1-c24",
+            "doc-0-c16",
+            "doc-1-c0",
+            "doc-0-c5",
+            "doc-0-c13",
+            "doc-1-c5",
+            "doc-1-c8",
+            "doc-0-c15",
+            "doc-1-c20",
+            "doc-0-c17"
+          ],
+          "recall5": 1,
+          "ndcg5": 1,
+          "mrr": 1
+        }
+      ]
+    },
+    "fp16": {
+      "error": "Error: Exception during initialization: E:\\_work\\1\\s\\onnxruntime\\core\\graph\\graph_utils.cc:30 onnxruntime::graph_utils::GetIndexFromName itr != node_args.end() was false. Attempting to get index by a name which does not exist:InsertedPrecisionFreeCast_/encoder/layer.3/attention/output/LayerNorm/Constant_output_0for node: /embeddings/LayerNorm/Mul/SimplifiedLayerNormFusion/\n"
+    }
+  },
+  "comparison": {
+    "recall5_delta": 0,
+    "recall10_delta": 0,
+    "ndcg5_delta": -0.0417,
+    "ndcg10_delta": -0.0383,
+    "mrr_delta": -0.0521
+  }
+}

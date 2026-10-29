@@ -118,12 +118,31 @@ npm run test:e2e
 
 Integration tests use temporary directories and do not pollute `data/db/`; E2E uses system Edge by default, and can switch with `PLAYWRIGHT_CHANNEL=chrome`.
 
+### Evaluation
+
+```bash
+npm run eval
+npm run bench
+```
+
+`eval` writes model size and retrieval quality data; `bench` writes import and first/warm query timings. Results are saved in `bench/results/`.
+
 ### Usage
 
 - Left pane: drop or select text documents; each document is split and embedded on-device before being written into the knowledge base;
 - Right pane:
   - Key Retrieval: enter a query to search; results are presented as a collection of retrieval cards, switchable between **Hybrid Search** and **Vector Search**; click a result card to open the source reader and highlight the matched passage;
   - Source Reading: click a knowledge-base document card or a result card to show its source text on the far right, automatically scrolled to the hit;
+
+<p align="right"><a href="#readme-top">⭱ Back to top</a></p>
+
+## Documentation
+
+- [Technical Note](./docs/TECHNICAL.md)
+- [Benchmark Report](./docs/BENCHMARK.md)
+- [Testing and Reproduction](./docs/TESTING.md)
+- [Raw model-size and quality data](./bench/results/)
+- [Raw performance data](./bench/results/performance.json)
 
 <p align="right"><a href="#readme-top">⭱ Back to top</a></p>
 

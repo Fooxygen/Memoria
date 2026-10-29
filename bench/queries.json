@@ -1,0 +1,74 @@
+[
+  {
+    "id": "q01",
+    "query": "grug 是哪个类别的获奖 App？",
+    "keywords": ["grug"],
+    "category": "design"
+  },
+  {
+    "id": "q02",
+    "query": "Guitar Wiz 的开发者是谁？",
+    "keywords": ["Bijoy Thangaraj"],
+    "category": "design"
+  },
+  {
+    "id": "q03",
+    "query": "Blue Prince 的开发商是谁？",
+    "keywords": ["Dogubomb"],
+    "category": "design"
+  },
+  {
+    "id": "q04",
+    "query": "Moonlitt 主要用来做什么？",
+    "keywords": ["Moonlitt"],
+    "category": "design"
+  },
+  {
+    "id": "q05",
+    "query": "Primary 新闻应用有什么特点？",
+    "keywords": ["Primary"],
+    "category": "design"
+  },
+  {
+    "id": "q06",
+    "query": "Tide Guide 提供哪些数据？",
+    "keywords": ["Tide Guide"],
+    "category": "design"
+  },
+  {
+    "id": "q07",
+    "query": "Xcode 27 的 Device Hub 有什么作用？",
+    "keywords": ["Device Hub"],
+    "category": "tools"
+  },
+  {
+    "id": "q08",
+    "query": "Core AI 框架适合什么场景？",
+    "keywords": ["Core AI"],
+    "category": "tools"
+  },
+  {
+    "id": "q09",
+    "query": "SwiftUI 今年有哪些性能改进？",
+    "keywords": ["SwiftUI"],
+    "category": "tools"
+  },
+  {
+    "id": "q10",
+    "query": "Managed Background Assets 如何减少游戏安装体积？",
+    "keywords": ["Managed Background Assets"],
+    "category": "tools"
+  },
+  {
+    "id": "q11",
+    "query": "Steam Asset Converter 支持哪些平台？",
+    "keywords": ["Steam Asset Converter"],
+    "category": "tools"
+  },
+  {
+    "id": "q12",
+    "query": "Reality Composer Pro 3 有什么新功能？",
+    "keywords": ["Reality Composer Pro 3"],
+    "category": "tools"
+  }
+]

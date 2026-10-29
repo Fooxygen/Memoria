@@ -1,0 +1,60 @@
+{
+  "generated_at": "2026-10-29T15:16:16.182Z",
+  "model": "Xenova/all-MiniLM-L6-v2",
+  "revision": "751bff37182d3f1213fa05d7196b954e230abad9",
+  "license": "apache-2.0",
+  "source": "https://huggingface.co/Xenova/all-MiniLM-L6-v2",
+  "files": {
+    "config.json": {
+      "bytes": 650,
+      "mb": 0,
+      "mib": 0
+    },
+    "special_tokens_map.json": {
+      "bytes": 125,
+      "mb": 0,
+      "mib": 0
+    },
+    "tokenizer.json": {
+      "bytes": 711661,
+      "mb": 0.71,
+      "mib": 0.68
+    },
+    "tokenizer_config.json": {
+      "bytes": 366,
+      "mb": 0,
+      "mib": 0
+    },
+    "vocab.txt": {
+      "bytes": 231508,
+      "mb": 0.23,
+      "mib": 0.22
+    },
+    "onnx/model.onnx": {
+      "bytes": 90387606,
+      "mb": 90.39,
+      "mib": 86.2
+    },
+    "onnx/model_fp16.onnx": {
+      "bytes": 45297825,
+      "mb": 45.3,
+      "mib": 43.2
+    },
+    "onnx/model_quantized.onnx": {
+      "bytes": 22972370,
+      "mb": 22.97,
+      "mib": 21.91
+    }
+  },
+  "compression": {
+    "int8_vs_fp32": 3.93,
+    "fp16_vs_fp32": 2,
+    "int8_vs_fp16": 1.97
+  },
+  "deployment": {
+    "shared_bytes": 944310,
+    "int8_bytes": 23916680,
+    "fp16_bytes": 46242135,
+    "fp32_bytes": 91331916
+  }
+}

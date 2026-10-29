@@ -1,0 +1,42 @@
+{
+  "generated_at": "2026-10-29T15:28:58.616Z",
+  "browser": "Microsoft Edge (Playwright)",
+  "corpus": "example/Apple_推出全新智能框架与先进工具助力_App_开发.txt",
+  "import": {
+    "backend": "WebGPU",
+    "read_ms": 1.5,
+    "model_load_ms": 2313.9,
+    "encode_ms": 8224.6,
+    "write_ms": 589,
+    "flush_ms": 307.9,
+    "total_ms": 9333.6
+  },
+  "webgpu": {
+    "backend": "WebGPU",
+    "first": {
+      "load_ms": 2008.2,
+      "encode_ms": 3158.3,
+      "api_ms": 112.7,
+      "total_ms": 3576.3
+    },
+    "warm": {
+      "encode_ms": 156.2,
+      "api_ms": 21.1,
+      "total_ms": 196.4
+    }
+  },
+  "wasm": {
+    "backend": "WASM",
+    "first": {
+      "load_ms": 1500.1,
+      "encode_ms": 1592.3,
+      "api_ms": 32.7,
+      "total_ms": 1959.4
+    },
+    "warm": {
+      "encode_ms": 8.5,
+      "api_ms": 22.1,
+      "total_ms": 56.8
+    }
+  }
+}

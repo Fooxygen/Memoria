@@ -3,7 +3,7 @@
 // Copyright (c) 2026 BaseTUT.
 // Licensed under the MIT License.
 
-import type { Plugin, ViteDevServer } from "vite";
+import type { Plugin, PreviewServer, ViteDevServer } from "vite";
 import type { ServerResponse, IncomingMessage } from "node:http";
 import { createReadStream } from "node:fs";
 import { existsSync, statSync } from "node:fs";
@@ -331,6 +331,25 @@ export function seekdb_plugin(): Plugin {
     return {
         name: "memoria-seekdb",
         async configureServer(server: ViteDevServer) {
+            await db_client_get();
+            await documents_create();
+            await document_contents_create();
+
+            try {
+                await chunks_index_refresh();
+            } catch (error) {
+                console.error("[index] startup refresh failed:", error);
+            }
+
+            server.middlewares.use(serve_models);
+            server.middlewares.use(serve_onnx_runtime);
+            server.middlewares.use(api_middleware);
+
+            server.httpServer?.once("close", () => {
+                void db_close();
+            });
+        },
+        async configurePreviewServer(server: PreviewServer) {
             await db_client_get();
             await documents_create();
             await document_contents_create();

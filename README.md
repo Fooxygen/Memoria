@@ -118,12 +118,31 @@ npm run test:e2e
 
 集成测试使用临时目录，不会污染 `data/db/`；E2E 默认使用系统 Edge，可通过 `PLAYWRIGHT_CHANNEL=chrome` 切换。
 
+### 评测
+
+```bash
+npm run eval
+npm run bench
+```
+
+`eval` 生成模型体积与检索质量数据，`bench` 生成首次/预热查询及导入耗时；结果写入 `bench/results/`。
+
 ### 使用
 
 - 左栏：拖入或选择文本文档，文档会被切分并在端侧向量化后写入知识库；
 - 右栏：
   - 关键检索：输入查询并检索，结果以检索卡片组呈现，可切换 **混合检索** 与 **向量检索**；点击检索卡片会打开原文阅览并高亮对应片段；
   - 原文阅览：点击知识库文档卡片或检索卡片，将在最右侧展示原文内容，并自动滚动到命中位置；
+
+<p align="right"><a href="#readme-top">⭱ Back to top</a></p>
+
+## 文档
+
+- [技术说明](./docs/TECHNICAL.md)
+- [评测报告](./docs/BENCHMARK.md)
+- [测试与复现](./docs/TESTING.md)
+- [模型体积与质量原始数据](./bench/results/)
+- [性能原始数据](./bench/results/performance.json)
 
 <p align="right"><a href="#readme-top">⭱ Back to top</a></p>
 

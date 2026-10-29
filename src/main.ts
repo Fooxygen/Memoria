@@ -17,6 +17,7 @@ import {
     type SearchHit,
 } from "./ui/render";
 import { refresh_icons }        from "./ui/icons";
+import { perf_end, perf_start } from "./store/perf";
 import {
     INFER_SETTING_DEFAULT,
     SEARCH_SETTING_DEFAULT,
@@ -445,11 +446,16 @@ document.addEventListener("pointerdown", (event) => {
 });
 
 async function document_process(file: File): Promise<"done" | "skip"> {
+    perf_start("ingest:total");
+
+    perf_start("ingest:read");
+    const content = await file.text();
+    perf_end("ingest:read");
 
     const doc = {
         id:      `doc_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
         title:   file.name.replace(/\.[^.]+$/, ""),
-        content: await file.text()
+        content,
     };
 
     const content_hash = text_hash_content(doc.content);
@@ -471,9 +477,11 @@ async function document_process(file: File): Promise<"done" | "skip"> {
         infer_phase_set("load");
     }
     let vecs: number[][];
+    perf_start("ingest:encode");
     try {
         vecs = await infer.encode(chunks.map((c) => c.content));
     } finally {
+        perf_end("ingest:encode");
         infer_phase_set(null);
         infer_ui_sync(infer.setting);
     }
@@ -492,6 +500,7 @@ async function document_process(file: File): Promise<"done" | "skip"> {
     }));
     const preview = doc.content.trim().replace(/\s+/g, " ");
 
+    perf_start("ingest:write");
     const res = (await json_post("/api/ingest", {
         doc: {
             id:           doc.id,
@@ -503,6 +512,8 @@ async function document_process(file: File): Promise<"done" | "skip"> {
         },
         chunks: records,
     })) as { duplicate?: boolean };
+    perf_end("ingest:write");
+    perf_end("ingest:total");
 
     if (res.duplicate) {
         log_push(`内容重复，已跳过：${doc.title}`, "知识库中已存在相同内容的文档");
@@ -514,10 +525,13 @@ async function document_process(file: File): Promise<"done" | "skip"> {
 }
 
 async function index_flush(): Promise<void> {
+    perf_start("ingest:flush");
     try {
         await json_post("/api/index/flush", {});
     } catch (error) {
         log_push("索引刷新失败", String(error));
+    } finally {
+        perf_end("ingest:flush");
     }
 }
 
@@ -697,6 +711,14 @@ async function search_execute(): Promise<void> {
     if (!query) return;
 
     const top_k = search_topk_read();
+    perf_start("search:total");
+    let total_open = true;
+
+    function total_end(): void {
+        if (!total_open) return;
+        total_open = false;
+        perf_end("search:total");
+    }
 
     let hits: SearchHit[];
     try {
@@ -708,19 +730,39 @@ async function search_execute(): Promise<void> {
         }
 
         try {
-            const vec = (await infer.encode([query]))[0];
-            const res = (await json_post("/api/search", { vec, top_k, mode: search_mode_value, query })) as { hits: SearchHit[] };
+            let vec: number[];
+            perf_start("search:encode");
+            try {
+                vec = (await infer.encode([query]))[0];
+            } finally {
+                perf_end("search:encode");
+            }
+
+            let res: { hits: SearchHit[] };
+            perf_start("search:api");
+            try {
+                res = (await json_post("/api/search", {
+                    vec,
+                    top_k,
+                    mode:  search_mode_value,
+                    query,
+                })) as { hits: SearchHit[] };
+            } finally {
+                perf_end("search:api");
+            }
             hits = (res.hits ?? []) as SearchHit[];
         } finally {
             infer_phase_set(null);
             infer_ui_sync(infer.setting);
         }
     } catch (error) {
+        total_end();
         log_push("检索失败", String(error));
         return;
     }
 
     if (hits.length === 0) {
+        total_end();
         log_push("没有找到相关内容", "换个说法再试");
         return;
     }
@@ -737,6 +779,7 @@ async function search_execute(): Promise<void> {
     page_bind();
     dock_search();
     refresh_icons();
+    total_end();
 }
 
 interface SearchRecord {
