@@ -242,17 +242,6 @@ export async function document_find_by_hash(content_hash: string): Promise<Docum
     return document_meta_from_row(rows[0]);
 }
 
-export async function document_get(id: string): Promise<DocumentMeta | null> {
-    const cl = await db_client_get();
-    await documents_create();
-
-    const rows = await cl.execute(`
-        select id, title, preview, chunk_count, content_hash from ${TABLE_DOCUMENTS} where id = ? limit 1
-    `, [id]) as Record<string, unknown>[] | null;
-    if (!rows || rows.length === 0) return null;
-    return document_meta_from_row(rows[0]);
-}
-
 // Document Contents
 
 export async function document_contents_create() {

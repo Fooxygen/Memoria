@@ -321,6 +321,8 @@ async function json_delete(url: string): Promise<unknown> {
 
 // Infer
 
+let infer_notice_shown = false;
+
 function infer_ui_sync(setting: InferSetting = INFER_SETTING_DEFAULT): void {
 
     // Fixed
@@ -332,10 +334,21 @@ function infer_ui_sync(setting: InferSetting = INFER_SETTING_DEFAULT): void {
     rt_quant.textContent = setting.quant;
 
     // Backend
-    const backend = setting.backend === "webgpu" ? "WebGPU" : "WASM";
+    const backend = setting.status === "idle"
+        ? "待加载"
+        : setting.status === "loading"
+            ? "加载中"
+            : setting.status === "error"
+                ? "不可用"
+                : setting.backend === "webgpu" ? "WebGPU" : "WASM";
     rt_backend.textContent = backend;
-    rt_backend_badge.classList.toggle("is_webgpu", setting.backend === "webgpu");
-    rt_backend_badge.classList.toggle("is_wasm", setting.backend === "wasm");
+    rt_backend_badge.classList.toggle("is_webgpu", setting.status === "ready" && setting.backend === "webgpu");
+    rt_backend_badge.classList.toggle("is_wasm", setting.status === "ready" && setting.backend === "wasm");
+
+    if (setting.notice && !infer_notice_shown) {
+        infer_notice_shown = true;
+        log_push("推理后端", setting.notice);
+    }
 }
 
 function infer_phase_set(mode: "load" | "download" | null): void {
@@ -449,15 +462,21 @@ async function document_process(file: File): Promise<"done" | "skip"> {
 
     if (!infer.setting.ready) {
         const local = await infer_local_available();
-        infer_phase_set(local ? "load" : "download");
+        if (!local) {
+            log_push("模型文件缺失", "请先运行 npm run model:fetch");
+            throw new Error("模型文件缺失");
+        }
+        infer.setting.status = "loading";
+        infer_ui_sync(infer.setting);
+        infer_phase_set("load");
     }
     let vecs: number[][];
     try {
         vecs = await infer.encode(chunks.map((c) => c.content));
     } finally {
         infer_phase_set(null);
+        infer_ui_sync(infer.setting);
     }
-    infer_ui_sync(infer.setting);
     
     // Records: Chunks + Embedding + Metadata
     const records  = chunks.map((c, i) => ({
@@ -682,9 +701,20 @@ async function search_execute(): Promise<void> {
     let hits: SearchHit[];
     try {
         const infer = await infer_get();
-        const vec = (await infer.encode([query]))[0];
-        const res = (await json_post("/api/search", { vec, top_k, mode: search_mode_value, query })) as { hits: SearchHit[] };
-        hits = (res.hits ?? []) as SearchHit[];
+        if (!infer.setting.ready) {
+            infer.setting.status = "loading";
+            infer_ui_sync(infer.setting);
+            infer_phase_set("load");
+        }
+
+        try {
+            const vec = (await infer.encode([query]))[0];
+            const res = (await json_post("/api/search", { vec, top_k, mode: search_mode_value, query })) as { hits: SearchHit[] };
+            hits = (res.hits ?? []) as SearchHit[];
+        } finally {
+            infer_phase_set(null);
+            infer_ui_sync(infer.setting);
+        }
     } catch (error) {
         log_push("检索失败", String(error));
         return;

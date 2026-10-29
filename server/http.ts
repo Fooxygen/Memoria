@@ -7,7 +7,7 @@ import type { Plugin, ViteDevServer } from "vite";
 import type { ServerResponse, IncomingMessage } from "node:http";
 import { createReadStream } from "node:fs";
 import { existsSync, statSync } from "node:fs";
-import { join, normalize, resolve } from "node:path";
+import { join, normalize, resolve, sep } from "node:path";
 import {
     db_client_get,
     db_close,
@@ -20,7 +20,6 @@ import {
     document_contents_delete,
     document_content_get,
     document_find_by_hash,
-    document_get,
     chunks_add,
     chunks_delete_by_document,
     chunks_refresh_if_dirty,
@@ -36,22 +35,34 @@ const MIME_BY_EXT: Record<string, string> = {
     ".json": "application/json",
     ".txt":  "text/plain",
     ".map":  "application/json",
+    ".wasm": "application/wasm",
+    ".mjs":  "text/javascript",
+    ".js":   "text/javascript",
 };
 
 function models_root_get(): string {
     return resolve(process.env.MEMORIA_MODEL_ROOT ?? "data/models");
 }
 
-export function serve_models(req: IncomingMessage, res: ServerResponse, next: Next): void {
+function ort_root_get(): string {
+    return resolve(process.env.MEMORIA_ORT_ROOT ?? "node_modules/onnxruntime-web/dist");
+}
+
+function serve_static(
+    req: IncomingMessage,
+    res: ServerResponse,
+    next: Next,
+    prefix: string,
+    root: string,
+): void {
     const path = new URL(req.url ?? "", "http://localhost").pathname;
-    if (!path.startsWith("/models/")) {
+    if (!path.startsWith(prefix)) {
         next();
         return;
     }
-    const root = models_root_get();
-    const rel = decodeURIComponent(path.slice("/models/".length)).replace(/\\/g, "/");
+    const rel = decodeURIComponent(path.slice(prefix.length)).replace(/\\/g, "/");
     const file = normalize(join(root, rel));
-    if (!file.startsWith(root)) {
+    if (file !== root && !file.startsWith(root + sep)) {
         res.statusCode = 403;
         res.end();
         return;
@@ -70,6 +81,14 @@ export function serve_models(req: IncomingMessage, res: ServerResponse, next: Ne
         return;
     }
     createReadStream(file).pipe(res);
+}
+
+export function serve_models(req: IncomingMessage, res: ServerResponse, next: Next): void {
+    serve_static(req, res, next, "/models/", models_root_get());
+}
+
+export function serve_onnx_runtime(req: IncomingMessage, res: ServerResponse, next: Next): void {
+    serve_static(req, res, next, "/onnx_runtime/", ort_root_get());
 }
 
 function read_json(req: IncomingMessage): Promise<unknown> {
@@ -166,6 +185,8 @@ export async function api_middleware(req: IncomingMessage, res: ServerResponse, 
             const mode = body.mode === "hybrid" && typeof body.query === "string" && body.query.trim()
                 ? "hybrid"
                 : "semantic";
+            const documents = await documents_list();
+            const title_by_id = new Map(documents.map((document) => [document.id, document.title]));
             const raw = (mode === "hybrid"
                 ? await chunks_hybrid_search(body.query as string, vec, limit)
                 : await chunks_search(vec, limit)) as {
@@ -192,19 +213,9 @@ export async function api_middleware(req: IncomingMessage, res: ServerResponse, 
                     idx_chunk:    Number(meta.idx_chunk ?? 0),
                     offset_start: Number(meta.offset_start ?? -1),
                     offset_end:   Number(meta.offset_end ?? -1),
-                    title:        "",
+                    title:        title_by_id.get(typeof meta.id_document === "string" ? meta.id_document : "") ?? "",
                 };
             });
-
-            const document_ids = [...new Set(hits.map((hit) => hit.id_document).filter(Boolean))];
-            const title_by_id = new Map<string, string>();
-            await Promise.all(document_ids.map(async (id) => {
-                const document = await document_get(id);
-                if (document) title_by_id.set(id, document.title);
-            }));
-            for (const hit of hits) {
-                hit.title = title_by_id.get(hit.id_document) ?? "";
-            }
 
             send_json(res, 200, { hits });
         } catch (error) {
@@ -291,6 +302,7 @@ export function seekdb_plugin(): Plugin {
             await document_contents_create();
 
             server.middlewares.use(serve_models);
+            server.middlewares.use(serve_onnx_runtime);
             server.middlewares.use(api_middleware);
 
             server.httpServer?.once("close", () => {

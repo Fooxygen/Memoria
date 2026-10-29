@@ -43,8 +43,16 @@ async function infer_create(): Promise<Infer> {
 
     env.localModelPath   = "/models/";
     env.allowLocalModels = true;
+    env.allowRemoteModels = false;
 
-    let error = "";
+    const wasm = env.backends.onnx.wasm;
+    if (!wasm) throw new Error("ONNX Runtime WASM 配置不可用");
+    wasm.wasmPaths = "/onnx_runtime/";
+
+    const setting: InferSetting = { ...INFER_SETTING_DEFAULT };
+
+    let executor:           Awaited<ReturnType<typeof executor_load>> | null = null;
+    let executor_loadevent: Promise<void> | null = null;
 
     async function executor_load(backend: InferBackend): Promise<unknown> {
         return pipeline("feature-extraction", INFER_MODEL, {
@@ -53,49 +61,66 @@ async function infer_create(): Promise<Infer> {
         });
     }
 
-    let setting:            InferSetting = { ...INFER_SETTING_DEFAULT };
-    let executor:           Awaited<ReturnType<typeof executor_load>> | null = null;
-    let executor_loadevent: Promise<void> | null = null;
-    
     async function executor_load_try(): Promise<void> {
-        if (executor_loadevent) {
-            return executor_loadevent;
+        if (executor) return;
+
+        if (!executor_loadevent) {
+            setting.status = "loading";
+            setting.ready   = false;
+
+            executor_loadevent = (async () => {
+                const has_webgpu = Boolean(navigator.gpu);
+                let webgpu_error = "";
+
+                if (has_webgpu) {
+                    try {
+                        executor = await executor_load("webgpu");
+                        setting.backend = "webgpu";
+                        setting.ready   = true;
+                        setting.status  = "ready";
+                        setting.notice  = "";
+                        return;
+                    } catch (error) {
+                        webgpu_error = String(error);
+                    }
+                }
+
+                try {
+                    executor = await executor_load("wasm");
+                    setting.backend = "wasm";
+                    setting.ready   = true;
+                    setting.status  = "ready";
+                    setting.notice  = has_webgpu
+                        ? "WebGPU 初始化失败，已自动降级到 WASM"
+                        : "当前环境不支持 WebGPU，已使用 WASM";
+                    return;
+                } catch (error) {
+                    executor = null;
+                    setting.ready  = false;
+                    setting.status = "error";
+                    setting.notice = "";
+
+                    const detail = webgpu_error
+                        ? `webgpu: ${webgpu_error}; wasm: ${String(error)}`
+                        : `wasm: ${String(error)}`;
+                    throw new Error(`模型加载失败：${detail}`);
+                }
+            })();
         }
 
-        executor_loadevent = (async () => {
-            
-            // WebGPU
-            if (navigator.gpu) {
-                try {
-                    executor = await executor_load("webgpu");
-                    setting.backend = "webgpu";
-                    setting.ready   = true;
-                    return;
-                } catch (err) {
-                    error = `webgpu: ${String(err)}`;
-                }
-            }
-
-            // WASM
-            try {
-                executor = await executor_load("wasm");
-                setting.backend = "wasm";
-                setting.ready   = true;
-                return;
-            } catch (err) {
-                error = `wasm: ${String(err)}`;
-                executor = null;
-            }
-            
-            if (!executor) {
-                throw new Error(`模型加载失败：${error || "未知错误"}`);
-            }
-        })();
-        return executor_loadevent;
+        try {
+            await executor_loadevent;
+        } catch (error) {
+            executor_loadevent = null;
+            executor = null;
+            setting.ready  = false;
+            setting.status = "error";
+            throw error;
+        }
     }
 
     const infer: Infer = {
-        setting: setting,
+        setting,
         async encode(texts: string[]): Promise<number[][]> {
             await executor_load_try();
             if (!executor) throw new Error("infer not ready");
@@ -106,8 +131,7 @@ async function infer_create(): Promise<Infer> {
                     dims?: number[];
                 }>;
             })(texts, { pooling: "mean", normalize: true }));
-            const list = output.tolist();
-            return list;
+            return output.tolist();
         }
     };
 

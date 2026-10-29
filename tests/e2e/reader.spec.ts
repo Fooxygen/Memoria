@@ -4,8 +4,20 @@
 
 import { test, expect } from "@playwright/test";
 
-test("opens the reader from a search hit and highlights the chunk", async ({ page, request }) => {
+test("falls back to WASM, opens the reader and highlights the chunk", async ({ page, request }) => {
     test.setTimeout(90_000);
+
+    await page.addInitScript(() => {
+        Object.defineProperty(navigator, "gpu", { value: undefined, configurable: true });
+    });
+
+    const external: string[] = [];
+    const runtime: string[] = [];
+    page.on("request", (req) => {
+        const url = req.url();
+        if (/cdn\.jsdelivr\.net|huggingface\.co/.test(url)) external.push(url);
+        if (url.includes("/onnx_runtime/")) runtime.push(url);
+    });
 
     const paragraphs = Array.from({ length: 40 }, (_, index) => `第 ${index + 1} 段：Memoria 的端侧检索示例。`);
     const target_index = 25;
@@ -46,12 +58,19 @@ test("opens the reader from a search hit and highlights the chunk", async ({ pag
     await request.post("/api/index/flush", { data: {} });
 
     await page.goto("/");
+    await expect(page.locator("#rt_backend")).toHaveText("待加载");
+
     await page.locator("#search_input").fill("seekdb");
     await page.locator("#btn_search").click();
 
     const result = page.locator(".result_card").first();
     await expect(result).toBeVisible({ timeout: 60_000 });
     await expect(result).toContainText("seekdb");
+    await expect(page.locator("#rt_backend")).toHaveText("WASM");
+    await expect(page.locator("#logs_list")).toContainText("WASM");
+    expect(runtime.length).toBeGreaterThan(0);
+    expect(external).toEqual([]);
+
     await result.click();
 
     await expect(page.locator("#page_reader")).toBeVisible();

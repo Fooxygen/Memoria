@@ -11,17 +11,22 @@ export const INFER_MODEL_SRC  = "Xenova · HuggingFace";
 export const INFER_MODEL_DIM  = 384;
 export type  InferQuant       = "int8"   | "fp16";
 export type  InferBackend     = "webgpu" | "wasm";
+export type  InferStatus      = "idle" | "loading" | "ready" | "error";
 
 export interface InferSetting {
     quant:   InferQuant;
     backend: InferBackend;
     ready:   boolean;
+    status:  InferStatus;
+    notice:  string;
 }
 
 export const INFER_SETTING_DEFAULT: InferSetting = {
     quant:   "int8",
     backend: "webgpu",
-    ready:   false
+    ready:   false,
+    status:  "idle",
+    notice:  ""
 };
 
 // Search
