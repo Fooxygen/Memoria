@@ -25,3 +25,9 @@ dist-ssr
 
 # SeekDB
 data/
+
+# Tests
+test-results/
+playwright-report/
+blob-report/
+coverage/

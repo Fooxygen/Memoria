@@ -19,7 +19,10 @@ import type {
 
 // Database
 
-const DB_PATH = resolve(process.env.MEMORIA_DB_PATH ?? "data/db");
+function db_path_get(): string {
+    return resolve(process.env.MEMORIA_DB_PATH ?? "data/db");
+}
+
 const DB_NAME = "memoria";
 
 // Data
@@ -41,7 +44,7 @@ let collection_chunks: Collection   | null = null;
 // Database
 
 async function db_init() {
-    const client_admin = new SeekdbAdminClient({ path: DB_PATH });
+    const client_admin = new SeekdbAdminClient({ path: db_path_get() });
     try {
         await client_admin.createDatabase(DB_NAME);
     } catch {}
@@ -52,7 +55,7 @@ export async function db_client_get() : Promise<SeekdbClient> {
     if (!client) {
         await db_init();
         client = new SeekdbClient({
-            path: DB_PATH,
+            path: db_path_get(),
             database: DB_NAME
         });
     }

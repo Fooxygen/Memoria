@@ -108,6 +108,16 @@ npm run preview
 > [!NOTE]
 > SeekDB 以嵌入式方式运行，数据落在 `data/db/`。
 
+### 测试
+
+```bash
+npm run test:unit
+npm run test:integration
+npm run test:e2e
+```
+
+集成测试使用临时目录，不会污染 `data/db/`；E2E 默认使用系统 Edge，可通过 `PLAYWRIGHT_CHANNEL=chrome` 切换。
+
 ### 使用
 
 - 左栏：拖入或选择文本文档，文档会被切分并在端侧向量化后写入知识库；

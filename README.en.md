@@ -108,6 +108,16 @@ npm run preview
 > [!NOTE]
 > SeekDB runs in embedded mode, with data stored in `data/db/`.
 
+### Test
+
+```bash
+npm run test:unit
+npm run test:integration
+npm run test:e2e
+```
+
+Integration tests use temporary directories and do not pollute `data/db/`; E2E uses system Edge by default, and can switch with `PLAYWRIGHT_CHANNEL=chrome`.
+
 ### Usage
 
 - Left pane: drop or select text documents; each document is split and embedded on-device before being written into the knowledge base;
