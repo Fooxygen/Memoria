@@ -70,18 +70,22 @@ Memoria 是一个运行在浏览器中的迷你知识库。
 
 ### 准备
 
-端侧推理使用 `Xenova/all-MiniLM-L6-v2`，请将模型文件放入 `data/models/`，目录结构如下：
+端侧推理使用 `Xenova/all-MiniLM-L6-v2`。模型权重不纳入仓库，运行以下命令拉取并校验：
 
-- `config.json`；
-- `tokenizer.json`；
-- `tokenizer_config.json`；
-- `special_tokens_map.json`；
-- `vocab.txt`；
-- `onnx/model.onnx`；
-- `onnx/model_fp16.onnx`；
-- `onnx/model_quantized.onnx`。
+```bash
+npm run model:fetch
+npm run model:check
+```
 
-模型可从 HuggingFace 的 [Xenova/all-MiniLM-L6-v2](https://huggingface.co/Xenova/all-MiniLM-L6-v2) 获取。
+默认只拉取 INT8 运行时所需的文件；如需 FP16 / FP32 评测权重：
+
+```bash
+npm run model:fetch -- --dtype all
+```
+
+模型固定到 `Xenova/all-MiniLM-L6-v2@751bff3`，文件哈希记录在 `scripts/model/models.lock.json`。脚本默认写入 `data/models/`，可通过 `MEMORIA_MODEL_ROOT` 覆盖；SeekDB 默认位于 `data/db/`，可通过 `MEMORIA_DB_PATH` 覆盖。
+
+模型来源：[Xenova/all-MiniLM-L6-v2](https://huggingface.co/Xenova/all-MiniLM-L6-v2)。如访问受限，可设置 `HF_ENDPOINT=https://hf-mirror.com` 后重试。
 
 ### 构建
 

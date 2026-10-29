@@ -28,7 +28,7 @@ import {
 } from "./db/db.ts";
 import type { ChunkRecord } from "./db/meta.ts";
 
-const MODELS_ROOT = resolve(process.cwd(), "data", "models");
+const MODELS_ROOT = resolve(process.env.MEMORIA_MODEL_ROOT ?? "data/models");
 
 const MIME_BY_EXT: Record<string, string> = {
     ".onnx": "application/octet-stream",

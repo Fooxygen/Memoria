@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite --open",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "model:fetch": "tsx scripts/model/fetch.ts",
+    "model:check": "tsx scripts/model/fetch.ts --check"
   },
   "devDependencies": {
     "@types/node": "^26.4.1",

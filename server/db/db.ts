@@ -3,6 +3,7 @@
 //  Copyright (c) 2026 BaseTUT.
 //  Licensed under the MIT License.
 
+import { resolve } from "node:path";
 import {
     SeekdbAdminClient,
     SeekdbClient,
@@ -18,7 +19,7 @@ import type {
 
 // Database
 
-const DB_PATH = "./data/db";
+const DB_PATH = resolve(process.env.MEMORIA_DB_PATH ?? "data/db");
 const DB_NAME = "memoria";
 
 // Data

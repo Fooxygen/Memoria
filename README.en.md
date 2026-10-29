@@ -70,18 +70,22 @@ To run it, refer to **Build & Run** below.
 
 ### Setup
 
-On-device inference uses `Xenova/all-MiniLM-L6-v2`. Place the model files in `data/models/`, with the following structure:
+On-device inference uses `Xenova/all-MiniLM-L6-v2`. Model weights are not tracked by the repository. Fetch and verify them with:
 
-- `config.json`;
-- `tokenizer.json`;
-- `tokenizer_config.json`;
-- `special_tokens_map.json`;
-- `vocab.txt`;
-- `onnx/model.onnx`;
-- `onnx/model_fp16.onnx`;
-- `onnx/model_quantized.onnx`.
+```bash
+npm run model:fetch
+npm run model:check
+```
 
-The model can be obtained from [Xenova/all-MiniLM-L6-v2](https://huggingface.co/Xenova/all-MiniLM-L6-v2) on HuggingFace.
+By default only the INT8 runtime files are downloaded. For FP16 / FP32 evaluation weights:
+
+```bash
+npm run model:fetch -- --dtype all
+```
+
+The model is pinned to `Xenova/all-MiniLM-L6-v2@751bff3`, with file hashes in `scripts/model/models.lock.json`. The script writes to `data/models/` by default; override it with `MEMORIA_MODEL_ROOT`. SeekDB uses `data/db/` by default; override it with `MEMORIA_DB_PATH`.
+
+Model source: [Xenova/all-MiniLM-L6-v2](https://huggingface.co/Xenova/all-MiniLM-L6-v2). If access is restricted, set `HF_ENDPOINT=https://hf-mirror.com` and retry.
 
 ### Build
 
