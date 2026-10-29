@@ -16,11 +16,11 @@ export interface DocumentMeta {
  * @param idx_chunk The Chunk Index within the document
  */
 export type ChunkRecordMeta = {
-    id_document: string;
-    idx_chunk:   number;
+    id_document:  string;
+    idx_chunk:    number;
     /** UTF-16 offsets into the original document content. */
-    offset_start?: number;
-    offset_end?: number;
+    offset_start: number;
+    offset_end:   number;
 } & Record<string, string | number>;
 
 export interface ChunkRecord {

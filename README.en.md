@@ -122,8 +122,8 @@ Integration tests use temporary directories and do not pollute `data/db/`; E2E u
 
 - Left pane: drop or select text documents; each document is split and embedded on-device before being written into the knowledge base;
 - Right pane:
-  - Key Retrieval: enter a query to search; results are presented as a collection of retrieval cards, switchable between **Hybrid Search** and **Vector Search**;
-  - Source Reading: click a document card in the knowledge base to show its source text on the far right;
+  - Key Retrieval: enter a query to search; results are presented as a collection of retrieval cards, switchable between **Hybrid Search** and **Vector Search**; click a result card to open the source reader and highlight the matched passage;
+  - Source Reading: click a knowledge-base document card or a result card to show its source text on the far right, automatically scrolled to the hit;
 
 <p align="right"><a href="#readme-top">⭱ Back to top</a></p>
 

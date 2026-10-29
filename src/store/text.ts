@@ -36,10 +36,35 @@ export function text_hash_content(text: string): string {
     return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16);
 }
 
+export interface TextRange {
+    start: number;
+    end:   number;
+}
+
 function text_chunk_trim(content: string, start: number, end: number): [number, number] {
     while (start < end && TEXT_WHITESPACE.test(content[start])) start += 1;
     while (end > start && TEXT_WHITESPACE.test(content[end - 1])) end -= 1;
     return [start, end];
+}
+
+export function text_paragraph_ranges(content: string): TextRange[] {
+    const ranges: TextRange[] = [];
+    const separator = /\r?\n(?:[ \t]*\r?\n)+/g;
+    let segment_start = 0;
+
+    function range_push(start: number, end: number): void {
+        const [trim_start, trim_end] = text_chunk_trim(content, start, end);
+        if (trim_start < trim_end) ranges.push({ start: trim_start, end: trim_end });
+    }
+
+    for (const match of content.matchAll(separator)) {
+        const separator_start = match.index ?? 0;
+        range_push(segment_start, separator_start);
+        segment_start = separator_start + match[0].length;
+    }
+    range_push(segment_start, content.length);
+
+    return ranges;
 }
 
 function text_chunk_break_find(content: string, from: number, to: number, pattern: RegExp): number {
@@ -88,26 +113,14 @@ function text_chunk_split(chunks: TextChunk[], doc_id: string, content: string, 
 export function text_chunk_document(doc: SourceDoc): TextChunk[] {
     const chunks: TextChunk[] = [];
     const content = doc.content;
-    const separator = /\r?\n(?:[ \t]*\r?\n)+/g;
-    let segment_start = 0;
 
-    function segment_push(start: number, end: number): void {
-        const [trim_start, trim_end] = text_chunk_trim(content, start, end);
-        if (trim_start >= trim_end) return;
-
-        if (trim_end - trim_start <= TEXT_CHUNK_MAX_CHARS) {
-            text_chunk_push(chunks, doc.id, content, trim_start, trim_end);
+    for (const range of text_paragraph_ranges(content)) {
+        if (range.end - range.start <= TEXT_CHUNK_MAX_CHARS) {
+            text_chunk_push(chunks, doc.id, content, range.start, range.end);
         } else {
-            text_chunk_split(chunks, doc.id, content, trim_start, trim_end);
+            text_chunk_split(chunks, doc.id, content, range.start, range.end);
         }
     }
-
-    for (const match of content.matchAll(separator)) {
-        const separator_start = match.index ?? 0;
-        segment_push(segment_start, separator_start);
-        segment_start = separator_start + match[0].length;
-    }
-    segment_push(segment_start, content.length);
 
     return chunks;
 }

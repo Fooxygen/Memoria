@@ -82,6 +82,12 @@ const page_reader_title = page_reader.querySelector<HTMLElement>(".page_reader_t
 
 let sidebar_collapsed = false;
 let reader_doc_id: string | null = null;
+let reader_request_id = 0;
+
+interface ReaderFocus {
+    offset_start: number;
+    offset_end:   number;
+}
 
 function sidebar_collapsed_set(value: boolean): void {
     sidebar_collapsed = value;
@@ -89,6 +95,7 @@ function sidebar_collapsed_set(value: boolean): void {
 }
 
 function reader_visible_set(value: boolean): void {
+    if (!value) reader_request_id += 1;
     page_group.classList.toggle("is_split", value);
     page_reader.hidden = !value;
     document_opening.clear();
@@ -99,21 +106,77 @@ function reader_visible_set(value: boolean): void {
     page_ingest_cards_status_render();
 }
 
-async function reader_open(id: string, title: string): Promise<void> {
+function reader_highlight_set(focus: ReaderFocus): void {
+    const paragraphs = page_reader_body.querySelectorAll<HTMLElement>(".reader_paragraph");
+    let target: HTMLElement | null = null;
+    let local_start = 0;
+    let local_end = 0;
+
+    for (const paragraph of paragraphs) {
+        const start = Number(paragraph.dataset.start);
+        const end = Number(paragraph.dataset.end);
+        if (!Number.isInteger(start) || !Number.isInteger(end)) continue;
+        if (focus.offset_start < start || focus.offset_end > end) continue;
+
+        target = paragraph;
+        local_start = focus.offset_start - start;
+        local_end = focus.offset_end - start;
+        break;
+    }
+    if (!target) return;
+
+    const text = target.firstChild;
+    if (!(text instanceof Text)) return;
+
+    const length = text.textContent?.length ?? 0;
+    const start = Math.max(0, Math.min(length, local_start));
+    const end = Math.max(start, Math.min(length, local_end));
+    if (end <= start) return;
+
+    const range = document.createRange();
+    range.setStart(text, start);
+    range.setEnd(text, end);
+
+    const mark = document.createElement("mark");
+    mark.className = "reader_highlight";
+    range.surroundContents(mark);
+
+    requestAnimationFrame(() => {
+        const body_rect = page_reader_body.getBoundingClientRect();
+        const mark_rect = mark.getBoundingClientRect();
+        const top = page_reader_body.scrollTop
+            + (mark_rect.top - body_rect.top)
+            - page_reader_body.clientHeight / 2
+            + mark_rect.height / 2;
+        page_reader_body.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    });
+}
+
+async function reader_open(id: string, title: string, focus?: ReaderFocus): Promise<void> {
+    const request_id = ++reader_request_id;
     reader_doc_id = id;
     reader_visible_set(true);
     if (page_reader_title) page_reader_title.textContent = title;
     page_reader_body.innerHTML = `<p class="reader_hint">加载中…</p>`;
     try {
         const res = await fetch(`/api/document/content?id=${encodeURIComponent(id)}`);
+        if (request_id !== reader_request_id) return;
         if (res.status === 404) {
             page_reader_body.innerHTML = `<p class="reader_hint">该文档没有保存原文，请重新导入。</p>`;
             return;
         }
         if (!res.ok) throw await json_error(res);
         const data = (await res.json()) as { content?: string };
+        if (request_id !== reader_request_id) return;
         page_reader_body.innerHTML = render_reader_document(data.content ?? "");
+        if (focus) {
+            requestAnimationFrame(() => {
+                if (request_id !== reader_request_id) return;
+                reader_highlight_set(focus);
+            });
+        }
     } catch (error) {
+        if (request_id !== reader_request_id) return;
         page_reader_body.innerHTML = `<p class="reader_hint">原文加载失败</p>`;
         log_push("原文加载失败", String(error));
     }
@@ -918,6 +981,33 @@ file_input.addEventListener("change", (event) => {
 });
 
 btn_search.addEventListener("click", search_execute);
+
+function result_card_open(card: HTMLElement): void {
+    if (window.getSelection()?.toString()) return;
+
+    const id = card.dataset.doc ?? "";
+    const start = Number(card.dataset.offsetStart);
+    const end = Number(card.dataset.offsetEnd);
+    if (!id || !Number.isInteger(start) || !Number.isInteger(end) || start < 0 || end <= start) return;
+
+    void reader_open(id, card.dataset.title || "原文阅览", {
+        offset_start: start,
+        offset_end:   end,
+    });
+}
+
+results_list.addEventListener("click", (event) => {
+    const card = (event.target as HTMLElement).closest<HTMLElement>(".result_card");
+    if (card) result_card_open(card);
+});
+
+results_list.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    const card = (event.target as HTMLElement).closest<HTMLElement>(".result_card");
+    if (!card) return;
+    event.preventDefault();
+    result_card_open(card);
+});
 
 sidebar_toggle.addEventListener("click", () => sidebar_collapsed_set(!sidebar_collapsed));
 reader_close.addEventListener("click", () => reader_visible_set(false));

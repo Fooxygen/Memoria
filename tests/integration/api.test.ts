@@ -63,8 +63,8 @@ describe("memoria HTTP API", () => {
                 content_hash: "hash-api-1",
             },
             chunks: [
-                chunk_record("doc-api_chunk0", CONTENT_SEEKDB, DOC_ID, 0, embedding_at(0)),
-                chunk_record("doc-api_chunk1", CONTENT_BROWSER, DOC_ID, 1, embedding_at(1)),
+                chunk_record("doc-api_chunk0", CONTENT_SEEKDB, DOC_ID, 0, embedding_at(0), 0, CONTENT_SEEKDB.length),
+                chunk_record("doc-api_chunk1", CONTENT_BROWSER, DOC_ID, 1, embedding_at(1), CONTENT_SEEKDB.length + 2, CONTENT_SEEKDB.length + 2 + CONTENT_BROWSER.length),
             ],
         });
 
@@ -110,8 +110,22 @@ describe("memoria HTTP API", () => {
             mode: "semantic",
             query: "seekdb",
         });
-        const semantic_data = (await semantic.json()) as { hits: { content: string }[] };
-        expect(semantic_data.hits[0]?.content).toContain("seekdb");
+        const semantic_data = (await semantic.json()) as {
+            hits: {
+                content:      string;
+                id_document:  string;
+                offset_start: number;
+                offset_end:   number;
+                title:        string;
+            }[];
+        };
+        expect(semantic_data.hits[0]).toMatchObject({
+            content:      expect.stringContaining("seekdb"),
+            id_document:  DOC_ID,
+            offset_start: 0,
+            offset_end:   CONTENT_SEEKDB.length,
+            title:        "Memoria API",
+        });
 
         const hybrid = await post_json(`${api.url}/api/search`, {
             vec: embedding_at(0),

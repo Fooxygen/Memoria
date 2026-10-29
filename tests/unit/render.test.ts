@@ -26,14 +26,33 @@ describe("render_lib_item", () => {
 });
 
 describe("render_result_collection", () => {
-    it("keeps result order and escapes chunk content", () => {
+    it("keeps result order, escapes chunk content and exposes source metadata", () => {
         const html = render_result_collection([
-            { content: "<b>first</b>", pct: 80 },
-            { content: "second", pct: 40 },
+            {
+                content: "<b>first</b>",
+                pct: 80,
+                id_document: "doc-1",
+                idx_chunk: 0,
+                offset_start: 0,
+                offset_end: 7,
+                title: "First",
+            },
+            {
+                content: "second",
+                pct: 40,
+                id_document: "doc-2",
+                idx_chunk: 1,
+                offset_start: 8,
+                offset_end: 14,
+                title: "Second",
+            },
         ]);
 
         expect(html.indexOf("80")).toBeLessThan(html.indexOf("40"));
         expect(html).toContain("&lt;b&gt;first&lt;/b&gt;");
+        expect(html).toContain('data-doc="doc-1"');
+        expect(html).toContain('data-offset-start="0"');
+        expect(html).toContain('data-offset-end="7"');
     });
 });
 
@@ -44,5 +63,7 @@ describe("render_reader_document", () => {
         expect(html.match(/reader_paragraph/g)).toHaveLength(2);
         expect(html).not.toContain("<script>");
         expect(html).toContain("&lt;script&gt;");
+        expect(html).toContain('data-start="0"');
+        expect(html).toContain('data-start="7"');
     });
 });

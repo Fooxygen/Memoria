@@ -3,7 +3,7 @@
 // Copyright (c) 2026 BaseTUT.
 // Licensed under the MIT License.
 
-import { text_escape_html } from "../store/text";
+import { text_escape_html, text_paragraph_ranges } from "../store/text";
 
 export interface LibDoc {
     id: string;
@@ -55,8 +55,13 @@ export function render_queue_card(it: QueueCardItem): string {
 }
 
 export interface SearchHit {
-    content: string;
-    pct: number;
+    content:      string;
+    pct:          number;
+    id_document:  string;
+    idx_chunk:    number;
+    offset_start: number;
+    offset_end:   number;
+    title:        string;
 }
 
 export function render_result_collection(hits: SearchHit[]): string {
@@ -64,7 +69,13 @@ export function render_result_collection(hits: SearchHit[]): string {
         .map((hit) => {
             const opacity = 0.3 + (Math.min(100, Math.max(0, hit.pct)) / 100) * 0.7;
             return `
-                <article class="result_card card" data-pct="${hit.pct}">
+                <article class="result_card card" role="button" tabindex="0"
+                    data-pct="${hit.pct}"
+                    data-doc="${text_escape_html(hit.id_document)}"
+                    data-title="${text_escape_html(hit.title)}"
+                    data-offset-start="${hit.offset_start}"
+                    data-offset-end="${hit.offset_end}"
+                    aria-label="查看原文">
                     <div class="result_card_score" style="opacity: ${opacity.toFixed(2)}">
                         <span class="pct_num">${hit.pct}</span><span class="pct_sym">%</span>
                     </div>
@@ -75,14 +86,12 @@ export function render_result_collection(hits: SearchHit[]): string {
 }
 
 export function render_reader_document(content: string): string {
-    const paragraphs = content
-        .split(/\n{2,}/)
-        .map((p) => p.trim())
-        .filter((p) => p.length > 0);
-    if (paragraphs.length === 0) {
+    const ranges = text_paragraph_ranges(content);
+    if (ranges.length === 0) {
         return `<p class="reader_hint">（空文档）</p>`;
     }
-    return paragraphs
-        .map((p) => `<p class="reader_paragraph">${text_escape_html(p).replace(/\n/g, "<br />")}</p>`)
+    return ranges
+        .map((range) => `
+            <p class="reader_paragraph" data-start="${range.start}" data-end="${range.end}">${text_escape_html(content.slice(range.start, range.end))}</p>`)
         .join("");
 }

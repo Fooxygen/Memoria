@@ -45,6 +45,8 @@
 	--accent: #2563eb;
 
 	--brand-core: #791df9;
+	--select-bg: rgba(121, 29, 249, 0.5);
+	--select-bg-soft: rgba(121, 29, 249, 0.12);
 
 	--brand-dark-bg: #5712b8;
 	--brand-dark-border: #9458f7;
@@ -135,7 +137,7 @@ body {
 }
 
 ::selection {
-	background: rgba(121, 29, 249, 0.5);
+	background: var(--select-bg);
 }
 
 button {
@@ -707,11 +709,40 @@ select {
 	margin-bottom: 1.1em;
 	user-select: text;
 	text-align: justify;
+	white-space: pre-wrap;
 	overflow-wrap: break-word;
 }
 
 .reader_paragraph:last-child {
 	margin-bottom: 0;
+}
+
+.reader_highlight {
+	background: var(--select-bg);
+	color: inherit;
+	border-radius: 3px;
+	animation: reader_highlight_flash 1.6s var(--ease-silk) forwards;
+}
+
+@keyframes reader_highlight_flash {
+	0%, 20% {
+		background: var(--select-bg);
+	}
+	30%, 42% {
+		background: var(--select-bg-soft);
+	}
+	52%, 68% {
+		background: var(--select-bg);
+	}
+	100% {
+		background: transparent;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.reader_highlight {
+		animation: none;
+	}
 }
 
 .reader_hint {
@@ -948,6 +979,12 @@ select {
 	overflow: hidden;
 	background: rgba(255, 255, 255, 0.82);
 	border-color: rgba(255, 255, 255, 0.28);
+	cursor: pointer;
+}
+
+.result_card:focus-visible {
+	outline: 2px solid var(--brand-core);
+	outline-offset: 3px;
 }
 
 .result_card_score {

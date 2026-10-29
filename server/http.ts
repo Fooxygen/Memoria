@@ -20,6 +20,7 @@ import {
     document_contents_delete,
     document_content_get,
     document_find_by_hash,
+    document_get,
     chunks_add,
     chunks_delete_by_document,
     chunks_refresh_if_dirty,
@@ -170,18 +171,41 @@ export async function api_middleware(req: IncomingMessage, res: ServerResponse, 
                 : await chunks_search(vec, limit)) as {
                     documents?: (string | null)[] | (string | null)[][];
                     distances?: number[] | number[][];
+                    metadatas?: (Record<string, unknown> | null)[] | (Record<string, unknown> | null)[][];
                 };
             const docs = raw.documents as (string | null)[] | undefined;
-            const dists = raw.distances as number[] | undefined;
-            const row_docs = Array.isArray(docs) && Array.isArray(docs[0]) ? (docs[0] as (string | null)[]) : (docs ?? []);
-            const row_dists = Array.isArray(dists) && Array.isArray(dists[0]) ? (dists[0] as number[]) : (dists ?? []);
+            const dists = raw.distances as (number | null)[] | (number | null)[][] | undefined;
+            const metas = raw.metadatas as (Record<string, unknown> | null)[] | (Record<string, unknown> | null)[][] | undefined;
+            const row_docs = (Array.isArray(docs) && Array.isArray(docs[0]) ? docs[0] : (docs ?? [])) as (string | null)[];
+            const row_dists = (Array.isArray(dists) && Array.isArray(dists[0]) ? dists[0] : (dists ?? [])) as (number | null)[];
+            const row_metas = (Array.isArray(metas) && Array.isArray(metas[0]) ? metas[0] : (metas ?? [])) as (Record<string, unknown> | null)[];
             const hits = row_docs.map((content, i) => {
                 const d = row_dists[i];
+                const meta = row_metas[i] ?? {};
                 const pct = mode === "hybrid" || d == null || !Number.isFinite(d)
                     ? hybrid_pct(i, row_docs.length)
                     : Math.min(99, Math.max(1, Math.round(((d + 1) / 2) * 100)));
-                return { content: String(content ?? ""), pct };
+                return {
+                    content:      String(content ?? ""),
+                    pct,
+                    id_document:  typeof meta.id_document === "string" ? meta.id_document : "",
+                    idx_chunk:    Number(meta.idx_chunk ?? 0),
+                    offset_start: Number(meta.offset_start ?? -1),
+                    offset_end:   Number(meta.offset_end ?? -1),
+                    title:        "",
+                };
             });
+
+            const document_ids = [...new Set(hits.map((hit) => hit.id_document).filter(Boolean))];
+            const title_by_id = new Map<string, string>();
+            await Promise.all(document_ids.map(async (id) => {
+                const document = await document_get(id);
+                if (document) title_by_id.set(id, document.title);
+            }));
+            for (const hit of hits) {
+                hit.title = title_by_id.get(hit.id_document) ?? "";
+            }
+
             send_json(res, 200, { hits });
         } catch (error) {
             console.error("[search] error:", error);

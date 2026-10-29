@@ -210,6 +210,16 @@ export async function chunks_delete_by_document(id_document: string) {
     index_mark_dirty();
 }
 
+function document_meta_from_row(row: Record<string, unknown>): DocumentMeta {
+    return {
+        id:           String(row.id),
+        title:        String(row.title ?? ""),
+        preview:      String(row.preview ?? ""),
+        chunk_count:  Number(row.chunk_count ?? 0),
+        content_hash: row.content_hash == null ? undefined : String(row.content_hash),
+    };
+}
+
 export async function documents_list() : Promise<DocumentMeta[]> {
     const cl = await db_client_get();
     await documents_create();
@@ -218,12 +228,7 @@ export async function documents_list() : Promise<DocumentMeta[]> {
         select id, title, preview, chunk_count from ${TABLE_DOCUMENTS}    
     `)  as Record<string, unknown>[] | null;
     if (!rows) return [];
-    return rows.map(r => ({
-        id:           String(r.id),
-        title:        String(r.title),
-        preview:      String(r.preview ?? ""),
-        chunk_count:  Number(r.chunk_count ?? 0),
-    }));
+    return rows.map(document_meta_from_row);
 }
 
 export async function document_find_by_hash(content_hash: string): Promise<DocumentMeta | null> {
@@ -234,13 +239,18 @@ export async function document_find_by_hash(content_hash: string): Promise<Docum
         select id, title, preview, chunk_count, content_hash from ${TABLE_DOCUMENTS} where content_hash = ? limit 1
     `, [content_hash]) as Record<string, unknown>[] | null;
     if (!rows || rows.length === 0) return null;
-    return {
-        id:           String(rows[0].id),
-        title:        String(rows[0].title),
-        preview:      String(rows[0].preview ?? ""),
-        chunk_count:  Number(rows[0].chunk_count ?? 0),
-        content_hash: rows[0].content_hash == null ? undefined : String(rows[0].content_hash),
-    };
+    return document_meta_from_row(rows[0]);
+}
+
+export async function document_get(id: string): Promise<DocumentMeta | null> {
+    const cl = await db_client_get();
+    await documents_create();
+
+    const rows = await cl.execute(`
+        select id, title, preview, chunk_count, content_hash from ${TABLE_DOCUMENTS} where id = ? limit 1
+    `, [id]) as Record<string, unknown>[] | null;
+    if (!rows || rows.length === 0) return null;
+    return document_meta_from_row(rows[0]);
 }
 
 // Document Contents
