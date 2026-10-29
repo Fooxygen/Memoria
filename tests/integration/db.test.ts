@@ -63,8 +63,8 @@ describe("seekdb data layer", () => {
         expect(await document_content_get("doc-db")).toContain(CONTENT_SEEKDB);
 
         await chunks_add([
-            chunk_record("doc-db_chunk0", CONTENT_SEEKDB, "doc-db", 0, embedding_at(0)),
-            chunk_record("doc-db_chunk1", CONTENT_BROWSER, "doc-db", 1, embedding_at(1)),
+            chunk_record("doc-db_chunk0", CONTENT_SEEKDB, "doc-db", 0, embedding_at(0), 0, CONTENT_SEEKDB.length),
+            chunk_record("doc-db_chunk1", CONTENT_BROWSER, "doc-db", 1, embedding_at(1), 0, CONTENT_BROWSER.length),
         ]);
     });
 
@@ -75,6 +75,12 @@ describe("seekdb data layer", () => {
         const semantic = await chunks_search(embedding_at(0), 2);
         expect(semantic.ids[0]?.[0]).toBe("doc-db_chunk0");
         expect(semantic.documents?.[0]?.[0]).toBe(CONTENT_SEEKDB);
+        expect(semantic.metadatas?.[0]?.[0]).toMatchObject({
+            id_document:  "doc-db",
+            idx_chunk:    0,
+            offset_start: 0,
+            offset_end:   CONTENT_SEEKDB.length,
+        });
 
         const hybrid = await chunks_hybrid_search("seekdb", embedding_at(0), 2);
         expect(hybrid.documents?.[0]?.some((content) => content?.includes("seekdb"))).toBe(true);

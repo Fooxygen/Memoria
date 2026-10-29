@@ -12,5 +12,7 @@ export interface SourceDoc {
 export interface TextChunk {
     id: string;
     content: string;
+    offset_start: number;
+    offset_end: number;
 }
 

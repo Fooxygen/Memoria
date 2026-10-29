@@ -16,11 +16,18 @@ export function chunk_record(
     id_document: string,
     idx_chunk: number,
     embedding: number[],
+    offset_start?: number,
+    offset_end?: number,
 ): ChunkRecord {
     return {
         id,
         content,
         embedding,
-        meta: { id_document, idx_chunk },
+        meta: {
+            id_document,
+            idx_chunk,
+            ...(offset_start === undefined ? {} : { offset_start }),
+            ...(offset_end === undefined ? {} : { offset_end }),
+        },
     };
 }

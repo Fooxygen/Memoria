@@ -401,7 +401,12 @@ async function document_process(file: File): Promise<"done" | "skip"> {
         id: `${doc.id}_chunk${i}`,
         content: c.content,
         embedding: vecs[i],
-        meta: { id_document: doc.id, idx_chunk: i },
+        meta: {
+            id_document:  doc.id,
+            idx_chunk:    i,
+            offset_start: c.offset_start,
+            offset_end:   c.offset_end,
+        },
     }));
     const preview = doc.content.trim().replace(/\s+/g, " ");
 

@@ -3,7 +3,12 @@
 // Licensed under the MIT License.
 
 import { describe, expect, it } from "vitest";
-import { text_chunk_document, text_escape_html, text_hash_content } from "../../src/store/text";
+import {
+    TEXT_CHUNK_MAX_CHARS,
+    text_chunk_document,
+    text_escape_html,
+    text_hash_content,
+} from "../../src/store/text";
 
 describe("text_escape_html", () => {
     it("escapes html-sensitive characters", () => {
@@ -45,5 +50,46 @@ describe("text_chunk_document", () => {
             content: "\n\n   \n\n",
         });
         expect(chunks).toEqual([]);
+    });
+
+    it("keeps offsets aligned with the original content", () => {
+        const content = "  first paragraph  \n\n\n second paragraph \n\n   ";
+        const chunks = text_chunk_document({ id: "doc-offset", title: "Offset", content });
+
+        for (const chunk of chunks) {
+            expect(content.slice(chunk.offset_start, chunk.offset_end)).toBe(chunk.content);
+        }
+    });
+
+    it("hard-splits long CJK paragraphs without losing content", () => {
+        const content = "中".repeat(1000);
+        const chunks = text_chunk_document({ id: "doc-cjk", title: "CJK", content });
+
+        expect(chunks.length).toBeGreaterThan(1);
+        expect(chunks.map((chunk) => chunk.content).join("")).toBe(content);
+        for (const chunk of chunks) {
+            expect(chunk.content.length).toBeLessThanOrEqual(TEXT_CHUNK_MAX_CHARS);
+            expect(content.slice(chunk.offset_start, chunk.offset_end)).toBe(chunk.content);
+        }
+    });
+
+    it("prefers sentence boundaries in long paragraphs", () => {
+        const content = `${"中".repeat(49)}。`.repeat(10);
+        const chunks = text_chunk_document({ id: "doc-sentence", title: "Sentence", content });
+
+        for (const chunk of chunks) {
+            expect(chunk.content.length).toBeLessThanOrEqual(TEXT_CHUNK_MAX_CHARS);
+            expect(chunk.content.endsWith("。")).toBe(true);
+        }
+    });
+
+    it("supports CRLF paragraph separators", () => {
+        const content = "first\r\n\r\nsecond";
+        const chunks = text_chunk_document({ id: "doc-crlf", title: "CRLF", content });
+
+        expect(chunks.map((chunk) => chunk.content)).toEqual(["first", "second"]);
+        for (const chunk of chunks) {
+            expect(content.slice(chunk.offset_start, chunk.offset_end)).toBe(chunk.content);
+        }
     });
 });
