@@ -148,6 +148,6 @@ npm run bench
 
 ## 许可证
 
-Copyright (c) 2026 BaseTUT. Licensed under the [MIT License](LICENSE).
+Copyright (c) 2026 BaseTUT. With BaseTUT. Licensed under the [MIT License](LICENSE).
 
 <p align="right"><a href="#readme-top">⭱ Back to top</a></p>
