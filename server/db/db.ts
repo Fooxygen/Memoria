@@ -133,6 +133,13 @@ export async function chunks_refresh_if_dirty(): Promise<boolean> {
     return refreshed;
 }
 
+export async function chunks_index_refresh(): Promise<void> {
+    const target = index_writes;
+    const chunk = await chunks_get();
+    await chunk.refresh_index();
+    if (index_refreshed < target) index_refreshed = target;
+}
+
 export async function chunks_add(records: ChunkRecord[]) {
     const chunk = await chunks_get();
     await chunk.add({

@@ -586,7 +586,7 @@ async function documents_ingest_loop(): Promise<void> {
             if (task) task.status = result;
         } catch (error) {
             log_push("处理失败", String(error));
-            if (task) task.status = "done";
+            if (task) task.status = "fail";
         }
         ingest_cards_render();
     }
@@ -967,7 +967,7 @@ function page_ingest_cards_render(): void {
             id:     it.id,
             render: () => render_queue_card(it),
             sync:   (el) => {
-                el.classList.remove("is_wait", "is_run", "is_done", "is_skip");
+                el.classList.remove("is_wait", "is_run", "is_done", "is_skip", "is_fail");
                 el.classList.add(QUEUE_STATUS_CLASS[it.status]);
                 const title = el.querySelector<HTMLElement>(".doc_card_title");
                 if (title) title.textContent = it.title;

@@ -22,6 +22,7 @@ import {
     document_find_by_hash,
     chunks_add,
     chunks_delete_by_document,
+    chunks_index_refresh,
     chunks_refresh_if_dirty,
     chunks_search,
     chunks_hybrid_search,
@@ -29,6 +30,8 @@ import {
 import type { ChunkRecord } from "./db/meta.ts";
 
 type Next = (err?: unknown) => void;
+
+const EMBEDDING_DIM = 384;
 
 const MIME_BY_EXT: Record<string, string> = {
     ".onnx": "application/octet-stream",
@@ -120,6 +123,12 @@ function hybrid_pct(index: number, total: number): number {
     return Math.max(5, Math.round(100 - (index / (total - 1)) * 95));
 }
 
+function embedding_valid(value: unknown): value is number[] {
+    return Array.isArray(value)
+        && value.length === EMBEDDING_DIM
+        && value.every((item) => typeof item === "number" && Number.isFinite(item));
+}
+
 export async function api_middleware(req: IncomingMessage, res: ServerResponse, next: Next): Promise<void> {
     const url = new URL(req.url ?? "", "http://localhost");
     const path = url.pathname;
@@ -177,8 +186,8 @@ export async function api_middleware(req: IncomingMessage, res: ServerResponse, 
         try {
             const body = (await read_json(req)) as { vec?: number[]; top_k?: number; mode?: string; query?: string };
             const vec = body.vec ?? [];
-            if (!vec.length) {
-                send_json(res, 400, { ok: false, error: "missing vec" });
+            if (!embedding_valid(vec)) {
+                send_json(res, 400, { ok: false, error: "invalid vec" });
                 return;
             }
             const limit = Number(body.top_k) || 5;
@@ -246,29 +255,54 @@ export async function api_middleware(req: IncomingMessage, res: ServerResponse, 
                 }
             }
 
-            await documents_add({
-                id: String(doc.id),
-                title: String(doc.title ?? ""),
-                preview: String(doc.preview ?? ""),
-                chunk_count: Number(doc.chunk_count ?? 0),
-                content_hash: content_hash || undefined,
+            const records: ChunkRecord[] = (chunks ?? []).map((c) => {
+                const record = c as Record<string, unknown>;
+                return {
+                    id: String(record.id),
+                    content: String(record.content ?? ""),
+                    embedding: (record.embedding as number[]) ?? [],
+                    meta: (record.meta as ChunkRecord["meta"]) ?? {},
+                };
             });
 
-            if (typeof doc.content === "string") {
-                await document_contents_add(String(doc.id), doc.content);
+            for (const record of records) {
+                if (!embedding_valid(record.embedding)) {
+                    send_json(res, 400, { ok: false, error: `invalid embedding: ${record.id}` });
+                    return;
+                }
             }
 
-            if (chunks?.length) {
-                const records: ChunkRecord[] = chunks.map((c) => {
-                    const record = c as Record<string, unknown>;
-                    return {
-                        id: String(record.id),
-                        content: String(record.content ?? ""),
-                        embedding: (record.embedding as number[]) ?? [],
-                        meta: (record.meta as ChunkRecord["meta"]) ?? {},
-                    };
+            const document_id = String(doc.id);
+            let document_saved = false;
+
+            try {
+                await documents_add({
+                    id: document_id,
+                    title: String(doc.title ?? ""),
+                    preview: String(doc.preview ?? ""),
+                    chunk_count: Number(doc.chunk_count ?? 0),
+                    content_hash: content_hash || undefined,
                 });
-                await chunks_add(records);
+                document_saved = true;
+
+                if (typeof doc.content === "string") {
+                    await document_contents_add(document_id, doc.content);
+                }
+
+                if (records.length) {
+                    await chunks_add(records);
+                }
+            } catch (error) {
+                if (document_saved) {
+                    try {
+                        await chunks_delete_by_document(document_id);
+                        await document_contents_delete(document_id);
+                        await documents_delete(document_id);
+                    } catch (rollback_error) {
+                        console.error("[ingest] rollback failed:", rollback_error);
+                    }
+                }
+                throw error;
             }
 
             send_json(res, 200, { ok: true });
@@ -300,6 +334,12 @@ export function seekdb_plugin(): Plugin {
             await db_client_get();
             await documents_create();
             await document_contents_create();
+
+            try {
+                await chunks_index_refresh();
+            } catch (error) {
+                console.error("[index] startup refresh failed:", error);
+            }
 
             server.middlewares.use(serve_models);
             server.middlewares.use(serve_onnx_runtime);

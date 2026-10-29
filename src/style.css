@@ -1581,6 +1581,14 @@ select {
 	opacity: 0.55;
 }
 
+.doc_card.is_fail .doc_card_status {
+	background: #ff3b30;
+}
+
+.doc_card.is_fail {
+	opacity: 0.75;
+}
+
 .doc_shelf_empty {
 	margin: auto;
 	text-align: center;

@@ -4,7 +4,9 @@
 
 import { describe, expect, it } from "vitest";
 import {
+    QUEUE_STATUS_CLASS,
     render_lib_item,
+    render_queue_card,
     render_reader_document,
     render_result_collection,
 } from "../../src/ui/render";
@@ -53,6 +55,14 @@ describe("render_result_collection", () => {
         expect(html).toContain('data-doc="doc-1"');
         expect(html).toContain('data-offset-start="0"');
         expect(html).toContain('data-offset-end="7"');
+    });
+});
+
+describe("render_queue_card", () => {
+    it("marks failed imports distinctly", () => {
+        const html = render_queue_card({ id: "queue-1", title: "Failed", status: "fail" });
+        expect(QUEUE_STATUS_CLASS.fail).toBe("is_fail");
+        expect(html).toContain("is_fail");
     });
 });
 

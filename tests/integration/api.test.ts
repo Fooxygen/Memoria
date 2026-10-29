@@ -149,6 +149,40 @@ describe("memoria HTTP API", () => {
         expect(missing.status).toBe(404);
     });
 
+    it("rejects invalid embeddings without partial writes", async () => {
+        const invalid = await post_json(`${api.url}/api/ingest`, {
+            doc: {
+                id:           "doc-api-failed",
+                title:        "Failed",
+                preview:      "failed",
+                chunk_count:  1,
+                content:      "failed content",
+                content_hash: "hash-failed",
+            },
+            chunks: [{
+                id:        "doc-api-failed_chunk0",
+                content:   "failed content",
+                embedding: [1, 2, 3],
+                meta: {
+                    id_document:  "doc-api-failed",
+                    idx_chunk:    0,
+                    offset_start: 0,
+                    offset_end:   14,
+                },
+            }],
+        });
+
+        expect(invalid.status).toBe(400);
+
+        const documents = await fetch(`${api.url}/api/documents`);
+        const document_data = (await documents.json()) as { documents: { id: string }[] };
+        expect(document_data.documents.map((document) => document.id)).not.toContain("doc-api-failed");
+        expect(document_data.documents.map((document) => document.id)).toEqual([DOC_ID]);
+
+        const content = await fetch(`${api.url}/api/document/content?id=doc-api-failed`);
+        expect(content.status).toBe(404);
+    });
+
     it("validates requests and falls through unknown routes", async () => {
         const search = await post_json(`${api.url}/api/search`, {});
         expect(search.status).toBe(400);
