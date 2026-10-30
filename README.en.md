@@ -9,12 +9,12 @@ English |
   <img src="./public/memoria_brand.svg" width="480" style="margin=0">
   <h3 align="center">Memoria</h3>
   <p align="center">
-    On-device semantic retrieval mini knowledge base built on the SeekDB vector database
+    The Miniature on-device Semantic Search Knowledge Base, powered by SeekDB
     <br /><br />
-    <a href="https://github.com/Fooxygen/Memoria/issues/new?labels=bug">
+    <a href="https://github.com/Fooxygen/Memoria/issues/new?labels=bug&template=bug-report.md">
       <strong>» Report Bug</strong>
     </a>
-    <a href="https://github.com/Fooxygen/Memoria/issues/new?labels=enhancement">
+    <a href="https://github.com/Fooxygen/Memoria/issues/new?labels=enhancement&template=feature-request.md">
       <strong>» Request Feature</strong>
     </a>
   </p>

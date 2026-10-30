@@ -11,10 +11,10 @@
   <p align="center">
     基于 SeekDB 向量数据库的端侧语义检索迷你知识库
     <br /><br />
-    <a href="https://github.com/Fooxygen/Memoria/issues/new?labels=bug">
-      <strong>» 报告问题</strong>
+    <a href="https://github.com/Fooxygen/Memoria/issues/new?labels=bug&template=bug-report.md">
+      <strong>» 报告漏洞</strong>
     </a>
-    <a href="https://github.com/Fooxygen/Memoria/issues/new?labels=enhancement">
+    <a href="https://github.com/Fooxygen/Memoria/issues/new?labels=enhancement&template=feature-request.md">
       <strong>» 请求特性</strong>
     </a>
   </p>
